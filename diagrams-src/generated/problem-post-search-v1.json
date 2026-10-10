@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Post search (Facebook): the simplest design and where it breaks","nodes":[["ev",105,265,"Post + like\nevents","t","queue",null,null],["pg",345,70,"LIKE '%term%' ✗","r","note",null,null]],"edges":[["ev","pg","","r"]],"zones":[],"texts":[]}

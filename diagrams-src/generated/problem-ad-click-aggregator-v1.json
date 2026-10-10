@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Ad click aggregator: the simplest design and where it breaks","nodes":[["u",105,130,"Browser","t","pill",null,null],["cs",345,130,"Click service|302 redirect","b","rect",null,null],["pg",630,70,"Postgres raw\nGROUP BY ✗","r","rect",null,null]],"edges":[["u","cs","",""],["cs","pg","","r"]],"zones":[],"texts":[]}

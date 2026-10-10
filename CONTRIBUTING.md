@@ -19,10 +19,21 @@ Each diagram is defined once in `diagrams-src/*.js` as a short list of boxes and
 - `docs/diagrams/<name>.svg`: the hand-drawn image shown on GitHub and the site.
 - `docs/diagrams/<name>.excalidraw`: open it at [excalidraw.com](https://excalidraw.com) (*Open* → choose the file) to tweak the layout by hand.
 
+Hand-written specs live in `diagrams-src/*.js`; specs generated during the first conversion live in `diagrams-src/generated/*.json`. Edit either, then rebuild:
+
 ```bash
 npm install
 npm run diagrams
 ```
+
+## The PDF
+
+```bash
+pip install playwright pypdf pyyaml && playwright install chromium
+mkdocs build && python scripts/build_pdf.py
+```
+
+This writes `docs/downloads/system-design-step-by-step.pdf` in navigation order, with bookmarks.
 
 A diagram should explain **one** idea. If it needs a paragraph to decode, split it in two.
 

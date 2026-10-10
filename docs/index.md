@@ -5,45 +5,54 @@ description: A free, diagram-first system design handbook. Every design starts s
 
 # System Design, Step by Step
 
-A free, diagram-first handbook for system design interviews and for real systems.
+A free, diagram-first handbook for system design interviews and for building real systems.
 
 Most resources show you a finished architecture and expect you to memorize it. This one shows **how you get there**: start with the simplest design that works, calculate where it breaks, fix only that, and repeat. Every page has hand-drawn diagrams you can open and edit in [Excalidraw](https://excalidraw.com).
 
 ![How this handbook fits together](diagrams/handbook-map.svg)
 
-## Two ways to use it
+## What's inside
+
+| Section | What you get |
+|---|---|
+| [Foundations](foundations/index.md) | The method, non-functional requirements with SLOs, and the numbers to know |
+| [Core concepts](core-concepts/index.md) | Networking, API design, data modeling, indexing, caching, sharding, consistent hashing, CAP |
+| [7 patterns](patterns/index.md) | Scaling reads and writes, real-time updates, contention, multi-step processes, large blobs, long-running tasks |
+| [Technologies](technologies.md) | Postgres, Redis, Kafka, Cassandra, DynamoDB, Elasticsearch, Flink, ZooKeeper, API gateways: when and when not |
+| [29 problems](problems/index.md) | URL shortener to payments, each from v1 to final design with an interview script |
+| [DDIA, chapter by chapter](ddia/index.md) | All 12 chapters of *Designing Data-Intensive Applications* as diagrams, tied to interview problems |
+| [Low-level design](lld/index.md) | File system, movie booking, logger, inventory: class diagrams and tested Java |
+| [Interview playbook](playbook/index.md) | The 45-minute framework, what senior answers sound like, quick-fire practice |
+| [Slide decks](slides/index.md) | Three interactive decks for review and out-loud rehearsal |
+
+## Pick your path
 
 | If you want to… | Do this |
 |---|---|
-| **Learn** | Read in order: Foundations → Core concepts → Patterns → Problems. Each problem page walks from a naive **v1** to the final design. |
-| **Prepare for an interview** | Go straight to a problem page and use **§7 Interview script**: a minute-by-minute plan for 45 minutes. Read the *Common mistakes* the night before. |
+| **Learn system design** | Foundations → Core concepts → Patterns → Problems. Each problem walks from a naive **v1** to the final design. |
+| **Prepare for an interview in two weeks** | Read the [playbook](playbook/index.md), then do two problems a day: read the page, then rehearse it with the [interview deck](slides/interview.html). |
+| **Understand the theory** | Read the [DDIA pages](ddia/index.md) alongside the book; every chapter ends with how it shows up in interviews. |
+| **Review the night before** | Skim the TL;DRs and *Common mistakes* of each problem, then do the [quick-fire questions](playbook/quick-fire.md). |
 
-## Contents
-
-This is the **pilot**: four pages in the final format. The rest follows the same template.
-
-| Section | Pages | Status |
-|---|---|---|
-| Foundations | NFRs and how to quantify them · numbers to know · CAP and PACELC | planned |
-| Core concepts | [Caching](core-concepts/caching.md) · networking · API design · data modeling · indexing · sharding · consistent hashing · CAP · numbers | ✅ 1 of 9 |
-| Patterns | Scaling reads · scaling writes · real-time updates · contention · multi-step processes · large blobs · long-running tasks | planned |
-| Technologies | Postgres · Redis · Kafka · Cassandra · DynamoDB · Elasticsearch · Flink · ZooKeeper · API gateway | planned |
-| DDIA, chapter by chapter | [Ch 5 Replication](ddia/05-replication.md) · partitioning · transactions · distributed-systems failures · consistency and consensus … | ✅ 1 of 12 |
-| Problems | [Ticketmaster](problems/ticketmaster.md) · URL shortener · news feed · chat · ride sharing · payments · … (29 total) | ✅ 1 of 29 |
-| Low-level design | File system · movie booking · logger · inventory | planned |
-| Interview playbook | 45-minute delivery script · NFR checklist · phrases that signal seniority · traps | planned |
-
-## How every problem page is structured
+## Every problem page has the same shape
 
 1. **TL;DR**: three lines you could say out loud.
-2. **Requirements**: functional, then non-functional with numbers. The NFRs drive every later decision.
+2. **Requirements**: functional, then non-functional with numbers.
 3. **Back-of-envelope numbers**: only the ones that change the design.
 4. **Core entities and API**
-5. **v1, and where it breaks**: the simplest design, with a diagram of the failure.
-6. **Final design**: a diagram, plus a table of *why each component exists*.
-7. **Deep dives**: the questions an interviewer will push on.
-8. **Interview script**: what to do and say, minute by minute.
-9. **Common mistakes** and **related** pages.
+5. **v1, and where it breaks**
+6. **The final design**, step by step, with why each part exists
+7. **Deep dives**: the questions interviewers push on
+8. **Interview script**: what to do in each part of 45 minutes
+9. **Common mistakes** and **related** pages
+
+## Formats
+
+- **Website**: searchable, with dark mode and mobile layout.
+- **GitHub**: every page is plain Markdown that renders in the repository.
+- **Slides**: [three interactive decks](slides/index.md) that work offline.
+- **PDF**: the [whole handbook in one file](downloads/system-design-step-by-step.pdf) for printing or reading offline.
+- **Editable diagrams**: every diagram has an `.excalidraw` source next to its `.svg`.
 
 ## Contributing
 
@@ -51,4 +60,4 @@ Fixes and new pages are welcome. See [CONTRIBUTING](contributing.md) for the pag
 
 ## Credits
 
-Written in our own words, with our own diagrams. The DDIA pages are study summaries of *Designing Data-Intensive Applications* by Martin Kleppmann; please read the book. Diagrams use the open-source [Excalifont](https://plus.excalidraw.com/excalifont) (SIL OFL 1.1). Not affiliated with any company or course mentioned.
+Written in our own words, with our own diagrams. The DDIA pages are study notes on *Designing Data-Intensive Applications* by Martin Kleppmann; please read the book. Diagrams use the open-source [Excalifont](https://plus.excalidraw.com/excalifont) (SIL OFL 1.1). Problem names refer to well-known products only to describe the kind of system; this project is not affiliated with any company or course.

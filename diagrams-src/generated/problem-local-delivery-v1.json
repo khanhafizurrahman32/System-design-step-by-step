@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Local delivery (Gopuff): the simplest design and where it breaks","nodes":[["cl",105,265,"Client","t","pill",null,null],["gw",285,265,"Gateway","x","rect",null,null],["av",540,130,"Availability service","b","rect",null,null]],"edges":[["cl","gw","",""],["gw","av","",""]],"zones":[],"texts":[]}

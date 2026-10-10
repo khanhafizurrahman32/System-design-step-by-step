@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Collaborative editor (Google Docs): the simplest design and where it breaks","nodes":[["a",105,145,"Editor A","t","pill",null,null],["b",105,385,"Editor B","t","pill",null,null],["lww",615,460,"whole-doc save → last write wins ✗","r","note",null,null]],"edges":[["a","lww","","rd"],["b","lww","","rd"]],"zones":[],"texts":[]}

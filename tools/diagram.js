@@ -61,7 +61,7 @@ function build(spec, name, outdir) {
   for (const n of spec.nodes || []) { const [w, h] = measure(n); N[n[0]] = { x: n[1], y: n[2], w, h }; }
 
   // edges (drawn under nodes)
-  let edgeSvg = '', labelSvg = '';
+  let edgeSvg = '', labelSvg = ''; const placed = [];
   for (const [i, e] of (spec.edges || []).entries()) {
     const [f, t, label, st = ''] = e; const A = Array.isArray(f) ? { x: f[0], y: f[1] } : N[f], B = Array.isArray(t) ? { x: t[0], y: t[1] } : N[t];
     if (!A || !B) throw new Error(`${name}: bad edge ${f}->${t}`);
@@ -83,8 +83,12 @@ function build(spec, name, outdir) {
       startArrowhead: st.includes('2') ? 'arrow' : null, endArrowhead: st.includes('n') ? null : 'arrow', elbowed: false,
       boundElements: label ? [{ type: 'text', id: aid + 't' }] : null });
     if (label) {
-      const lx = curve ? (x1 + 2 * cx + x2) / 4 : (x1 + x2) / 2, ly = curve ? (y1 + 2 * cy + y2) / 4 : (y1 + y2) / 2;
       const lines = String(label).split('\n'), size = 16; const lw = Math.max(...lines.map(l => tw(l, size))) + 12, lh = lines.length * size * LH + 6;
+      const at = u => curve ? [(1 - u) * (1 - u) * x1 + 2 * (1 - u) * u * cx + u * u * x2, (1 - u) * (1 - u) * y1 + 2 * (1 - u) * u * cy + u * u * y2] : [x1 + (x2 - x1) * u, y1 + (y2 - y1) * u];
+      const hits = (px, py) => Object.values(N).some(b => Math.abs(px - b.x) < (b.w + lw) / 2 - 2 && Math.abs(py - b.y) < (b.h + lh) / 2 - 2) || placed.some(b => Math.abs(px - b[0]) < (b[2] + lw) / 2 && Math.abs(py - b[1]) < (b[3] + lh) / 2);
+      let [lx, ly] = at(0.5);
+      for (const u of [0.5, 0.38, 0.62, 0.28, 0.72, 0.2, 0.8]) { const [px, py] = at(u); if (!hits(px, py)) { lx = px; ly = py; break; } }
+      placed.push([lx, ly, lw, lh]);
       labelSvg += `<rect x="${(lx - lw / 2).toFixed(1)}" y="${(ly - lh / 2).toFixed(1)}" width="${lw.toFixed(1)}" height="${lh.toFixed(1)}" rx="6" fill="#ffffff"/>`;
       lines.forEach((l, k) => labelSvg += text(lx, ly - lh / 2 + 3 + size * LH * (k + 0.78), l, size, color));
       exText(aid + 't', lx - lw / 2, ly - lh / 2, lw, lh, label, size, color, aid);
@@ -150,10 +154,22 @@ function build(spec, name, outdir) {
   }
   fs.rmSync(tmp, { recursive: true });
 
-  const out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(spec.alt || spec.title || name)}">
+  // grow the canvas if any box sticks out
+  // crop the canvas to what is drawn (boxes, zones, free text, edge endpoints), with a margin
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const grow = (a, b, c, d) => { x0 = Math.min(x0, a); y0 = Math.min(y0, b); x1 = Math.max(x1, c); y1 = Math.max(y1, d); };
+  for (const b of Object.values(N)) grow(b.x - b.w / 2, b.y - b.h / 2, b.x + b.w / 2, b.y + b.h / 2);
+  for (const z of spec.zones || []) grow(z[0], z[1], z[0] + z[2], z[1] + z[3]);
+  for (const t of spec.texts || []) { const sz = t[4] || 18, lines = String(t[2]).split('\n'), w = Math.max(...lines.map(l => tw(l, sz))); const a = t[5]; const lx = a === 's' ? t[0] : a === 'e' ? t[0] - w : t[0] - w / 2; grow(lx, t[1] - sz, lx + w, t[1] + sz * LH * (lines.length - 1) + 6); }
+  for (const e of spec.edges || []) for (const pt of [e[0], e[1]]) if (Array.isArray(pt)) grow(pt[0], pt[1], pt[0], pt[1]);
+  if (spec.title) grow(10, 10, 24 + tw(spec.title, 24), 48);
+  if (!isFinite(x0)) { x0 = 0; y0 = 0; x1 = W; y1 = H; }
+  x0 -= 24; y0 -= 24; x1 += 24; y1 += 24;
+  const VW = x1 - x0, VH = y1 - y0;
+  const out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x0.toFixed(0)} ${y0.toFixed(0)} ${VW.toFixed(0)} ${VH.toFixed(0)}" width="${VW.toFixed(0)}" height="${VH.toFixed(0)}" role="img" aria-label="${esc(spec.alt || spec.title || name)}">
 <title>${esc(spec.alt || spec.title || name)}</title>
 <style>${faces}text{font-family:'Excalifont','Segoe Print','Comic Sans MS',cursive;}</style>
-<rect width="${W}" height="${H}" fill="#ffffff"/>
+<rect x="${x0.toFixed(0)}" y="${y0.toFixed(0)}" width="${VW.toFixed(0)}" height="${VH.toFixed(0)}" fill="#ffffff"/>
 ${titleSvg}${svg}${edgeSvg}${nodeSvg}${labelSvg}${freeSvg}
 </svg>`;
   fs.writeFileSync(path.join(outdir, name + '.svg'), out);
@@ -161,8 +177,11 @@ ${titleSvg}${svg}${edgeSvg}${nodeSvg}${labelSvg}${freeSvg}
   return out.length;
 }
 
-const [specPath, outdir] = process.argv.slice(2);
-const specs = require(path.resolve(specPath));
-for (const [name, spec] of Object.entries(specs)) {
-  const n = build(spec, name, outdir); console.log(`${name}: ${(n / 1024).toFixed(0)} KB`);
+module.exports = { build };
+if (require.main === module) {
+  const [specPath, outdir] = process.argv.slice(2);
+  const specs = require(path.resolve(specPath));
+  for (const [name, spec] of Object.entries(specs)) {
+    const n = build(spec, name, outdir); console.log(`${name}: ${(n / 1024).toFixed(0)} KB`);
+  }
 }

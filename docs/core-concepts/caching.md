@@ -6,7 +6,7 @@ tags: [core-concept, scaling-reads]
 
 # Caching
 
-**Used by:** [Ticketmaster](../problems/ticketmaster.md) · URL shortener · News feed · Local delivery · almost every read-heavy problem
+**Used by:** [Ticketmaster](../problems/ticketmaster.md) · [URL shortener](../problems/url-shortener.md) · [News feed](../problems/news-feed.md) · [Local delivery](../problems/local-delivery.md) · [Distributed cache](../problems/distributed-cache.md)
 
 ## TL;DR
 
@@ -104,6 +104,6 @@ One key gets so much traffic that the single cache node holding it saturates, fo
 
 ## Related
 
-- **Problems:** [Ticketmaster](../problems/ticketmaster.md)
+- **Problems:** [Ticketmaster](../problems/ticketmaster.md) · [Distributed cache](../problems/distributed-cache.md) (design the cache itself)
 - **DDIA:** [Ch 5 Replication](../ddia/05-replication.md). Read replicas are the other way to scale reads, with the same staleness trade-off.
-- **Patterns:** Scaling reads *(pattern page coming next)*
+- **Patterns:** [Scaling reads](../patterns/scaling-reads.md)

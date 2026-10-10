@@ -6,7 +6,7 @@ tags: [contention, scaling-reads, medium]
 
 # Ticketmaster: selling seats without selling any seat twice
 
-**Difficulty:** Medium · **Patterns:** [Dealing with contention](#related) · [Scaling reads](#related) · **Core concept:** [Caching](../core-concepts/caching.md) · **DDIA:** [Ch 5 Replication](../ddia/05-replication.md), Ch 7 Transactions
+**Difficulty:** Medium · **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md) · **Core concept:** [Caching](../core-concepts/caching.md) · **DDIA:** [Ch 5 Replication](../ddia/05-replication.md), [Ch 7 Transactions](../ddia/07-transactions.md)
 
 ## TL;DR
 
@@ -156,7 +156,7 @@ The outcome is unknown: the card may or may not have been charged. Keep the book
 
 ## Related
 
-- **Patterns:** Dealing with contention · Scaling reads *(pattern pages coming next)*
+- **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md)
 - **Core concepts:** [Caching](../core-concepts/caching.md)
-- **DDIA:** [Ch 5 Replication](../ddia/05-replication.md) for why replicas can serve a stale seat map; Ch 7 Transactions for write skew and why the default isolation level doesn't save you.
-- **Similar problems:** Online auction (contention on one row), Local delivery inventory (decrement stock without overselling).
+- **DDIA:** [Ch 5 Replication](../ddia/05-replication.md) for why replicas can serve a stale seat map; [Ch 7 Transactions](../ddia/07-transactions.md) for write skew and why the default isolation level doesn't save you.
+- **Similar problems:** [Online auction](online-auction.md) (contention on one row) · [Local delivery](local-delivery.md) (decrement stock without overselling) · [LLD: Movie ticket booking](../lld/movie-booking.md)

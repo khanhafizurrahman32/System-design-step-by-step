@@ -1,0 +1,47 @@
+// Diagrams for handwritten pages (foundations, playbook, LLD). Same format as pilot.js.
+module.exports = {
+'design-loop': { w: 1180, h: 300, alt: 'The design loop: requirements, estimate, simple design, find the break, fix only that, repeat.',
+  nodes: [['r', 110, 110, 'Requirements|what + how well', 'b'], ['e', 300, 110, 'Estimate|QPS · storage', 'a'], ['s', 490, 110, 'Simple design|client → service → DB', 'g'],
+    ['b', 700, 110, 'Find the break|which number fails?', 'r'], ['f', 910, 110, 'Fix only that|cache · queue · shard', 'p'], ['done', 1090, 110, 'NFRs met?', 'x', 'pill']],
+  edges: [['r', 'e', ''], ['e', 's', ''], ['s', 'b', ''], ['b', 'f', ''], ['f', 'done', ''], ['done', 'b', 'not yet', 'rC']],
+  texts: [[590, 270, 'Every component you add should point back to a number that made it necessary.', 'x', 17]] },
+
+'nfr-slo': { w: 1100, h: 330, alt: 'An SLI is what you measure, an SLO is your internal target for it, an SLA is the external promise with penalties. The gap between 100% and the SLO is the error budget.',
+  nodes: [['sli', 160, 120, 'SLI|what you measure', 'b'], ['slo', 500, 120, 'SLO|your target', 'g'], ['sla', 860, 120, 'SLA|promise + penalty', 'a'],
+    ['eb', 500, 260, 'Error budget = 100% − SLO\n99.9% → ~43 min of failure per month', 'r', 'note']],
+  edges: [['sli', 'slo', 'measured against'], ['slo', 'sla', 'stricter than', ''], ['slo', 'eb', '', 'rd']],
+  texts: [[160, 200, 'e.g. % of requests < 300 ms', 'x', 15], [860, 200, 'e.g. 99.5% or credits refunded', 'x', 15]] },
+
+'interview-timeline': { w: 1240, h: 240, alt: 'Forty-five minute interview timeline: requirements, NFRs, estimates, API, high-level design, deep dives, wrap-up.',
+  nodes: [['a', 90, 100, 'Requirements|0–5 min', 'b'], ['b', 260, 100, 'NFRs|5–8', 'b'], ['c', 410, 100, 'Numbers|8–10', 'a'], ['d', 560, 100, 'API|10–13', 'x'],
+    ['e', 740, 100, 'High-level design|13–25', 'g'], ['f', 950, 100, 'Deep dives|25–40', 'p'], ['g', 1140, 100, 'Wrap-up|40–45', 'k']],
+  edges: [['a', 'b', ''], ['b', 'c', ''], ['c', 'd', ''], ['d', 'e', ''], ['e', 'f', ''], ['f', 'g', '']],
+  texts: [[620, 210, 'Spend the most time where the hard problems are: design and deep dives.', 'x', 17]] },
+
+'lld-file-system': { w: 1140, h: 460, alt: 'File system class diagram: abstract Entry with name and parent; File holds content; Directory holds a map of child entries; FileSystem resolves paths from the root.',
+  nodes: [['fs', 190, 110, 'FileSystem\nroot: Directory\nmkdir · write · read · ls · mv · rm', 'p'],
+    ['entry', 680, 110, '«abstract» Entry\nname · parent: Directory\npath() · size()', 'b'],
+    ['file', 420, 340, 'File\ncontent: StringBuilder\nsize() = content length', 'g'],
+    ['dir', 860, 340, 'Directory\nchildren: Map<String, Entry>\nsize() = sum of children', 'a']],
+  edges: [['fs', 'entry', 'resolves paths to'], ['file', 'entry', 'extends', 'd'], ['dir', 'entry', 'extends', 'd'], ['dir', 'entry', 'contains 0..*', 'aC']] },
+
+'lld-movie-booking': { w: 1260, h: 500, alt: 'Movie booking class diagram: a Show belongs to a Movie and a Screen; each Show has ShowSeats with a status and hold expiry; BookingService locks per show to hold and confirm seats.',
+  nodes: [['movie', 140, 90, 'Movie\nid · title · duration', 'x'], ['screen', 140, 300, 'Screen\nid · seats: List<Seat>', 'x'],
+    ['show', 540, 230, 'Show\nid · movie · screen · startTime\nseats: Map<SeatId, ShowSeat>', 'b'],
+    ['seat', 1030, 90, 'ShowSeat\nstatus: AVAILABLE · HELD · BOOKED\nheldBy · holdExpiresAt', 'g'],
+    ['svc', 1030, 380, 'BookingService\nlocks: Map<ShowId, Lock>\nhold() · confirm() · release()', 'p'], ['bk', 540, 440, 'Booking\nid · user · show · seats · status', 'a']],
+  edges: [['show', 'movie', 'of'], ['show', 'screen', 'on'], ['show', 'seat', 'has many'], ['svc', 'show', 'locks per show', 'p'], ['svc', 'bk', 'creates', 'p']] },
+
+'lld-logger': { w: 1240, h: 440, alt: 'Logger class diagram: Logger filters by level and hands records to an async dispatcher; Sinks such as ConsoleSink and FileSink each use a Formatter.',
+  nodes: [['app', 120, 90, 'Application code', 't', 'pill'], ['lg', 440, 90, 'Logger\nname · minLevel\ndebug() info() warn() error()', 'b'],
+    ['q', 960, 90, 'AsyncDispatcher\nBlockingQueue<LogRecord>\nbackground thread', 'p'],
+    ['sink', 960, 270, '«interface» Sink\nwrite(LogRecord)', 'g'], ['c', 760, 400, 'ConsoleSink', 'g'], ['f', 1140, 400, 'FileSink\nrotates by size', 'g'],
+    ['fmt', 480, 270, '«interface» Formatter\nformat(LogRecord) → String', 'a']],
+  edges: [['app', 'lg', ''], ['lg', 'q', 'records ≥ minLevel'], ['q', 'sink', 'fan out'], ['c', 'sink', 'implements', 'd'], ['f', 'sink', 'implements', 'd'], ['sink', 'fmt', 'uses', 'a']] },
+
+'lld-inventory': { w: 1180, h: 420, alt: 'Inventory class diagram: InventoryService manages Warehouses, each with stock per product and its own lock; transfers lock both warehouses in id order; listeners are notified on low stock.',
+  nodes: [['svc', 200, 110, 'InventoryService\nadd · remove · transfer', 'p'], ['wh', 600, 110, 'Warehouse\nid · lock\nstock: Map<ProductId, Integer>', 'b'],
+    ['p', 1010, 110, 'Product\nid · name · reorderLevel', 'x'], ['l', 220, 320, '«interface» StockListener\nonLowStock(warehouse, product)', 'a'],
+    ['rule', 680, 320, 'transfer(A, B): lock the lower id first\n→ no deadlock between opposite transfers', 'r', 'note']],
+  edges: [['svc', 'wh', 'manages'], ['wh', 'p', 'stocks'], ['svc', 'l', 'notifies', 'a'], ['svc', 'rule', '', 'rd']] },
+};

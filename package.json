@@ -3,7 +3,7 @@
   "private": true,
   "description": "Diagram tooling: spec -> hand-drawn SVG + editable .excalidraw",
   "scripts": {
-    "diagrams": "node tools/diagram.js diagrams-src/pilot.js docs/diagrams"
+    "diagrams": "node tools/build-all.js"
   },
   "devDependencies": {
     "@excalidraw/excalidraw": "0.18.0",

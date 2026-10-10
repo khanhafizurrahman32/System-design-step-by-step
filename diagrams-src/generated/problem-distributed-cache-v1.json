@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Distributed cache: the simplest design and where it breaks","nodes":[["cl",105,265,"App servers|smart client","t","rect",null,null],["one",450,265,"Single node|HashMap + LRU list","b","rect",null,null]],"edges":[["cl","one","",""]],"zones":[],"texts":[]}

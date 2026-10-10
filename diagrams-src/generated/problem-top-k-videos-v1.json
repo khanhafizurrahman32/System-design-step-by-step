@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Top-K videos (YouTube): the simplest design and where it breaks","nodes":[["v",105,265,"View events","t","queue",null,null],["db",390,100,"UPDATE videos\nSET views+1 ✗","r","rect",null,null]],"edges":[["v","db","","r"]],"zones":[],"texts":[]}

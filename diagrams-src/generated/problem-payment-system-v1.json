@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Payment system (Stripe): the simplest design and where it breaks","nodes":[["m",105,265,"Merchant","t","pill",null,null],["api",330,265,"Payments API|idempotency keys","b","rect",null,null],["pr",975,115,"Card processor|/ network","x","rect",null,null]],"edges":[["m","api","",""],["api","pr","charge, then\nwrite DB ✗","r"]],"zones":[],"texts":[]}

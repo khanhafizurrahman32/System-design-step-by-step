@@ -6,7 +6,7 @@ tags: [ddia, replication]
 
 # DDIA Chapter 5: Replication
 
-> This page is a study summary in our own words and diagrams, written to help you connect the book to interview problems. It is not a substitute for the book. *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
+> These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
 ## TL;DR
 
@@ -96,4 +96,8 @@ Cassandra and DynamoDB-style systems use this. The catch: concurrent writes to t
 
 - **Problems:** [Ticketmaster](../problems/ticketmaster.md): the seat map can come from a lagging replica; the booking must not.
 - **Core concepts:** [Caching](../core-concepts/caching.md) has the same staleness trade-off as reading from replicas.
-- **Next chapter:** Ch 6 Partitioning *(coming next)*
+- **Pattern:** [Scaling reads](../patterns/scaling-reads.md)
+
+---
+
+← [Ch 4: Encoding and evolution](04-encoding-and-evolution.md) · [Ch 6: Partitioning](06-partitioning.md) →

@@ -7,7 +7,9 @@ exclude_docs: |
 theme:
   name: material
   features:
+    - navigation.tabs
     - navigation.sections
+    - navigation.indexes
     - navigation.top
     - navigation.footer
     - search.suggest
@@ -32,15 +34,99 @@ markdown_extensions:
   - toc: {permalink: true}
   - admonition
   - github-callouts
+  - md_in_html
   - attr_list
   - pymdownx.superfences
   - pymdownx.highlight
 nav:
-  - Home: index.md
-  - Core concepts:
-      - Caching: core-concepts/caching.md
-  - Problems:
-      - Ticketmaster: problems/ticketmaster.md
-  - DDIA:
-      - "Ch 5: Replication": ddia/05-replication.md
-  - Contributing: contributing.md
+- Home: index.md
+- Foundations:
+  - Overview: foundations/index.md
+  - How to approach any design: foundations/how-to-approach-a-design.md
+  - Non-functional requirements: foundations/nfrs.md
+  - Numbers and estimation: foundations/numbers-and-estimation.md
+- Core concepts:
+  - Overview: core-concepts/index.md
+  - Networking essentials: core-concepts/networking.md
+  - API design: core-concepts/api-design.md
+  - Data modeling: core-concepts/data-modeling.md
+  - Database indexing: core-concepts/indexing.md
+  - Caching: core-concepts/caching.md
+  - Sharding: core-concepts/sharding.md
+  - Consistent hashing: core-concepts/consistent-hashing.md
+  - CAP theorem and PACELC: core-concepts/cap-theorem.md
+- Patterns:
+  - Overview: patterns/index.md
+  - Scaling reads: patterns/scaling-reads.md
+  - Scaling writes: patterns/scaling-writes.md
+  - Real-time updates: patterns/real-time-updates.md
+  - Dealing with contention: patterns/contention.md
+  - Multi-step processes: patterns/multi-step-processes.md
+  - Handling large blobs: patterns/large-blobs.md
+  - Long-running tasks: patterns/long-running-tasks.md
+- Technologies: technologies.md
+- Problems:
+  - Overview: problems/index.md
+  - Scaling reads:
+    - URL shortener (Bitly): problems/url-shortener.md
+    - Rate limiter: problems/rate-limiter.md
+    - Business discovery (Yelp): problems/business-discovery.md
+    - News feed (Facebook): problems/news-feed.md
+    - News aggregator (Google News): problems/news-aggregator.md
+    - Local delivery (Gopuff): problems/local-delivery.md
+    - Dating app (Tinder): problems/dating-app.md
+    - Distributed cache: problems/distributed-cache.md
+  - Scaling writes:
+    - Top-K videos (YouTube): problems/top-k-videos.md
+    - Ad click aggregator: problems/ad-click-aggregator.md
+    - Web crawler: problems/web-crawler.md
+    - Metrics monitoring (Datadog): problems/metrics-monitoring.md
+    - Fitness tracking (Strava): problems/fitness-tracking.md
+    - Post search (Facebook): problems/post-search.md
+    - Price tracker (CamelCamelCamel): problems/price-tracker.md
+  - Real-time updates:
+    - Ride sharing (Uber): problems/ride-sharing.md
+    - Live comments (Facebook Live): problems/live-comments.md
+    - Collaborative editor (Google Docs): problems/collaborative-editor.md
+    - Stock trading (Robinhood): problems/stock-trading.md
+    - Online auction: problems/online-auction.md
+    - LLM chat (ChatGPT): problems/llm-chat.md
+    - Chat app (WhatsApp): problems/chat-app.md
+  - Contention:
+    - Ticketmaster: problems/ticketmaster.md
+  - Multi-step processes:
+    - Payment system (Stripe): problems/payment-system.md
+    - Online judge (LeetCode): problems/online-judge.md
+    - Job scheduler: problems/job-scheduler.md
+  - Large blobs:
+    - Video platform (YouTube): problems/video-platform.md
+    - File storage and sync (Dropbox): problems/file-sync.md
+    - Photo sharing (Instagram): problems/photo-sharing.md
+  - Long-running tasks: []
+- DDIA:
+  - Overview: ddia/index.md
+  - 'Ch 1: Reliable, Scalable, Maintainable': ddia/01-reliability-scalability-maintainability.md
+  - 'Ch 2: Data Models & Query Languages': ddia/02-data-models.md
+  - 'Ch 3: Storage & Retrieval': ddia/03-storage-and-retrieval.md
+  - 'Ch 4: Encoding & Evolution': ddia/04-encoding-and-evolution.md
+  - 'Ch 5: Replication': ddia/05-replication.md
+  - 'Ch 6: Partitioning (Sharding)': ddia/06-partitioning.md
+  - 'Ch 7: Transactions': ddia/07-transactions.md
+  - 'Ch 8: The Trouble with Distributed Systems': ddia/08-trouble-with-distributed-systems.md
+  - 'Ch 9: Consistency & Consensus': ddia/09-consistency-and-consensus.md
+  - 'Ch 10: Batch Processing': ddia/10-batch-processing.md
+  - 'Ch 11: Stream Processing': ddia/11-stream-processing.md
+  - 'Ch 12: The Future of Data Systems': ddia/12-future-of-data-systems.md
+- Low-level design:
+  - Overview: lld/index.md
+  - 'LLD: In-memory file system': lld/file-system.md
+  - 'LLD: Movie ticket booking': lld/movie-booking.md
+  - 'LLD: Logging library': lld/logger.md
+  - 'LLD: Inventory management': lld/inventory.md
+- Interview playbook:
+  - Overview: playbook/index.md
+  - The 45-minute delivery framework: playbook/delivery-framework.md
+  - Phrases, signals and traps: playbook/phrases-and-traps.md
+  - Quick-fire practice: playbook/quick-fire.md
+- Slide decks: slides/index.md
+- Contributing: contributing.md

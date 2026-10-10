@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Video platform (YouTube): the simplest design and where it breaks","nodes":[["up",105,265,"Uploader","t","pill",null,null],["api",360,100,"Video API","b","rect",null,null],["md",360,460,"Metadata DB","g","db",null,null]],"edges":[["up","api","",""],["api","md","",""]],"zones":[],"texts":[]}

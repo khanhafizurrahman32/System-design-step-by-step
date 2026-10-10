@@ -1,0 +1,1 @@
+{"w":1200,"h":520,"alt":"Online judge (LeetCode): the simplest design and where it breaks","nodes":[["cl",105,265,"Client","t","pill",null,null],["api",345,265,"Submission API","b","rect",null,null],["run",345,70,"run on API server ✗","r","note",null,null]],"edges":[["cl","api","",""],["api","run","","rd"]],"zones":[],"texts":[]}
