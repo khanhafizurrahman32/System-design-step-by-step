@@ -1,0 +1,8 @@
+Content (text and diagrams in docs/ and diagrams-src/) is licensed under the
+Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0).
+Full legal text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+Code (tools/, scripts/) is licensed under the MIT License.
+
+The Excalifont subsets embedded in docs/diagrams/*.svg are licensed under the
+SIL Open Font License 1.1 by their authors (see docs/diagrams/README.md).

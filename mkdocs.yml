@@ -1,0 +1,46 @@
+site_name: System Design, Step by Step
+site_description: A free, diagram-first system design handbook. Start simple, find the break, fix only that.
+# repo_url: https://github.com/<you>/system-design-step-by-step   # set when the repo is created
+# edit_uri: edit/main/docs/          # enable together with repo_url
+exclude_docs: |
+  diagrams/README.md
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle: {icon: material/weather-night, name: Dark mode}
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle: {icon: material/weather-sunny, name: Light mode}
+extra_css:
+  - assets/extra.css
+markdown_extensions:
+  - tables
+  - toc: {permalink: true}
+  - admonition
+  - github-callouts
+  - attr_list
+  - pymdownx.superfences
+  - pymdownx.highlight
+nav:
+  - Home: index.md
+  - Core concepts:
+      - Caching: core-concepts/caching.md
+  - Problems:
+      - Ticketmaster: problems/ticketmaster.md
+  - DDIA:
+      - "Ch 5: Replication": ddia/05-replication.md
+  - Contributing: contributing.md

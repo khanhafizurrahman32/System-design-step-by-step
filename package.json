@@ -1,0 +1,12 @@
+{
+  "name": "system-design-step-by-step",
+  "private": true,
+  "description": "Diagram tooling: spec -> hand-drawn SVG + editable .excalidraw",
+  "scripts": {
+    "diagrams": "node tools/diagram.js diagrams-src/pilot.js docs/diagrams"
+  },
+  "devDependencies": {
+    "@excalidraw/excalidraw": "0.18.0",
+    "roughjs": "4.6.6"
+  }
+}
