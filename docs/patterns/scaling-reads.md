@@ -8,6 +8,9 @@ tags: [pattern]
 
 *Most systems read far more than they write. Make the common read cheap, and the database only sees what the cache can't answer.*
 
+> [!TIP]
+> **One-page sketchnote:** [SCALING READS on a single page](../sketchnotes/pattern-scaling-reads.svg), for revision or printing.
+
 ## When to reach for it
 
 - Read:write ratio is 10:1 or higher.

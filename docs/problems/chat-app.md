@@ -10,6 +10,9 @@ tags: [real-time-updates, medium]
 
 *Chat looks like CRUD until you notice the two users are on different servers and one of them is offline.*
 
+> [!TIP]
+> **One-page sketchnote:** [CHAT APP (WHATSAPP) on a single page](../sketchnotes/problem-chat-app.svg), for revision or printing.
+
 ## TL;DR
 
 - Keep a persistent WebSocket per device; route messages between chat servers with a registry and per-user pub/sub.
@@ -93,6 +96,21 @@ Upload to S3 via presigned URL; the message carries only the object key.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Chat server 2 → Redis → Pub/sub → Cassandra → Inbox → APNs / FCM. Justify each addition with a number. |
 | 25–40 | Deep dives | Never lose a message? · Ordering? · Groups? · Media? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Route between servers, deliver to offline devices, keep order. |
+| **Deciding number** | ~600k messages/s; hundreds of millions of open connections. |
+| **Staff call and trade-off** | WebSockets + user→server registry + per-user pub/sub; persist before ack; an inbox per device. Accept at-least-once delivery with client dedupe. |
+| **Raise before you're asked** | Server crash holding connections; order within a chat; multi-device sync; what end-to-end encryption rules out. |
+| **Senior stops at** | WebSockets + a database. |
+| **Staff goes on to** | Delivery semantics, draining connections during deploys, the limits end-to-end encryption puts on server features. |
+| **Run it** | Watch delivery latency, undelivered inbox size, reconnect rate. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

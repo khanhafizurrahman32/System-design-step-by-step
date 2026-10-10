@@ -10,6 +10,9 @@ tags: [scaling-writes, hard]
 
 *Ten billion pages in five days is a pipeline problem, constrained by politeness and network bandwidth.*
 
+> [!TIP]
+> **One-page sketchnote:** [WEB CRAWLER on a single page](../sketchnotes/problem-web-crawler.svg), for revision or printing.
+
 ## TL;DR
 
 - About 23k pages per second; size the fleet by network bandwidth, not CPU.
@@ -90,6 +93,21 @@ Cache DNS per worker; multiple resolvers.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: S3 raw HTML → Parse queue → Parser workers → S3 text → Redis → URL dedupe. Justify each addition with a number. |
 | 25–40 | Deep dives | Why separate stages? · Crash mid-crawl? · Crawler traps? · DNS bottleneck? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | A politeness-limited pipeline that must finish 10B pages in 5 days. |
+| **Deciding number** | ~23k pages/s; ~46 GB/s of bandwidth; ~20 PB raw. |
+| **Staff call and trade-off** | Separate fetch and parse stages with queues and raw pages in S3. Accept storage cost to make each stage independently retryable. |
+| **Raise before you're asked** | Crawler traps; breaking per-domain rate limits; DNS as a bottleneck; duplicate content. |
+| **Senior stops at** | Queue + workers. |
+| **Staff goes on to** | Sizes the fleet by bandwidth not CPU, prices the storage, prioritises the frontier, treats robots.txt as a hard rule. |
+| **Run it** | Watch pages/s, per-domain errors, frontier size, dedupe ratio. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

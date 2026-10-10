@@ -18,6 +18,8 @@ Most resources show you a finished architecture and expect you to memorize it. T
 | [DDIA, chapter by chapter](docs/ddia/index.md) | All 12 chapters of *Designing Data-Intensive Applications* as diagrams, tied to interview problems |
 | [Low-level design](docs/lld/index.md) | File system, movie booking, logger, inventory: class diagrams and tested Java |
 | [Interview playbook](docs/playbook/index.md) | The 45-minute framework, what senior answers sound like, quick-fire practice |
+| [Staff-level answers](docs/playbook/staff-level.md) | Senior vs staff, and all 29 problems through a staff lens ([interactive atlas](docs/slides/staff-atlas.html)) |
+| [Sketchnotes](docs/sketchnotes/index.md) | 59 dense hand-drawn pages, one per topic, for revision and printing |
 | [Slide decks](docs/slides/index.md) | Three interactive decks for review and out-loud rehearsal |
 
 ## Pick your path
@@ -26,8 +28,9 @@ Most resources show you a finished architecture and expect you to memorize it. T
 |---|---|
 | **Learn system design** | Foundations → Core concepts → Patterns → Problems. Each problem walks from a naive **v1** to the final design. |
 | **Prepare for an interview in two weeks** | Read the [playbook](docs/playbook/index.md), then do two problems a day: read the page, then rehearse it with the [interview deck](docs/slides/interview.html). |
+| **Interviewing for staff or above** | Read [Staff-level answers](docs/playbook/staff-level.md), then use the [staff atlas](docs/slides/staff-atlas.html) to rehearse all 29 problems at that level. |
 | **Understand the theory** | Read the [DDIA pages](docs/ddia/index.md) alongside the book; every chapter ends with how it shows up in interviews. |
-| **Review the night before** | Skim the TL;DRs and *Common mistakes* of each problem, then do the [quick-fire questions](docs/playbook/quick-fire.md). |
+| **Review the night before** | Flip through the [sketchnotes](docs/sketchnotes/index.md), starting with the [interview cheat sheet](docs/sketchnotes/interview-cheat-sheet.svg), then do the [quick-fire questions](docs/playbook/quick-fire.md). |
 
 ## Every problem page has the same shape
 
@@ -45,6 +48,7 @@ Most resources show you a finished architecture and expect you to memorize it. T
 
 - **Website**: searchable, with dark mode and mobile layout.
 - **GitHub**: every page is plain Markdown that renders in the repository.
+- **Sketchnotes**: [one hand-drawn page per topic](docs/sketchnotes/index.md), also as a [printable PDF](docs/downloads/sketchnotes.pdf).
 - **Slides**: [three interactive decks](docs/slides/index.md) that work offline.
 - **PDF**: the [whole handbook in one file](docs/downloads/system-design-step-by-step.pdf) for printing or reading offline.
 - **Editable diagrams**: every diagram has an `.excalidraw` source next to its `.svg`.

@@ -8,6 +8,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 3 · STORAGE & RETRIEVAL on a single page](../sketchnotes/ddia-03.svg), for revision or printing.
+
 ## TL;DR
 
 How a database actually stores bytes. Two families power almost everything: **log-structured** engines (LSM trees in Cassandra, RocksDB, Kafka) that append, and **page-oriented** engines (B-trees in Postgres, MySQL) that update in place. Plus why analytics needs column storage.

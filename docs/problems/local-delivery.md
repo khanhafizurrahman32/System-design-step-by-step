@@ -10,6 +10,9 @@ tags: [scaling-reads, easy]
 
 *It looks like an ordering system, but most of the load is people checking what is available near them.*
 
+> [!TIP]
+> **One-page sketchnote:** [LOCAL DELIVERY (GOPUFF) on a single page](../sketchnotes/problem-local-delivery.svg), for revision or printing.
+
 ## TL;DR
 
 - Browsing availability is far more frequent than ordering, so cache it and serve it from replicas.
@@ -93,6 +96,21 @@ Row contention on one inventory row: queue orders per item, or split stock into 
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Nearby-DC service → Travel-time API → Redis → Read replicas → Order service → Postgres primary. Justify each addition with a number. |
 | 25–40 | Deep dives | How do you prevent overselling? · Stale availability vs orders? · Scale orders? · Hot item (flash sale)? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Huge browse traffic on availability; strict stock at checkout. |
+| **Deciding number** | ~10k browse/s at peak vs ~12 orders/s; the 10k-row warehouse list fits in memory. |
+| **Staff call and trade-off** | Browse is AP (cache + replicas); checkout is CP (conditional decrements in one transaction). Accept occasional "sold out at checkout". |
+| **Raise before you're asked** | Flash-sale hot rows; cache showing stock that is gone; travel-time API outage (fall back to distance). |
+| **Senior stops at** | A transaction on order. |
+| **Staff goes on to** | States consistency per path, partitions stock by region so no transaction crosses shards, plans for the third-party API failing. |
+| **Run it** | Watch checkout failures due to stock, availability p99, external API spend. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

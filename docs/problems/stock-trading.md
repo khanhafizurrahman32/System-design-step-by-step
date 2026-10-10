@@ -10,6 +10,9 @@ tags: [real-time-updates, hard]
 
 *Two separate problems: pushing live prices to millions, and never losing or duplicating an order.*
 
+> [!TIP]
+> **One-page sketchnote:** [STOCK TRADING (ROBINHOOD) on a single page](../sketchnotes/problem-stock-trading.svg), for revision or printing.
+
 ## TL;DR
 
 - Prices: one consumer of the exchange feed publishes per symbol; push servers subscribe and stream to clients.
@@ -91,6 +94,21 @@ Autoscale SSE servers; per-user rate limits on orders.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Price processor → Pub/sub → SSE servers → Order service → Postgres → Exchange gateway → Fill processor. Justify each addition with a number. |
 | 25–40 | Deep dives | Write DB before or after the exchange call? · Duplicate submits? · Cancel races with a fill? · Market-open spike? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Push prices to millions, and never lose or duplicate an order. |
+| **Deciding number** | Thousands of updates/s across ~10k symbols; 20M users, so push not poll. |
+| **Staff call and trade-off** | Persist the order as pending before calling the exchange, reconcile on timeout; throttle prices per symbol. Accept coarser price updates in the app. |
+| **Raise before you're asked** | Unknown outcome on exchange timeout; duplicate orders; market-open spike. |
+| **Senior stops at** | Separate price and order paths. |
+| **Staff goes on to** | An order state machine, reconciliation against exchange reports, audit requirements, graceful degradation at open. |
+| **Run it** | Watch order ack latency, reconciliation breaks, price fan-out lag. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

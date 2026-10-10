@@ -10,6 +10,9 @@ tags: [scaling-reads, medium]
 
 *Swipes are a firehose of writes, and two people swiping right at the same moment must never miss their match.*
 
+> [!TIP]
+> **One-page sketchnote:** [DATING APP (TINDER) on a single page](../sketchnotes/problem-dating-app.svg), for revision or printing.
+
 ## TL;DR
 
 - Precompute each user's stack of nearby candidates and hide already-swiped profiles with a Bloom filter.
@@ -89,6 +92,21 @@ Invalidate and recompute the stack when the user moves more than X km.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Redis → Swipe service → Cassandra → Redis Lua → Push (APNs/FCM). Justify each addition with a number. |
 | 25–40 | Deep dives | Both swipe at once: why can a match be missed? · Hide already-swiped profiles? · Location changes? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Write-heavy swipes, and a mutual match must never be missed. |
+| **Deciding number** | ~100k swipes/s at peak; precomputed stacks ≈ 32 GB. |
+| **Staff call and trade-off** | Precomputed stacks + Bloom filter of swiped profiles; one atomic operation per pair of users for matches. Accept rare skipped profiles from Bloom false positives. |
+| **Raise before you're asked** | Two right-swipes at the same instant (write skew); stacks stale after the user moves; bots. |
+| **Senior stops at** | Stores swipes. |
+| **Staff goes on to** | Names the race precisely, uses a pair-keyed atomic op, sizes precomputation, weighs recommendation quality against cost. |
+| **Run it** | Watch match detection latency, stack freshness, swipe write lag. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

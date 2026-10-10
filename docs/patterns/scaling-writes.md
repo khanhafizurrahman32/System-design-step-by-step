@@ -8,6 +8,9 @@ tags: [pattern]
 
 *When writes outgrow one machine, absorb the spikes, write in batches, split the data, and write less.*
 
+> [!TIP]
+> **One-page sketchnote:** [SCALING WRITES on a single page](../sketchnotes/pattern-scaling-writes.svg), for revision or printing.
+
 ## When to reach for it
 
 - Sustained writes exceed what one primary handles (roughly 10k+ per second for simple rows).

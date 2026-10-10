@@ -10,6 +10,9 @@ tags: [scaling-reads, medium]
 
 *The canonical fan-out problem: build a personalised feed for billions of users in a few hundred milliseconds.*
 
+> [!TIP]
+> **One-page sketchnote:** [NEWS FEED (FACEBOOK) on a single page](../sketchnotes/problem-news-feed.svg), for revision or printing.
+
 ## TL;DR
 
 - Computing the feed on every read means hundreds of queries per page view, so precompute it when people post.
@@ -95,6 +98,21 @@ An async job backfills the followee's recent posts into the follower's feed.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Kafka → Fan-out workers → Redis feeds → Celebrity posts. Justify each addition with a number. |
 | 25–40 | Deep dives | Celebrity with 100M followers? · How much memory for feeds? · Pagination? · User follows someone new? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Fan-out cost at write time vs latency at read time. |
+| **Deciding number** | 115k feed reads/s; ~1.2M feed inserts/s with fan-out on write; celebrities with 100M followers. |
+| **Staff call and trade-off** | Hybrid: push to followers below a threshold (~100k), pull celebrity posts at read. Accept a merge step at read and feeds up to a minute stale. |
+| **Raise before you're asked** | Fan-out backlog after a celebrity post; Redis memory (only active users, capped lists); deletes and unfollows propagating. |
+| **Senior stops at** | Fan-out on write. |
+| **Staff goes on to** | Picks the threshold from numbers, rebuilds feeds for inactive users on demand, separates ranking into its own service, counts memory cost. |
+| **Run it** | Watch feed p99, fan-out lag, worker queue depth, Redis memory. Next: candidate generation + ranking model. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

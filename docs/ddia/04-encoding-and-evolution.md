@@ -8,6 +8,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 4 · ENCODING & EVOLUTION on a single page](../sketchnotes/ddia-04.svg), for revision or printing.
+
 ## TL;DR
 
 Data outlives code. During a rolling deploy, old and new versions of your service run at the same time, reading each other's data. Encoding formats such as Protobuf, Avro, and JSON decide whether that works or silently corrupts data.

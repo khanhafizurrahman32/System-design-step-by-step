@@ -23,6 +23,9 @@ tags: [core-concept]
 > [!WARNING]
 > **Don't over-invest:** Spending 15 minutes on endpoint shapes is a classic way to run out of time for the deep dives.
 
+> [!TIP]
+> **One-page sketchnote:** [API DESIGN on a single page](../sketchnotes/concept-api-design.svg), for revision or printing.
+
 ## Checklist
 
 1. Name resources after your core entities.

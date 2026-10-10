@@ -8,6 +8,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 7 · TRANSACTIONS on a single page](../sketchnotes/ddia-07.svg), for revision or printing.
+
 ## TL;DR
 
 A transaction groups reads and writes into one unit: all of it happens or none of it does, and concurrent transactions don't see each other's half-finished work. Most interview "contention" questions, such as seat booking, inventory, payments, and auctions, come down to which **isolation anomaly** you are defending against.

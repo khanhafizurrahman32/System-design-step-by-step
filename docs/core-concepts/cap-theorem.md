@@ -23,6 +23,9 @@ tags: [core-concept]
 > [!TIP]
 > **Say this in the interview:** "CAP is a per-feature choice: the booking path is CP, browsing is AP."
 
+> [!TIP]
+> **One-page sketchnote:** [CAP THEOREM AND PACELC on a single page](../sketchnotes/concept-cap-theorem.svg), for revision or printing.
+
 ## Checklist
 
 1. Partitions will happen, so the real choice is C or A during one.

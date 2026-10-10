@@ -8,6 +8,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 1 · RELIABLE, SCALABLE, MAINTAINABLE on a single page](../sketchnotes/ddia-01.svg), for revision or printing.
+
 ## TL;DR
 
 The three words every NFR discussion comes back to. This chapter gives them precise meaning: reliability means tolerating faults, scalability means describing load and performance with numbers, and maintainability means keeping the system easy to run and change.

@@ -10,6 +10,9 @@ tags: [scaling-reads, medium]
 
 *The trap is over-engineering: the whole dataset fits on one database server.*
 
+> [!TIP]
+> **One-page sketchnote:** [BUSINESS DISCOVERY (YELP) on a single page](../sketchnotes/problem-business-discovery.svg), for revision or printing.
+
 ## TL;DR
 
 - Ten million businesses at ~1 KB each is about 10 GB, small enough for one Postgres instance.
@@ -94,6 +97,21 @@ Only if search needs relevance ranking, fuzzy matching, and facets beyond pg_trg
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: PostGIS GiST + pg_trgm → Read replicas → Review service. Justify each addition with a number. |
 | 25–40 | Deep dives | Which geo index? · Average rating with concurrent reviews? · One review per user? · When would you add Elasticsearch? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | 2-D "near me" search and correct ratings, without over-engineering. |
+| **Deciding number** | 10M businesses × 1 KB ≈ 10 GB; ~20k searches/s at peak. |
+| **Staff call and trade-off** | One Postgres + PostGIS + replicas + page cache. Accept simpler ranking for far less to operate; add Elasticsearch only when relevance needs it. |
+| **Raise before you're asked** | Replica lag hiding a new review; hot cities skewing load; review spam. |
+| **Senior stops at** | Adds a geo index. |
+| **Staff goes on to** | Uses the 10 GB number to argue against a search cluster, and defines the trigger and CDC migration path for adding one later. |
+| **Run it** | Watch search p99, replica lag, cache hit. Trigger for Elasticsearch: fuzzy relevance or QPS beyond replicas. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

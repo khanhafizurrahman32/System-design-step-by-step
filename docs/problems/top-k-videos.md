@@ -10,6 +10,9 @@ tags: [scaling-writes, hard]
 
 *The design falls straight out of one number: hundreds of thousands of views per second.*
 
+> [!TIP]
+> **One-page sketchnote:** [TOP-K VIDEOS (YOUTUBE) on a single page](../sketchnotes/problem-top-k-videos.svg), for revision or printing.
+
 ## TL;DR
 
 - A counter row per video in a database can't take ~800k updates per second.
@@ -89,6 +92,21 @@ Count-Min Sketch + heap uses fixed memory and is good for trending; exact needs 
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Kafka → Counter P0 → Counter P1 … Pn → Aggregator → Redis / cache → S3 raw → batch. Justify each addition with a number. |
 | 25–40 | Deep dives | Why is the merge exact? · Sliding windows? · Very hot video? · Approximate is OK? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Count ~800k events/s and rank across hour, day, month and all time. |
+| **Deciding number** | 70B views/day ≈ 800k/s; 4B videos × 8 B ≈ 32 GB of counters. |
+| **Staff call and trade-off** | Kafka partitioned by video; in-memory counts and local heaps; merge. Accept ~1 min freshness, with a batch recount for exact totals. |
+| **Raise before you're asked** | One viral video skewing a partition (pre-aggregate at producers); counts lost on restart (checkpoint); late events. |
+| **Senior stops at** | Streaming counts. |
+| **Staff goes on to** | Proves the merge is exact, chooses exact vs Count-Min per window, adds a reconciliation path. |
+| **Run it** | Watch consumer lag, window freshness, stream vs batch difference. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

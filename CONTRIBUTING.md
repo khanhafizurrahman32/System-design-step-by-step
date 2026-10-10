@@ -35,6 +35,17 @@ mkdocs build && python scripts/build_pdf.py
 
 This writes `docs/downloads/system-design-step-by-step.pdf` in navigation order, with bookmarks.
 
+## Sketchnotes
+
+Each one-page sketchnote is a JSON spec in `diagrams-src/sketchnotes/` (panels with text, bullets, highlighted numbers, tables and embedded diagrams). Rebuild them and their PDF with:
+
+```bash
+node tools/sketchnote.js diagrams-src/sketchnotes docs/sketchnotes
+python scripts/build_sketch_pdf.py
+```
+
+Text in each panel shrinks automatically to fit; the tool warns if a panel still overflows.
+
 A diagram should explain **one** idea. If it needs a paragraph to decode, split it in two.
 
 ## Problem page template

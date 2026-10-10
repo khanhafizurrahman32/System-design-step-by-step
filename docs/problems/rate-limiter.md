@@ -10,6 +10,9 @@ tags: [scaling-reads, medium]
 
 *Every public API needs one, and the obvious implementation has a race condition.*
 
+> [!TIP]
+> **One-page sketchnote:** [RATE LIMITER on a single page](../sketchnotes/problem-rate-limiter.svg), for revision or printing.
+
 ## TL;DR
 
 - Counting per server gives each client N times its limit; the counter must be shared, usually in Redis.
@@ -92,6 +95,21 @@ One key lands on one shard. Give each server a local allowance and sync periodic
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Redis Cluster → Lua script → Rules config. Justify each addition with a number. |
 | 25–40 | Deep dives | Which algorithm? · Race between servers? · Redis is down? · Very hot client? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Count requests atomically across many gateways while adding under 10 ms. |
+| **Deciding number** | 1M checks/s ≈ 10–20 Redis shards; ~1 GB of bucket state. |
+| **Staff call and trade-off** | Token bucket in a Redis Lua script. Accept approximate limits for very hot tenants (local allowances synced periodically). |
+| **Raise before you're asked** | Redis outage: fail-open or fail-closed, decided per endpoint; clock skew in refill (use Redis time); one tenant overloading a shard. |
+| **Senior stops at** | Algorithm + Redis. |
+| **Staff goes on to** | Plan tiers, global vs regional limits, rules as versioned config with shadow mode, and protecting the limiter itself. |
+| **Run it** | Watch rejection rate per rule, limiter p99, Redis CPU. Roll out new rules in shadow (log-only) first. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

@@ -8,6 +8,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 8 · THE TROUBLE WITH DISTRIBUTED SYSTEMS on a single page](../sketchnotes/ddia-08.svg), for revision or printing.
+
 ## TL;DR
 
 On one machine, things either work or crash. Across machines you get **partial failure**: some parts work, some don't, and you often can't tell which. The three villains are unreliable networks, unreliable clocks, and process pauses.

@@ -7,6 +7,8 @@ description: "Twenty-nine system design problems, each built from a simple first
 
 Every page follows the same template: requirements, numbers, a **v1** design and where it breaks, the final design and why each part exists, deep dives, a minute-by-minute interview script, and common mistakes.
 
+Interviewing for staff? Each page has a **Staff-level lens** section, and all 29 are collected in [Staff-level answers](../playbook/staff-level.md).
+
 New to this? Start with [URL shortener](url-shortener.md), [Rate limiter](rate-limiter.md) and [Ticketmaster](ticketmaster.md).
 
 ## Scaling reads

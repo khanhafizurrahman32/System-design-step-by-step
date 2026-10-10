@@ -10,6 +10,9 @@ tags: [real-time-updates, hard]
 
 *The challenge is correctness, not scale: everyone must end up with the same document.*
 
+> [!TIP]
+> **One-page sketchnote:** [COLLABORATIVE EDITOR (GOOGLE DOCS) on a single page](../sketchnotes/problem-collaborative-editor.svg), for revision or printing.
+
 ## TL;DR
 
 - Send small operations, not whole documents; last-write-wins on documents loses people's work.
@@ -93,6 +96,21 @@ Ephemeral presence over the same socket; not persisted.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Document server → Op log → Snapshots → LB → ZooKeeper. Justify each addition with a number. |
 | 25–40 | Deep dives | OT or CRDT? · Why one server per doc? · Offline edits? · Cursors? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Every client must converge to the same document. |
+| **Deciding number** | ~500 ops/s on a hot document; correctness, not scale. |
+| **Staff call and trade-off** | One owner server per document running OT, with an op log and snapshots. Accept a short pause when the owner fails over. |
+| **Raise before you're asked** | Owner failover; merging offline edits; very large documents. |
+| **Senior stops at** | Names OT or CRDT. |
+| **Staff goes on to** | Chooses between them from requirements (offline, server cost), assigns ownership via a coordination service, plans version history. |
+| **Run it** | Watch op latency, convergence errors, snapshot size. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

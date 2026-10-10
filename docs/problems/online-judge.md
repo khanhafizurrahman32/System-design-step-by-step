@@ -10,6 +10,9 @@ tags: [multi-step-processes, medium]
 
 *You are running strangers' code on your servers, so isolation comes first.*
 
+> [!TIP]
+> **One-page sketchnote:** [ONLINE JUDGE (LEETCODE) on a single page](../sketchnotes/problem-online-judge.svg), for revision or printing.
+
 ## TL;DR
 
 - Run every submission in a locked-down sandbox: no network, read-only filesystem, strict CPU, memory and time limits.
@@ -96,6 +99,21 @@ score = points × 1e6 − penalty_seconds.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Sandbox → Postgres → Queue (SQS) → Workers → Redis ZSET. Justify each addition with a number. |
 | 25–40 | Deep dives | Security layers? · Contest spike? · Polling vs push? · Leaderboard ties? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Run untrusted code safely, through contest spikes. |
+| **Deciding number** | ~100 submissions/s at peak; ~500 sandboxes running at once. |
+| **Staff call and trade-off** | Queue + microVM sandboxes + autoscaling workers. Accept a few seconds of latency. |
+| **Raise before you're asked** | Sandbox escape; noisy neighbours; contest start spike (pre-warm capacity). |
+| **Senior stops at** | Queue + containers. |
+| **Staff goes on to** | Defence in depth for isolation, pre-warming before contests, fairness between users. |
+| **Run it** | Watch queue wait, sandbox start time, verdict latency. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

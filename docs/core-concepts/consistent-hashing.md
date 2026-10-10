@@ -17,6 +17,9 @@ tags: [core-concept]
 > [!NOTE]
 > **Used by:** Distributed caches, Cassandra, DynamoDB, L7 routing of video/doc IDs to servers.
 
+> [!TIP]
+> **One-page sketchnote:** [CONSISTENT HASHING on a single page](../sketchnotes/concept-consistent-hashing.svg), for revision or printing.
+
 ## Checklist
 
 1. Place nodes and keys on the same hash ring.

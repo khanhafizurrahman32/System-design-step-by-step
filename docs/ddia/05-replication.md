@@ -8,6 +8,9 @@ tags: [ddia, replication]
 
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 5 · REPLICATION on a single page](../sketchnotes/ddia-05.svg), for revision or printing.
+
 ## TL;DR
 
 - Replication means keeping copies of the same data on several machines: to **survive failures**, to **serve more reads**, and to be **closer to users**.

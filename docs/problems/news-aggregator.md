@@ -10,6 +10,9 @@ tags: [scaling-reads, easy]
 
 *A feed problem where the feed is the same for everyone in a region, which changes everything.*
 
+> [!TIP]
+> **One-page sketchnote:** [NEWS AGGREGATOR (GOOGLE NEWS) on a single page](../sketchnotes/problem-news-aggregator.svg), for revision or printing.
+
 ## TL;DR
 
 - Writes are tiny (new articles); reads spike hard when big news breaks.
@@ -90,6 +93,21 @@ Cursor on (published_at, id). Offsets break when new articles arrive.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Redis → CDN → S3 + CDN. Justify each addition with a number. |
 | 25–40 | Deep dives | Why can a CDN cache the feed? · Polling cost vs freshness? · Duplicate stories? · Pagination? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | The feed is the same for everyone in a region, so the edge can serve it. |
+| **Deciding number** | ~12k reads/s, 50k+/s on breaking news; ~1 new article/s. |
+| **Staff call and trade-off** | Precompute per region and category, cache at the CDN for ~60 s. Accept a minute of staleness. |
+| **Raise before you're asked** | Many CDN entries expiring at once (serve stale, stagger TTLs); publisher outages; duplicate stories. |
+| **Senior stops at** | Adds a cache. |
+| **Staff goes on to** | Spots that the response is not personalised, calculates origin load after the CDN, sets an adaptive crawl budget. |
+| **Run it** | Watch CDN hit ratio, origin QPS, ingest-to-visible lag. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

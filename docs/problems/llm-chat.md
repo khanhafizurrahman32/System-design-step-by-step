@@ -10,6 +10,9 @@ tags: [real-time-updates, hard]
 
 *GPUs are the scarce resource, so every queueing decision is really a cost decision.*
 
+> [!TIP]
+> **One-page sketchnote:** [LLM CHAT (CHATGPT) on a single page](../sketchnotes/problem-llm-chat.svg), for revision or printing.
+
 ## TL;DR
 
 - Stream tokens to the client as they are generated so the first words appear in under a second.
@@ -94,6 +97,21 @@ Per-user rate limits and token quotas at the gateway.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: SSE servers → Request queue → Inference workers → Redis Streams. Justify each addition with a number. |
 | 25–40 | Deep dives | Why a queue before GPUs? · Client disconnects? · Long context? · Cost control? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | GPUs are scarce; every queueing choice is a cost choice. |
+| **Deciding number** | ~12k generations/s, each holding a GPU for seconds. |
+| **Staff call and trade-off** | Priority queue with admission control in front of the GPU pool, streamed tokens. Accept 429s or waiting for the free tier. |
+| **Raise before you're asked** | Client disconnecting mid-stream; GPU pool failures; runaway cost. |
+| **Senior stops at** | Streaming. |
+| **Staff goes on to** | Capacity planned in GPU-seconds, fairness and priority policy, batching for throughput, cost per request. |
+| **Run it** | Watch time-to-first-token, queue wait, GPU utilisation, cost per 1k tokens. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

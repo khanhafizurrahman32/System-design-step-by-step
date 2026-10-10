@@ -17,6 +17,21 @@ const tw = (s, size) => [...s].reduce((a, c) => a + (FONT.w[c] ?? 0.6), 0) * siz
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const MAIN = 20, SUB = 15, LH = 1.25;
 
+function fontFaces(chars) {
+  const byFile = {};
+  for (const c of chars) { const f = FONT.file[c]; if (f) (byFile[f] = byFile[f] || []).push(c); }
+  let faces = '';
+  const tmp = fs.mkdtempSync('/tmp/fs-');
+  for (const [f, cs] of Object.entries(byFile)) {
+    const out = path.join(tmp, 'sub.woff2');
+    const u = cs.map(c => 'U+' + c.codePointAt(0).toString(16).padStart(4, '0')).join(',');
+    cp.execFileSync('pyftsubset', [path.join(FONTDIR, f), `--unicodes=${u}`, '--flavor=woff2', `--output-file=${out}`, '--no-hinting', '--desubroutinize']);
+    faces += `@font-face{font-family:'Excalifont';src:url(data:font/woff2;base64,${fs.readFileSync(out).toString('base64')}) format('woff2');unicode-range:${u};}`;
+  }
+  fs.rmSync(tmp, { recursive: true });
+  return faces;
+}
+
 function measure(n) {
   const lines = String(n[3]).split('\n');
   let w = 0, h = 0;
@@ -141,18 +156,7 @@ function build(spec, name, outdir) {
   let titleSvg = '';
   if (spec.title) { titleSvg = text(24, 38, spec.title, 24, INK, 'start'); }
 
-  // font subset per split file
-  const byFile = {};
-  for (const c of chars) { const f = FONT.file[c]; if (f) (byFile[f] = byFile[f] || []).push(c); }
-  let faces = '';
-  const tmp = fs.mkdtempSync('/tmp/fs-');
-  for (const [f, cs] of Object.entries(byFile)) {
-    const out = path.join(tmp, 'sub.woff2');
-    const u = cs.map(c => 'U+' + c.codePointAt(0).toString(16).padStart(4, '0')).join(',');
-    cp.execFileSync('pyftsubset', [path.join(FONTDIR, f), `--unicodes=${u}`, '--flavor=woff2', `--output-file=${out}`, '--no-hinting', '--desubroutinize']);
-    faces += `@font-face{font-family:'Excalifont';src:url(data:font/woff2;base64,${fs.readFileSync(out).toString('base64')}) format('woff2');}`;
-  }
-  fs.rmSync(tmp, { recursive: true });
+  const faces = fontFaces(chars);
 
   // grow the canvas if any box sticks out
   // crop the canvas to what is drawn (boxes, zones, free text, edge endpoints), with a margin
@@ -177,7 +181,7 @@ ${titleSvg}${svg}${edgeSvg}${nodeSvg}${labelSvg}${freeSvg}
   return out.length;
 }
 
-module.exports = { build };
+module.exports = { build, tw, fontFaces, PAL, INK, LH };
 if (require.main === module) {
   const [specPath, outdir] = process.argv.slice(2);
   const specs = require(path.resolve(specPath));

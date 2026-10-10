@@ -10,6 +10,9 @@ tags: [large-blobs, easy]
 
 *Syncing a 50 GB file after a one-byte edit should not mean uploading 50 GB again.*
 
+> [!TIP]
+> **One-page sketchnote:** [FILE STORAGE AND SYNC (DROPBOX) on a single page](../sketchnotes/problem-file-sync.svg), for revision or printing.
+
 ## TL;DR
 
 - Split files into chunks fingerprinted by hash, and upload only the chunks the server doesn't already have.
@@ -94,6 +97,21 @@ Verify via S3 event or ETags before marking the file version committed.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: S3 → Change log → CDN / presigned. Justify each addition with a number. |
 | 25–40 | Deep dives | Resume after failure? · How do devices learn about changes? · Edits on two offline devices? · Trust the client said "done"? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Sync efficiently and handle conflicting edits. |
+| **Deciding number** | A 50 GB file is ~10k chunks; a 1-byte edit changes one chunk. |
+| **Staff call and trade-off** | Content-defined chunking with dedupe, a change log with cursors. Accept "conflicted copy" files for offline edits. |
+| **Raise before you're asked** | Conflicts; partial uploads; cross-user dedupe leaking whether a file exists. |
+| **Senior stops at** | Chunking. |
+| **Staff goes on to** | Conflict UX, the privacy risk of cross-user dedupe, change-log retention. |
+| **Run it** | Watch sync latency, bytes uploaded per change, conflict rate. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

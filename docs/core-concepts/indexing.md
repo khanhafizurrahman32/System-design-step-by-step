@@ -23,6 +23,9 @@ tags: [core-concept]
 > [!WARNING]
 > **Cost:** Every index slows writes; index only the hot queries.
 
+> [!TIP]
+> **One-page sketchnote:** [DATABASE INDEXING on a single page](../sketchnotes/concept-indexing.svg), for revision or printing.
+
 ## Checklist
 
 1. Equality and ranges: B-tree (the default).

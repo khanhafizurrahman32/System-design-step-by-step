@@ -10,6 +10,9 @@ tags: [scaling-writes, medium]
 
 *Search over billions of posts, where like counts change constantly.*
 
+> [!TIP]
+> **One-page sketchnote:** [POST SEARCH (FACEBOOK) on a single page](../sketchnotes/problem-post-search.svg), for revision or printing.
+
 ## TL;DR
 
 - Build an inverted index (term → post IDs) from the stream of new posts, sharded by term.
@@ -91,6 +94,21 @@ Term-partitioned index means one shard per term, so replicate hot terms.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Kafka → Indexing workers → Inverted index → Query service → Like batcher → Cold postings → S3 → Query cache. Justify each addition with a number. |
 | 25–40 | Deep dives | Why not just Elasticsearch? · Likes change constantly? · Multi-keyword? · Hot term? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Index a firehose whose ranking signals change constantly. |
+| **Deciding number** | ~12k posts/s and ~10× that in likes. |
+| **Staff call and trade-off** | Inverted index built from the stream, sharded by term; like-based ranking updated in batches or at thresholds. Accept slightly stale like ranking. |
+| **Raise before you're asked** | Hot terms overloading one shard; privacy (who may see a post) enforced at query time; reindexing. |
+| **Senior stops at** | "use Elasticsearch". |
+| **Staff goes on to** | Explains the inverted index, term vs document partitioning, and privacy-aware retrieval. |
+| **Run it** | Watch index lag, query p99, shard skew. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

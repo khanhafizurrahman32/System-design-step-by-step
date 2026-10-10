@@ -8,6 +8,9 @@ tags: [core-concept, scaling-reads]
 
 **Used by:** [Ticketmaster](../problems/ticketmaster.md) · [URL shortener](../problems/url-shortener.md) · [News feed](../problems/news-feed.md) · [Local delivery](../problems/local-delivery.md) · [Distributed cache](../problems/distributed-cache.md)
 
+> [!TIP]
+> **One-page sketchnote:** [CACHING on a single page](../sketchnotes/concept-caching.svg), for revision or printing.
+
 ## TL;DR
 
 - A cache keeps a copy of hot data in memory so you don't pay the full cost of reading it every time. A database read takes about 5–50 ms; a Redis read takes about 1 ms.

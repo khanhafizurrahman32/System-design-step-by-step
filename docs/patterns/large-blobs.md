@@ -8,6 +8,9 @@ tags: [pattern]
 
 *Files, photos and videos belong in object storage, and their bytes should never pass through your application servers.*
 
+> [!TIP]
+> **One-page sketchnote:** [HANDLING LARGE BLOBS on a single page](../sketchnotes/pattern-large-blobs.svg), for revision or printing.
+
 ## When to reach for it
 
 - Users upload or download files larger than a few megabytes.

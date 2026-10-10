@@ -10,6 +10,9 @@ tags: [large-blobs, hard]
 
 *Two hard problems: getting gigabyte uploads in reliably, and streaming smoothly on any connection.*
 
+> [!TIP]
+> **One-page sketchnote:** [VIDEO PLATFORM (YOUTUBE) on a single page](../sketchnotes/problem-video-platform.svg), for revision or printing.
+
 ## TL;DR
 
 - Upload directly to object storage with presigned, multipart, resumable URLs; bytes never touch your servers.
@@ -93,6 +96,21 @@ Transcode popular formats eagerly; long-tail renditions lazily.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: S3 raw → Transcode DAG → S3 processed → CDN → Viewer. Justify each addition with a number. |
 | 25–40 | Deep dives | Why presigned URLs? · Fast transcoding? · Adaptive bitrate? · Cost? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Reliable huge uploads and smooth playback anywhere. |
+| **Deciding number** | ~1 PB/day raw uploads. |
+| **Staff call and trade-off** | Presigned multipart uploads, a segment-parallel transcoding DAG, CDN delivery. Accept encoding long-tail formats lazily. |
+| **Raise before you're asked** | Transcode failures and retries; storage cost; popularity spikes. |
+| **Senior stops at** | S3 + CDN. |
+| **Staff goes on to** | A cost model (storage tiers, lazy encoding), DAG retries, CDN strategy. |
+| **Run it** | Watch upload success, time to playable, CDN hit ratio, rebuffer rate. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

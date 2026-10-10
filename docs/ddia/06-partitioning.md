@@ -8,6 +8,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 6 · PARTITIONING (SHARDING) on a single page](../sketchnotes/ddia-06.svg), for revision or printing.
+
 ## TL;DR
 
 When data or write load is too big for one machine, split it. Each record belongs to exactly one partition. The goals are to spread data and load evenly, avoid **hot spots**, and move as little data as possible when nodes are added.

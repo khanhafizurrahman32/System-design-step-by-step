@@ -10,6 +10,9 @@ tags: [real-time-updates, medium]
 
 *One popular stream can mean a million viewers each expecting new comments within a fraction of a second.*
 
+> [!TIP]
+> **One-page sketchnote:** [LIVE COMMENTS (FACEBOOK LIVE) on a single page](../sketchnotes/problem-live-comments.svg), for revision or printing.
+
 ## TL;DR
 
 - Polling at this scale is a self-inflicted denial of service; push with Server-Sent Events.
@@ -92,6 +95,21 @@ Page the last N from Cassandra by cursor, then attach to the stream.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Realtime servers → Pub/sub → L7 LB. Justify each addition with a number. |
 | 25–40 | Deep dives | SSE or WebSocket? · How does one comment reach 1,000 servers? · Mega-streams? · Late join? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Fan-out to a million viewers in under 200 ms. |
+| **Deciding number** | 1M viewers × 1k comments/s ≈ 1B deliveries/s for one stream. |
+| **Staff call and trade-off** | SSE + pub/sub per video, viewers of a video routed to the same servers; sample comments on mega-streams. Accept that not every viewer sees every comment. |
+| **Raise before you're asked** | Reconnection storms after a deploy; slow consumers; moderation. |
+| **Senior stops at** | WebSocket + pub/sub. |
+| **Staff goes on to** | Points out nobody can read 1k comments/s and samples, plans for reconnect storms, sizes connections per server. |
+| **Run it** | Watch delivery p99, connections per server, dropped messages. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

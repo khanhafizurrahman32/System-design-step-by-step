@@ -8,6 +8,9 @@ tags: [contention, scaling-reads, medium]
 
 **Difficulty:** Medium · **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md) · **Core concept:** [Caching](../core-concepts/caching.md) · **DDIA:** [Ch 5 Replication](../ddia/05-replication.md), [Ch 7 Transactions](../ddia/07-transactions.md)
 
+> [!TIP]
+> **One-page sketchnote:** [TICKETMASTER on a single page](../sketchnotes/problem-ticketmaster.svg), for revision or printing.
+
 ## TL;DR
 
 - Two very different paths share one system. **Browsing** events is enormous, read-only traffic that can be slightly stale, so cache it hard. **Booking** is small but must be exactly right.
@@ -145,6 +148,21 @@ The outcome is unknown: the card may or may not have been charged. Keep the book
 | 22–30 | Fix | Conditional `UPDATE`; why no cleanup job is needed; why no long transaction. |
 | 30–40 | Scale | CDN + cache for browse; Elasticsearch via CDC for search; waiting room for on-sales. |
 | 40–45 | Wrap-up | Payment timeouts and idempotency; what you'd monitor (hold success rate, queue length, p99). |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | No seat sold twice while 10M people arrive at once. |
+| **Deciding number** | ~100k seats vs 10M users: bookings are capped, reads are not. |
+| **Staff call and trade-off** | Conditional-update holds; virtual waiting room; browse is AP, booking is CP. Accept fans waiting in a queue. |
+| **Raise before you're asked** | Payment timing out while the hold expires; bots; the read storm hitting the booking database. |
+| **Senior stops at** | Row locking. |
+| **Staff goes on to** | The waiting room as load control, bot mitigation and fairness, shielding the booking path. |
+| **Run it** | Watch hold success rate, queue length, admit rate, booking p99. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

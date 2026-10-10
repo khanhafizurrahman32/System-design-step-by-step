@@ -17,6 +17,9 @@ tags: [core-concept]
 > [!NOTE]
 > **Normalize vs denormalize:** Normalize by default (one place to update). Denormalize deliberately for a hot read path, and say how the copy stays in sync (CDC, async job).
 
+> [!TIP]
+> **One-page sketchnote:** [DATA MODELING on a single page](../sketchnotes/concept-data-modeling.svg), for revision or printing.
+
 ## Checklist
 
 1. List the two or three hottest queries first.

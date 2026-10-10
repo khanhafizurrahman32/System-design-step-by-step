@@ -10,6 +10,9 @@ tags: [scaling-writes, hard]
 
 *Millions of data points per second arrive, and alerts must fire within a minute.*
 
+> [!TIP]
+> **One-page sketchnote:** [METRICS MONITORING (DATADOG) on a single page](../sketchnotes/problem-metrics-monitoring.svg), for revision or printing.
+
 ## TL;DR
 
 - Buffer the write firehose through Kafka into a time-series database built for appends and compression.
@@ -95,6 +98,21 @@ Require N consecutive windows; dedupe and group in the alert manager.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Kafka → TSDB writers → TSDB → Query service → Rollups → S3 → Flink alert eval → Alert manager → PagerDuty. Justify each addition with a number. |
 | 25–40 | Deep dives | Why a TSDB? · High cardinality? · Late data? · Alert flapping? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | A write firehose plus alerts within a minute. |
+| **Deciding number** | 5M points/s; ~600 GB/day compressed. |
+| **Staff call and trade-off** | Kafka → time-series DB with compression and downsampling; alerts evaluated on the stream. Accept lower resolution for old data. |
+| **Raise before you're asked** | Cardinality explosion from user-ID tags; who monitors the monitoring; alert storms. |
+| **Senior stops at** | A TSDB. |
+| **Staff goes on to** | Cardinality limits as policy, alert path separate from query path, retention tiers priced out. |
+| **Run it** | Watch ingest lag, dropped points, alert evaluation latency, active series count. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

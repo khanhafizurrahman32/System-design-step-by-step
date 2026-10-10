@@ -10,6 +10,9 @@ tags: [real-time-updates, hard]
 
 *Four problems in one: a flood of location updates, matching, locking drivers, and a multi-step trip lifecycle.*
 
+> [!TIP]
+> **One-page sketchnote:** [RIDE SHARING (UBER) on a single page](../sketchnotes/problem-ride-sharing.svg), for revision or printing.
+
 ## TL;DR
 
 - Driver locations are ephemeral and frequent, so keep them in Redis's geospatial index, not a database.
@@ -95,6 +98,21 @@ Durable workflow/queue; the request is re-processed and idempotent by ride_id.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Redis GEO → Matching service → Redis lock → Request queue. Justify each addition with a number. |
 | 25–40 | Deep dives | Driver double-assigned? · Reduce location load? · Why not query Postgres + PostGIS? · Matcher crash mid-match? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | A flood of location updates and exclusive driver assignment. |
+| **Deciding number** | 250k location writes/s; ~100 ride requests/s on average. |
+| **Staff call and trade-off** | Redis GEO for locations; offer to one driver at a time with a driver lock and conditional assignment; durable per-region queue. Accept slightly slower matching. |
+| **Raise before you're asked** | A driver assigned twice; matcher crashing mid-match; city hot spots and surge. |
+| **Senior stops at** | Geo index + matching. |
+| **Staff goes on to** | Cells per city to isolate failures, surge as a feedback loop, regional failover. |
+| **Run it** | Watch time-to-match p95, offer acceptance, location update lag. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

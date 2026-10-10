@@ -10,6 +10,9 @@ tags: [multi-step-processes, hard]
 
 *Ten thousand jobs per second, each within two seconds of its scheduled time.*
 
+> [!TIP]
+> **One-page sketchnote:** [JOB SCHEDULER on a single page](../sketchnotes/problem-job-scheduler.svg), for revision or printing.
+
 ## TL;DR
 
 - Cron on one machine is a single point of failure that can't scale.
@@ -93,6 +96,21 @@ Secondary index on (user_id, scheduled_at).
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Poller → Delay queue → Workers → etcd / ZK. Justify each addition with a number. |
 | 25–40 | Deep dives | How do you hit 2s precision? · Worker dies mid-job? · Duplicate enqueues? · User history queries? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | 10k jobs/s, each within 2 s of its time, never lost. |
+| **Deciding number** | 864M executions/day. |
+| **Staff call and trade-off** | Time-bucketed store + poller + delay queue + leases. Accept at-least-once execution, so jobs must be idempotent. |
+| **Raise before you're asked** | Poller leader failing; clock drift; duplicate execution; every cron job firing at :00. |
+| **Senior stops at** | A jobs table and a queue. |
+| **Staff goes on to** | Reasons through the two-tier design, leader election with fencing, isolation between tenants. |
+| **Run it** | Watch schedule-to-start lag p99, missed jobs, retries. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

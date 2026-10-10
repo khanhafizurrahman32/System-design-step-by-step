@@ -10,6 +10,9 @@ tags: [real-time-updates, medium]
 
 *Many people bid on one row at the same time, and exactly one of them must win each race.*
 
+> [!TIP]
+> **One-page sketchnote:** [ONLINE AUCTION on a single page](../sketchnotes/problem-online-auction.svg), for revision or printing.
+
 ## TL;DR
 
 - Comparing bids in application code loses updates under concurrency.
@@ -94,6 +97,21 @@ Extend end_time by N seconds on late bids, inside the same update.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Pub/sub → SSE → Watchers → Kafka → Delayed job. Justify each addition with a number. |
 | 25–40 | Deep dives | Two bids at the same instant? · Clock fairness at the deadline? · Durability? · Anti-sniping? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | One hot row, and bids must be strictly ordered. |
+| **Deciding number** | ~1k bids/s on one auction in its final seconds. |
+| **Staff call and trade-off** | Conditional update on the auction row; a Kafka partition per auction for the hottest ones. Accept serialized throughput per auction. |
+| **Raise before you're asked** | Deadline fairness (use server time); sniping; durability of an accepted bid. |
+| **Senior stops at** | A lock. |
+| **Staff goes on to** | Anti-sniping as a product decision, serializing through a log for extreme auctions, an audit trail. |
+| **Run it** | Watch bid acceptance latency, rejected-bid rate, partition lag. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

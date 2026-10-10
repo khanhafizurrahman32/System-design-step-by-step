@@ -8,6 +8,9 @@ tags: [pattern]
 
 *Many users want the same thing at the same moment. Exactly one should win, every time.*
 
+> [!TIP]
+> **One-page sketchnote:** [DEALING WITH CONTENTION on a single page](../sketchnotes/pattern-contention.svg), for revision or printing.
+
 ## When to reach for it
 
 - Limited resources: seats, stock, a username, a driver, the highest bid.

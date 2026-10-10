@@ -19,6 +19,9 @@ tags: [core-concept]
 > [!NOTE]
 > **Hot spots:** Even with hashing, one hot key overloads one shard: key splitting, caching, or buffering.
 
+> [!TIP]
+> **One-page sketchnote:** [SHARDING on a single page](../sketchnotes/concept-sharding.svg), for revision or printing.
+
 ## Checklist
 
 1. Has the calculation shown one primary isn't enough after caching and replicas?

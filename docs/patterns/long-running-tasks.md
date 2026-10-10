@@ -8,6 +8,9 @@ tags: [pattern]
 
 *If work takes longer than a request should, accept it, queue it, and let the client check back.*
 
+> [!TIP]
+> **One-page sketchnote:** [LONG-RUNNING TASKS on a single page](../sketchnotes/pattern-long-running-tasks.svg), for revision or printing.
+
 ## When to reach for it
 
 - Work takes more than a second or two: transcoding, report generation, code execution, model inference.

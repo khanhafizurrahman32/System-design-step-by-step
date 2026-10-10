@@ -21,6 +21,9 @@ tags: [core-concept]
 | WebSocket | Bidirectional real-time (chat, docs, games) |
 | Long polling | Fallback push when nothing else works |
 
+> [!TIP]
+> **One-page sketchnote:** [NETWORKING ESSENTIALS on a single page](../sketchnotes/concept-networking.svg), for revision or printing.
+
 ## Checklist
 
 1. Public API used by browsers and partners: REST over HTTPS.

@@ -1,8 +1,8 @@
 site_name: System Design, Step by Step
 site_description: A free, diagram-first system design handbook. Start simple, find the break, fix only that.
-site_url: https://khanhafizurrahman32.github.io/System-design-step-by-step/foundations/how-to-approach-a-design/
-repo_url: https://github.com/khanhafizurrahman32/System-design-step-by-step   # set when the repo is created
-edit_uri: edit/main/docs/          # enable together with repo_url
+site_url: https://khanhafizurrahman32.github.io/System-design-step-by-step/
+repo_url: https://github.com/khanhafizurrahman32/System-design-step-by-step
+edit_uri: edit/main/docs/
 exclude_docs: |
   diagrams/README.md
 theme:
@@ -129,5 +129,7 @@ nav:
   - The 45-minute delivery framework: playbook/delivery-framework.md
   - Phrases, signals and traps: playbook/phrases-and-traps.md
   - Quick-fire practice: playbook/quick-fire.md
+  - Staff-level answers: playbook/staff-level.md
+- Sketchnotes: sketchnotes/index.md
 - Slide decks: slides/index.md
 - Contributing: contributing.md

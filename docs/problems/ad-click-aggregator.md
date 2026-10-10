@@ -10,6 +10,9 @@ tags: [scaling-writes, hard]
 
 *Clicks are money, so the numbers must be fast for dashboards and exact for billing.*
 
+> [!TIP]
+> **One-page sketchnote:** [AD CLICK AGGREGATOR on a single page](../sketchnotes/problem-ad-click-aggregator.svg), for revision or printing.
+
 ## TL;DR
 
 - Redirect immediately and publish the click to Kafka; never aggregate raw rows at query time.
@@ -91,6 +94,21 @@ Column store and pre-aggregates make time-range queries over billions of rows su
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Kafka → Flink → OLAP → Advertiser → S3 raw → Spark nightly. Justify each addition with a number. |
 | 25–40 | Deep dives | Flink crashes? · Hot ad (Super Bowl)? · Why also batch? · Why OLAP? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Counts that are fast for dashboards and exact for billing. |
+| **Deciding number** | 10k clicks/s at peak, 100M/day, ~10 GB/day raw. |
+| **Staff call and trade-off** | Kafka → Flink (dedupe by signed impression ID) → OLAP store, plus a nightly batch recount. Accept running two paths to get money right. |
+| **Raise before you're asked** | Click fraud; double counting on replay (idempotent upserts); events arriving after the window closed. |
+| **Senior stops at** | Stream aggregation. |
+| **Staff goes on to** | Adds batch reconciliation because it is money, signed impression IDs, and an audit trail for advertiser disputes. |
+| **Run it** | Watch stream vs batch difference, consumer lag, dedupe rate. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

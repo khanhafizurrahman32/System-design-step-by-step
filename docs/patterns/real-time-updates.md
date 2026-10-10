@@ -8,6 +8,9 @@ tags: [pattern]
 
 *Push changes to clients the moment they happen, even when the sender and receiver are connected to different servers.*
 
+> [!TIP]
+> **One-page sketchnote:** [REAL-TIME UPDATES on a single page](../sketchnotes/pattern-real-time-updates.svg), for revision or printing.
+
 ## When to reach for it
 
 - Users expect to see changes within about a second: chat, live comments, prices, collaboration, ride tracking.

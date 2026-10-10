@@ -10,6 +10,9 @@ tags: [scaling-reads, easy]
 
 *It sounds like a toy, but it is the cleanest example of a read-heavy system: almost every request is a redirect.*
 
+> [!TIP]
+> **One-page sketchnote:** [URL SHORTENER (BITLY) on a single page](../sketchnotes/problem-url-shortener.svg), for revision or printing.
+
 ## TL;DR
 
 - Redirects outnumber new links about 100 to 1, so the design is mostly about serving reads fast.
@@ -89,6 +92,21 @@ Same table with a unique constraint; the insert fails if taken. Keep namespaces 
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Redirect service → Redis cache → Redis counter. Justify each addition with a number. |
 | 25–40 | Deep dives | How do you guarantee unique codes? · 301 or 302? · What if the counter node dies? · Custom aliases? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Serve redirects fast at 100:1 read-heavy, and make codes unique without coordination. |
+| **Deciding number** | ~100k redirects/s peak vs ~12 writes/s; 1B links × 500 B ≈ 500 GB, one Postgres. |
+| **Staff call and trade-off** | Cache-aside Redis plus replicas; counter + base62 with servers leasing ID ranges. Accept guessable codes, or add a reversible shuffle. |
+| **Raise before you're asked** | A viral link expiring from cache (stampede); losing the counter node (leased ranges make gaps harmless); phishing links. |
+| **Senior stops at** | Cache in front of the DB. |
+| **Staff goes on to** | Treats 301 vs 302 as a product decision (analytics vs load), adds abuse scanning, serves redirects from the edge for global latency. |
+| **Run it** | SLO: p99 redirect < 100 ms. Watch hit ratio and DB miss QPS. Next step at 10×: edge key-value store at the CDN. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

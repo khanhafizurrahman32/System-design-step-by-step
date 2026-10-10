@@ -53,7 +53,7 @@ def cover_html(sections):
 async def main():
     nav = yaml.safe_load('nav:' + (ROOT / 'mkdocs.yml').read_text().split('\nnav:')[1])['nav']
     pages = list(nav_pages(nav))
-    pages = [p for p in pages if p[2] != 'contributing.md']
+    pages = [p for p in pages if p[2] not in ('contributing.md', 'sketchnotes/index.md')]
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(SITE))
     handler.log_message = lambda *a: None
     srv = http.server.ThreadingHTTPServer(('127.0.0.1', PORT), handler)

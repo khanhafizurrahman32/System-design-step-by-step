@@ -10,6 +10,9 @@ tags: [multi-step-processes, hard]
 
 *Throughput is moderate. The hard part is staying correct when a call to the bank has an unknown outcome.*
 
+> [!TIP]
+> **One-page sketchnote:** [PAYMENT SYSTEM (STRIPE) on a single page](../sketchnotes/problem-payment-system.svg), for revision or printing.
+
 ## TL;DR
 
 - Record the payment as pending before calling the processor, and pass your ID as the idempotency key.
@@ -95,6 +98,21 @@ Impossible. Design a state machine with compensation (refund) and reconciliation
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Postgres → Card vault → Kafka (outbox relay) → Webhook service → Daily reconcile. Justify each addition with a number. |
 | 25–40 | Deep dives | Processor times out? · Webhook delivery? · Why double-entry? · Distributed transaction with the bank? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Stay correct when a call to the bank has an unknown outcome. |
+| **Deciding number** | ~10k TPS: moderate. Correctness is the problem. |
+| **Staff call and trade-off** | Pending record first, idempotency keys, outbox, double-entry ledger, daily reconciliation. Accept extra writes for auditability. |
+| **Raise before you're asked** | Processor timeouts; duplicate webhooks; partial refunds; PCI scope creep. |
+| **Senior stops at** | Idempotency keys. |
+| **Staff goes on to** | Ledger design, reconciliation, isolating card data to shrink compliance scope. |
+| **Run it** | Watch reconciliation breaks, age of pending payments, webhook delivery success. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

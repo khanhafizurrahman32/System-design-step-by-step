@@ -8,6 +8,9 @@ tags: [pattern]
 
 *A business action spans several services and any step can fail halfway. Make progress durable and failures reversible.*
 
+> [!TIP]
+> **One-page sketchnote:** [MULTI-STEP PROCESSES on a single page](../sketchnotes/pattern-multi-step-processes.svg), for revision or printing.
+
 ## When to reach for it
 
 - One user action touches several services or external APIs: booking + payment + confirmation, ride lifecycle, order fulfilment.

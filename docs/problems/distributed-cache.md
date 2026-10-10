@@ -10,6 +10,9 @@ tags: [scaling-reads, medium]
 
 *Design Redis itself: data structures inside one node, then distribution across many.*
 
+> [!TIP]
+> **One-page sketchnote:** [DISTRIBUTED CACHE on a single page](../sketchnotes/problem-distributed-cache.svg), for revision or printing.
+
 ## TL;DR
 
 - One node is a hash map plus a doubly linked list for O(1) least-recently-used eviction.
@@ -92,6 +95,21 @@ Every scale event remaps ~all keys, and the cold cache stampedes the database.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Cache node A → Cache node B → Cache node C → Replica A′ → Replica B′ → Replica C′ → Config / ZK. Justify each addition with a number. |
 | 25–40 | Deep dives | LRU in O(1)? · Add a node? · Hot key? · Why not hash % N? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Build the cache itself: eviction, distribution, failover. |
+| **Deciding number** | 1 TB ÷ ~32 GB per node ≈ 32+ nodes; each node ≫ 100k ops/s, so memory sets the count. |
+| **Staff call and trade-off** | Consistent hashing with virtual nodes, async replica per primary. Accept losing a few writes on failover. |
+| **Raise before you're asked** | Hot key overloading one node; scale-out causing cold misses and a DB stampede; split brain on promotion. |
+| **Senior stops at** | LRU + consistent hashing. |
+| **Staff goes on to** | Membership via a config service, gradual warm-up on scale-out, client routing vs proxy trade-off. |
+| **Run it** | Watch hit ratio, evictions, per-node p99 and memory, rebalance traffic. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

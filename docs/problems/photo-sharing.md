@@ -10,6 +10,9 @@ tags: [large-blobs, medium]
 
 *A news feed plus a media pipeline: two well-known problems combined.*
 
+> [!TIP]
+> **One-page sketchnote:** [PHOTO SHARING (INSTAGRAM) on a single page](../sketchnotes/problem-photo-sharing.svg), for revision or printing.
+
 ## TL;DR
 
 - Upload media straight to object storage; process thumbnails and sizes asynchronously; serve them from a CDN.
@@ -92,6 +95,21 @@ CDN for media; regional read replicas or caches for the feed.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: S3 media → Media processing → CDN → Kafka → Fan-out workers → Redis feeds. Justify each addition with a number. |
 | 25–40 | Deep dives | Post visible before media is processed? · Celebrities? · Like counts? · Global latency? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | A feed plus a media pipeline. |
+| **Deciding number** | ~115k feed reads/s; ~200 TB/day of media. |
+| **Staff call and trade-off** | Presigned uploads, async processing, CDN; hybrid fan-out. Accept a post appearing only after processing. |
+| **Raise before you're asked** | Processing backlog; celebrity fan-out; storage cost. |
+| **Senior stops at** | Feed + S3. |
+| **Staff goes on to** | Storage tiering and cost, processing SLOs, regional reads. |
+| **Run it** | Watch time to visible, feed p99, CDN hit ratio. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

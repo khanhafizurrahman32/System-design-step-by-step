@@ -10,6 +10,9 @@ tags: [scaling-writes, medium]
 
 *Five hundred million products can't all be crawled often, so decide what is worth checking.*
 
+> [!TIP]
+> **One-page sketchnote:** [PRICE TRACKER (CAMELCAMELCAMEL) on a single page](../sketchnotes/problem-price-tracker.svg), for revision or printing.
+
 ## TL;DR
 
 - Prioritise crawling by how many people track a product and how often its price changes.
@@ -91,6 +94,21 @@ Daily aggregates, cached.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Browser extension → Kafka → Time-series DB → Alert matcher → Subscriptions DB → Email / push. Justify each addition with a number. |
 | 25–40 | Deep dives | Crawl budget? · Bad extension data? · Matching efficiently? · Charts? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Too many products to crawl often, so spend the crawl budget where it matters. |
+| **Deciding number** | 500M products; ~6k pages/s to crawl each one daily. |
+| **Staff call and trade-off** | Crawl by priority (trackers, volatility) + validated crowd-sourced prices + event-driven alerts. Accept staler prices on the long tail. |
+| **Raise before you're asked** | Being blocked by the site; poisoned extension data; alert spam. |
+| **Senior stops at** | A cron crawl and a scan of subscriptions. |
+| **Staff goes on to** | Prioritises by value, validates crowd data, reacts to price events instead of scanning. |
+| **Run it** | Watch freshness of tracked products, alert latency, crawl budget used. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 

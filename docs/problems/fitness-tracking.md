@@ -10,6 +10,9 @@ tags: [scaling-writes, medium]
 
 *The key insight is where the work happens: on the phone, not the server.*
 
+> [!TIP]
+> **One-page sketchnote:** [FITNESS TRACKING (STRAVA) on a single page](../sketchnotes/problem-fitness-tracking.svg), for revision or printing.
+
 ## TL;DR
 
 - Record GPS on the device and upload the whole activity when it ends; no need to stream every point.
@@ -95,6 +98,21 @@ Use device timestamps (event time), not upload time.
 | 13–25 | v1, then evolve it | Draw v1 and show where it breaks. Then add, in order: Postgres → S3 → Queue → Stats / segment workers → Redis. Justify each addition with a number. |
 | 25–40 | Deep dives | Why device-first? · Upload reliability? · Leaderboards? · Time correctness? |
 | 40–45 | Wrap-up | Remaining bottlenecks, failure modes, what you would monitor. |
+
+
+## Staff-level lens
+
+| Question | Staff answer |
+|---|---|
+| **The real problem** | Do the work on the phone; make uploads reliable. |
+| **Deciding number** | 10M activities/day; ~1 TB/day of tracks. |
+| **Staff call and trade-off** | Record on device; idempotent, resumable upload; process asynchronously. Accept no live server view by default. |
+| **Raise before you're asked** | Duplicate uploads; device clock and timezone errors; leaking home locations (privacy zones). |
+| **Senior stops at** | Upload then process. |
+| **Staff goes on to** | Rejects streaming every GPS point with numbers, adds privacy zones, considers leaderboard cheating. |
+| **Run it** | Watch upload success, processing lag, leaderboard freshness. |
+
+All 29 problems through this lens: [Staff-level answers](../playbook/staff-level.md).
 
 ## 8. Common mistakes
 
