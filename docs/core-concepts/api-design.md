@@ -6,6 +6,8 @@ tags: [core-concept]
 
 # API design
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 *Spend five minutes, get the important details right, and move on to the design.*
 
 | Rule | Example |

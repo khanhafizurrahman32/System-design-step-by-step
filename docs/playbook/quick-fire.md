@@ -5,6 +5,8 @@ description: "Eighteen short questions interviewers ask between deep dives. Answ
 
 # Quick-fire practice
 
+<span class="lvl lvl-i">Intermediate</span>
+
 Answer each question out loud in under 30 seconds, then open it to compare.
 
 <details>

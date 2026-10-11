@@ -6,6 +6,8 @@ tags: [scaling-reads, medium]
 
 # News feed (Facebook)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) Twitter load · [Ch 11](../ddia/11-stream-processing.md) materialized views · [Ch 6](../ddia/06-partitioning.md) hot keys
 
 *The canonical fan-out problem: build a personalised feed for billions of users in a few hundred milliseconds.*

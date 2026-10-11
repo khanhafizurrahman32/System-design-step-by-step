@@ -6,6 +6,8 @@ tags: [large-blobs, medium]
 
 # Photo sharing (Instagram)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) fan-out · [Ch 11](../ddia/11-stream-processing.md) async pipelines
 
 *A news feed plus a media pipeline: two well-known problems combined.*

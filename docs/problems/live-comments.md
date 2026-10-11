@@ -6,6 +6,8 @@ tags: [real-time-updates, medium]
 
 # Live comments (Facebook Live)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) pub/sub · [Ch 6](../ddia/06-partitioning.md) partition by video
 
 *One popular stream can mean a million viewers each expecting new comments within a fraction of a second.*

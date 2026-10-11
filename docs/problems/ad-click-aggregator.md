@@ -6,6 +6,8 @@ tags: [scaling-writes, hard]
 
 # Ad click aggregator
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) windows, exactly-once · [Ch 12](../ddia/12-future-of-data-systems.md) Lambda · [Ch 3](../ddia/03-storage-and-retrieval.md) column stores
 
 *Clicks are money, so the numbers must be fast for dashboards and exact for billing.*

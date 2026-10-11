@@ -5,6 +5,8 @@ description: "What changes between a senior and a staff system design answer, wi
 
 # Staff-level answers
 
+<span class="lvl lvl-a">Advanced</span>
+
 A senior answer produces a working design. A staff answer also says **which number decided it**, **what trade-off it accepts**, **what will break before anyone asks**, and **how it will be run and changed**. Interviewers for staff roles grade those four things more than the boxes on the whiteboard.
 
 > [!TIP]

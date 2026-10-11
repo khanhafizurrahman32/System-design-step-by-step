@@ -6,6 +6,8 @@ tags: [core-concept]
 
 # Networking essentials
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 *How a request travels from a user to your service, and which protocol to pick for which job.*
 
 ![Concept 1: Networking essentials](../diagrams/concept-networking.svg)

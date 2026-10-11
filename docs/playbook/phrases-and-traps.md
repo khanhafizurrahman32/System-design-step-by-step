@@ -5,6 +5,8 @@ description: What senior-level answers sound like, the habits that give away a j
 
 # Phrases, signals and traps
 
+<span class="lvl lvl-i">Intermediate</span>
+
 ## What a senior answer sounds like
 
 | Signal | Example |

@@ -6,6 +6,8 @@ tags: [core-concept]
 
 # Database indexing
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 *An index turns a scan of every row into a short walk down a tree. Pick the right kind for the query.*
 
 | Index | Use for | Example |

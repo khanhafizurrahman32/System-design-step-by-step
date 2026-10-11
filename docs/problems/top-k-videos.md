@@ -6,6 +6,8 @@ tags: [scaling-writes, hard]
 
 # Top-K videos (YouTube)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) windows, partitioned streams · [Ch 6](../ddia/06-partitioning.md) partition by key
 
 *The design falls straight out of one number: hundreds of thousands of views per second.*

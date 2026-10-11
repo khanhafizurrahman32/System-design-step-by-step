@@ -6,6 +6,8 @@ tags: [scaling-reads, medium]
 
 # Distributed cache
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 6](../ddia/06-partitioning.md) consistent hashing · [Ch 5](../ddia/05-replication.md) async replication
 
 *Design Redis itself: data structures inside one node, then distribution across many.*

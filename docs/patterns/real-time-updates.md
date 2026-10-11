@@ -6,6 +6,8 @@ tags: [pattern]
 
 # Real-time updates
 
+<span class="lvl lvl-i">Intermediate</span>
+
 *Push changes to clients the moment they happen, even when the sender and receiver are connected to different servers.*
 
 > [!TIP]

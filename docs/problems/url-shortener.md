@@ -6,6 +6,8 @@ tags: [scaling-reads, easy]
 
 # URL shortener (Bitly)
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 **Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) replicas · [Ch 6](../ddia/06-partitioning.md) hash sharding
 
 *It sounds like a toy, but it is the cleanest example of a read-heavy system: almost every request is a redirect.*

@@ -6,6 +6,8 @@ tags: [multi-step-processes, hard]
 
 # Payment system (Stripe)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) unknown outcomes · [Ch 12](../ddia/12-future-of-data-systems.md) end-to-end idempotency, integrity · [Ch 11](../ddia/11-stream-processing.md) outbox
 
 *Throughput is moderate. The hard part is staying correct when a call to the bank has an unknown outcome.*

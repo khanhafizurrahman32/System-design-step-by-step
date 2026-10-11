@@ -6,6 +6,8 @@ tags: [pattern]
 
 # Dealing with contention
 
+<span class="lvl lvl-i">Intermediate</span>
+
 *Many users want the same thing at the same moment. Exactly one should win, every time.*
 
 > [!TIP]

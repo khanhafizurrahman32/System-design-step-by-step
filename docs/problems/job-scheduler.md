@@ -6,6 +6,8 @@ tags: [multi-step-processes, hard]
 
 # Job scheduler
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 9](../ddia/09-consistency-and-consensus.md) leader election · [Ch 8](../ddia/08-trouble-with-distributed-systems.md) leases / fencing · [Ch 6](../ddia/06-partitioning.md) time partitioning
 
 *Ten thousand jobs per second, each within two seconds of its scheduled time.*

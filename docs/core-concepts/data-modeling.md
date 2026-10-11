@@ -6,6 +6,8 @@ tags: [core-concept]
 
 # Data modeling
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 *Start from the queries the product runs, then choose keys and indexes that make each one cheap.*
 
 ![Concept 3: Data modeling](../diagrams/concept-data-modeling.svg)

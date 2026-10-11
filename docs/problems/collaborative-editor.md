@@ -6,6 +6,8 @@ tags: [real-time-updates, hard]
 
 # Collaborative editor (Google Docs)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) conflict resolution · [Ch 9](../ddia/09-consistency-and-consensus.md) total order · [Ch 11](../ddia/11-stream-processing.md) event log
 
 *The challenge is correctness, not scale: everyone must end up with the same document.*

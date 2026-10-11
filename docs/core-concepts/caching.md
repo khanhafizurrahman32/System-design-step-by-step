@@ -6,6 +6,8 @@ tags: [core-concept, scaling-reads]
 
 # Caching
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 **Used by:** [Ticketmaster](../problems/ticketmaster.md) · [URL shortener](../problems/url-shortener.md) · [News feed](../problems/news-feed.md) · [Local delivery](../problems/local-delivery.md) · [Distributed cache](../problems/distributed-cache.md)
 
 > [!TIP]

@@ -6,6 +6,8 @@ tags: [real-time-updates, hard]
 
 # Stock trading (Robinhood)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) unknown outcomes · [Ch 12](../ddia/12-future-of-data-systems.md) idempotency · [Ch 11](../ddia/11-stream-processing.md) pub/sub
 
 *Two separate problems: pushing live prices to millions, and never losing or duplicating an order.*

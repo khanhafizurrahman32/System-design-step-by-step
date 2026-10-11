@@ -6,6 +6,8 @@ tags: [scaling-writes, medium]
 
 # Fitness tracking (Strava)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) event time · [Ch 12](../ddia/12-future-of-data-systems.md) idempotent upload
 
 *The key insight is where the work happens: on the phone, not the server.*

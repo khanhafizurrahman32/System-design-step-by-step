@@ -6,6 +6,8 @@ tags: [real-time-updates, medium]
 
 # Chat app (WhatsApp)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) consistent prefix · [Ch 11](../ddia/11-stream-processing.md) at-least-once + idempotency
 
 *Chat looks like CRUD until you notice the two users are on different servers and one of them is offline.*

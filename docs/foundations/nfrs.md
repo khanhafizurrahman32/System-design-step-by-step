@@ -5,6 +5,8 @@ description: The eleven qualities that drive architecture, how to put a number o
 
 # Non-functional requirements
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 Functional requirements say **what** the system does. Non-functional requirements (NFRs) say **how well**, and they decide the architecture. Two systems with identical features but different NFRs look nothing alike.
 
 > [!TIP]

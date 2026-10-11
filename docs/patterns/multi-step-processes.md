@@ -6,6 +6,8 @@ tags: [pattern]
 
 # Multi-step processes
 
+<span class="lvl lvl-a">Advanced</span>
+
 *A business action spans several services and any step can fail halfway. Make progress durable and failures reversible.*
 
 > [!TIP]

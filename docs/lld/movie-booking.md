@@ -5,6 +5,8 @@ description: Hold several seats atomically, expire abandoned holds, and never se
 
 # LLD: Movie ticket booking
 
+<span class="lvl lvl-i">Intermediate</span>
+
 ## Requirements
 
 - Browse shows (a movie on a screen at a time) and see which seats are free.

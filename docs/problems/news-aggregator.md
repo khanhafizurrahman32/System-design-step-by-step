@@ -6,6 +6,8 @@ tags: [scaling-reads, easy]
 
 # News aggregator (Google News)
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 **Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) load parameters · [Ch 10](../ddia/10-batch-processing.md) ingest pipelines
 
 *A feed problem where the feed is the same for everyone in a region, which changes everything.*

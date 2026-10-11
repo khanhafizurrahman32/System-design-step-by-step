@@ -16,6 +16,7 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.tooltips
     - toc.follow
   palette:
     - media: "(prefers-color-scheme: light)"
@@ -36,13 +37,19 @@ markdown_extensions:
   - admonition
   - github-callouts
   - md_in_html
+  - abbr
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
   - attr_list
   - pymdownx.superfences
   - pymdownx.highlight
 nav:
 - Home: index.md
+- Start here: start-here.md
 - Foundations:
   - Overview: foundations/index.md
+  - The basics: foundations/basics.md
   - How to approach any design: foundations/how-to-approach-a-design.md
   - Non-functional requirements: foundations/nfrs.md
   - Numbers and estimation: foundations/numbers-and-estimation.md
@@ -129,7 +136,9 @@ nav:
   - The 45-minute delivery framework: playbook/delivery-framework.md
   - Phrases, signals and traps: playbook/phrases-and-traps.md
   - Quick-fire practice: playbook/quick-fire.md
+  - What's expected at each level: playbook/levels.md
   - Staff-level answers: playbook/staff-level.md
 - Sketchnotes: sketchnotes/index.md
 - Slide decks: slides/index.md
+- Glossary: glossary.md
 - Contributing: contributing.md

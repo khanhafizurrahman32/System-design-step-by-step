@@ -11,11 +11,15 @@ Most resources show you a finished architecture and expect you to memorize it. T
 
 ![How this handbook fits together](diagrams/handbook-map.svg)
 
+> [!TIP]
+> **New here?** [Start here](start-here.md) has a learning path for your level, from intermediate to staff, with checkpoints. Every page is marked <span class="lvl lvl-b">Beginner-friendly</span>, <span class="lvl lvl-i">Intermediate</span> or <span class="lvl lvl-a">Advanced</span>, and you can hover over technical terms for a definition, or look them up in the [glossary](glossary.md).
+
 ## What's inside
 
 | Section | What you get |
 |---|---|
-| [Foundations](foundations/index.md) | The method, non-functional requirements with SLOs, and the numbers to know |
+| [Start here](start-here.md) | Learning paths for intermediate, senior and staff engineers |
+| [Foundations](foundations/index.md) | The basics of how requests flow, the method, non-functional requirements and the numbers to know |
 | [Core concepts](core-concepts/index.md) | Networking, API design, data modeling, indexing, caching, sharding, consistent hashing, CAP |
 | [7 patterns](patterns/index.md) | Scaling reads and writes, real-time updates, contention, multi-step processes, large blobs, long-running tasks |
 | [Technologies](technologies.md) | Postgres, Redis, Kafka, Cassandra, DynamoDB, Elasticsearch, Flink, ZooKeeper, API gateways: when and when not |
@@ -26,13 +30,15 @@ Most resources show you a finished architecture and expect you to memorize it. T
 | [Staff-level answers](playbook/staff-level.md) | Senior vs staff, and all 29 problems through a staff lens ([interactive atlas](slides/staff-atlas.html)) |
 | [Sketchnotes](sketchnotes/index.md) | 59 dense hand-drawn pages, one per topic, for revision and printing |
 | [Slide decks](slides/index.md) | Three interactive decks for review and out-loud rehearsal |
+| [Glossary](glossary.md) | Plain-language definitions of 100+ terms |
 
 ## Pick your path
 
 | If you want to… | Do this |
 |---|---|
-| **Learn system design** | Foundations → Core concepts → Patterns → Problems. Each problem walks from a naive **v1** to the final design. |
+| **Learn system design** | Follow the [intermediate path](start-here.md#path-1-intermediate-engineer-about-23-weeks-1-hour-a-day): basics, core concepts, three patterns, then eight problems in order, with checkpoints. |
 | **Prepare for an interview in two weeks** | Read the [playbook](playbook/index.md), then do two problems a day: read the page, then rehearse it with the [interview deck](slides/interview.html). |
+| **Know how deep to go** | Read [What's expected at each level](playbook/levels.md): the same problem answered at mid-level, senior, staff and principal. |
 | **Interviewing for staff or above** | Read [Staff-level answers](playbook/staff-level.md), then use the [staff atlas](slides/staff-atlas.html) to rehearse all 29 problems at that level. |
 | **Understand the theory** | Read the [DDIA pages](ddia/index.md) alongside the book; every chapter ends with how it shows up in interviews. |
 | **Review the night before** | Flip through the [sketchnotes](sketchnotes/index.md), starting with the [interview cheat sheet](sketchnotes/interview-cheat-sheet.svg), then do the [quick-fire questions](playbook/quick-fire.md). |

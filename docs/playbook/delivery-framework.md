@@ -5,6 +5,8 @@ description: What to do in each part of a system design interview, how long to s
 
 # The 45-minute delivery framework
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 ![Interview timeline](../diagrams/interview-timeline.svg)
 
 | Time | Phase | Do | Avoid |

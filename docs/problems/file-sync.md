@@ -6,6 +6,8 @@ tags: [large-blobs, easy]
 
 # File storage and sync (Dropbox)
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 **Difficulty:** Easy · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) conflicts · [Ch 11](../ddia/11-stream-processing.md) change log / cursor
 
 *Syncing a 50 GB file after a one-byte edit should not mean uploading 50 GB again.*

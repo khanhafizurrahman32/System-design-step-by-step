@@ -6,6 +6,8 @@ tags: [core-concept]
 
 # Consistent hashing
 
+<span class="lvl lvl-i">Intermediate</span>
+
 *Add or remove a node and move only a small share of the keys.*
 
 ![Concept 7: Consistent hashing](../diagrams/concept-consistent-hashing.svg)

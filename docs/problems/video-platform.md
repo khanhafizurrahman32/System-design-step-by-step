@@ -6,6 +6,8 @@ tags: [large-blobs, hard]
 
 # Video platform (YouTube)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 10](../ddia/10-batch-processing.md) batch DAGs · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) bandwidth math
 
 *Two hard problems: getting gigabyte uploads in reliably, and streaming smoothly on any connection.*

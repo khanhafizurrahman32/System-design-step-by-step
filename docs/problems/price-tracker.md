@@ -6,6 +6,8 @@ tags: [scaling-writes, medium]
 
 # Price tracker (CamelCamelCamel)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) event-driven · [Ch 3](../ddia/03-storage-and-retrieval.md) time-series storage
 
 *Five hundred million products can't all be crawled often, so decide what is worth checking.*

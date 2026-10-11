@@ -6,6 +6,8 @@ tags: [scaling-reads, medium]
 
 # Business discovery (Yelp)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) geo indexes · [Ch 7](../ddia/07-transactions.md) atomic updates · [Ch 5](../ddia/05-replication.md) read replicas
 
 *The trap is over-engineering: the whole dataset fits on one database server.*

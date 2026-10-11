@@ -6,6 +6,8 @@ tags: [ddia, replication]
 
 # DDIA Chapter 5: Replication
 
+<span class="lvl lvl-a">Advanced</span>
+
 > These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
 
 > [!TIP]

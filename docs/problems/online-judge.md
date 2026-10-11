@@ -6,6 +6,8 @@ tags: [multi-step-processes, medium]
 
 # Online judge (LeetCode)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) queues · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) bursty load
 
 *You are running strangers' code on your servers, so isolation comes first.*

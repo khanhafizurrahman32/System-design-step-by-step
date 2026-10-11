@@ -6,6 +6,8 @@ tags: [real-time-updates, hard]
 
 # LLM chat (ChatGPT)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) logs and streams · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) tail latency
 
 *GPUs are the scarce resource, so every queueing decision is really a cost decision.*

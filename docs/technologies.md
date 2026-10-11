@@ -5,6 +5,8 @@ description: Nine technologies that cover most designs, with when to use each, w
 
 # Choosing technologies
 
+<span class="lvl lvl-i">Intermediate</span>
+
 You need fewer technologies than you think. Start with **Postgres**, add **Redis** for speed and **Kafka** for streams, and reach for the others only when a requirement asks for them.
 
 | Need | Default choice |

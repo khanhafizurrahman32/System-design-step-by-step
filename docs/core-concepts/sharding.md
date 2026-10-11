@@ -6,6 +6,8 @@ tags: [core-concept]
 
 # Sharding
 
+<span class="lvl lvl-i">Intermediate</span>
+
 *Split data across machines when one can't hold it or keep up with the writes, but only then.*
 
 ![Concept 6: Sharding](../diagrams/concept-sharding.svg)

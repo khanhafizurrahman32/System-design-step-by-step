@@ -6,6 +6,8 @@ tags: [scaling-writes, medium]
 
 # Post search (Facebook)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) inverted index · [Ch 6](../ddia/06-partitioning.md) term-partitioned index · [Ch 11](../ddia/11-stream-processing.md) stream indexing
 
 *Search over billions of posts, where like counts change constantly.*

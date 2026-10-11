@@ -6,6 +6,8 @@ tags: [pattern]
 
 # Scaling writes
 
+<span class="lvl lvl-i">Intermediate</span>
+
 *When writes outgrow one machine, absorb the spikes, write in batches, split the data, and write less.*
 
 > [!TIP]

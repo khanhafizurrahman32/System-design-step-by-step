@@ -5,6 +5,8 @@ description: A logging library with levels, pluggable sinks and formatters, and 
 
 # LLD: Logging library
 
+<span class="lvl lvl-i">Intermediate</span>
+
 ## Requirements
 
 - Log messages at levels `DEBUG < INFO < WARN < ERROR`; each logger has a minimum level.

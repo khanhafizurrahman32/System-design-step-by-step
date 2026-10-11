@@ -5,6 +5,8 @@ description: How to approach object-oriented design interviews, plus four worked
 
 # Low-level design
 
+<span class="lvl lvl-i">Intermediate</span>
+
 Low-level design (LLD) interviews ask you to model one component in code: its classes, their responsibilities, and how they behave when many threads use them at once.
 
 ## The approach

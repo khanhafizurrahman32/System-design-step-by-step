@@ -6,6 +6,8 @@ tags: [real-time-updates, hard]
 
 # Ride sharing (Uber)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) leases · [Ch 3](../ddia/03-storage-and-retrieval.md) geo index · [Ch 6](../ddia/06-partitioning.md) partition by region
 
 *Four problems in one: a flood of location updates, matching, locking drivers, and a multi-step trip lifecycle.*

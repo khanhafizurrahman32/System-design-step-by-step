@@ -6,6 +6,8 @@ tags: [pattern]
 
 # Scaling reads
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 *Most systems read far more than they write. Make the common read cheap, and the database only sees what the cache can't answer.*
 
 > [!TIP]

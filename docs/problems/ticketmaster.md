@@ -6,6 +6,8 @@ tags: [contention, scaling-reads, medium]
 
 # Ticketmaster: selling seats without selling any seat twice
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Medium · **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md) · **Core concept:** [Caching](../core-concepts/caching.md) · **DDIA:** [Ch 5 Replication](../ddia/05-replication.md), [Ch 7 Transactions](../ddia/07-transactions.md)
 
 > [!TIP]

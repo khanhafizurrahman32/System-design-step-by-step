@@ -6,6 +6,8 @@ tags: [scaling-reads, medium]
 
 # Rate limiter
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Dealing with contention](../patterns/contention.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) lost update · [Ch 6](../ddia/06-partitioning.md) shard by key
 
 *Every public API needs one, and the obvious implementation has a race condition.*

@@ -6,6 +6,8 @@ tags: [pattern]
 
 # Handling large blobs
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 *Files, photos and videos belong in object storage, and their bytes should never pass through your application servers.*
 
 > [!TIP]

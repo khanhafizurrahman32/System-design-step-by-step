@@ -6,6 +6,8 @@ tags: [scaling-reads, medium]
 
 # Dating app (Tinder)
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) write skew · [Ch 3](../ddia/03-storage-and-retrieval.md) Bloom filters, LSM
 
 *Swipes are a firehose of writes, and two people swiping right at the same moment must never miss their match.*

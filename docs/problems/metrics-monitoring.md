@@ -6,6 +6,8 @@ tags: [scaling-writes, hard]
 
 # Metrics monitoring (Datadog)
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) LSM, compression · [Ch 11](../ddia/11-stream-processing.md) stream alerting
 
 *Millions of data points per second arrive, and alerts must fire within a minute.*

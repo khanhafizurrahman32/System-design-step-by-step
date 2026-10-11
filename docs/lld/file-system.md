@@ -5,6 +5,8 @@ description: Design an in-memory file system with directories, files and paths, 
 
 # LLD: In-memory file system
 
+<span class="lvl lvl-i">Intermediate</span>
+
 ## Requirements
 
 - `mkdir(path)` creates directories, including missing parents.

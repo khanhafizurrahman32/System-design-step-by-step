@@ -1,5 +1,14 @@
 // Diagrams for handwritten pages (foundations, playbook, LLD). Same format as pilot.js.
 module.exports = {
+'request-journey': { w: 1500, h: 560, alt: 'The journey of a request: the browser asks DNS for an address, static files come from a CDN, API calls go through a load balancer to stateless app servers, which read a cache first and the database on a miss, and hand slow work to a queue processed by workers.',
+  nodes: [['br', 110, 290, 'Browser|or mobile app', 't', 'pill'], ['dns', 110, 80, 'DNS|name → IP address', 'x'],
+    ['cdn', 470, 80, 'CDN|images, JS, cached pages', 'a'], ['lb', 470, 290, 'Load balancer|spreads requests', 'b'],
+    ['a1', 800, 200, 'App server 1|stateless', 'g'], ['a2', 800, 380, 'App server 2|stateless', 'g'],
+    ['ca', 1120, 80, 'Cache (Redis)|~1 ms reads', 'a', 'db'], ['db', 1360, 270, 'Database|source of truth, indexed', 'g', 'db'],
+    ['q', 1080, 490, 'Queue|slow work for later', 'p', 'queue'], ['w', 1370, 490, 'Workers|email, resize, reports', 'p']],
+  edges: [['br', 'dns', '1  look up the address', ''], ['br', 'cdn', '2  static files', 'a'], ['br', 'lb', '3  API request', 'b'],
+    ['lb', 'a1', '', 'b'], ['lb', 'a2', '', 'b'], ['a1', 'ca', '4  check cache', 'a'], ['a1', 'db', '5  on miss: query', 'g'], ['a2', 'q', '6  enqueue slow job', 'p'], ['q', 'w', '', 'p'], ['w', 'db', '', 'pd']] },
+
 'design-loop': { w: 1180, h: 300, alt: 'The design loop: requirements, estimate, simple design, find the break, fix only that, repeat.',
   nodes: [['r', 110, 110, 'Requirements|what + how well', 'b'], ['e', 300, 110, 'Estimate|QPS · storage', 'a'], ['s', 490, 110, 'Simple design|client → service → DB', 'g'],
     ['b', 700, 110, 'Find the break|which number fails?', 'r'], ['f', 910, 110, 'Fix only that|cache · queue · shard', 'p'], ['done', 1090, 110, 'NFRs met?', 'x', 'pill']],

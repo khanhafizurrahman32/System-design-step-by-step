@@ -6,6 +6,8 @@ tags: [real-time-updates, medium]
 
 # Online auction
 
+<span class="lvl lvl-i">Intermediate</span>
+
 **Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · [Dealing with contention](../patterns/contention.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) lost update · [Ch 11](../ddia/11-stream-processing.md) partitioned log · [Ch 8](../ddia/08-trouble-with-distributed-systems.md) clocks
 
 *Many people bid on one row at the same time, and exactly one of them must win each race.*

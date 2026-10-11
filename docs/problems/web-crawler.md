@@ -6,6 +6,8 @@ tags: [scaling-writes, hard]
 
 # Web crawler
 
+<span class="lvl lvl-a">Advanced</span>
+
 **Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 10](../ddia/10-batch-processing.md) batch pipelines · [Ch 3](../ddia/03-storage-and-retrieval.md) Bloom filters · [Ch 11](../ddia/11-stream-processing.md) queues
 
 *Ten billion pages in five days is a pipeline problem, constrained by politeness and network bandwidth.*

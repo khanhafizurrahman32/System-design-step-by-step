@@ -6,6 +6,8 @@ tags: [core-concept]
 
 # CAP theorem and PACELC
 
+<span class="lvl lvl-i">Intermediate</span>
+
 *When the network splits, choose between refusing requests and answering with possibly stale data, separately for each feature.*
 
 ![Concept 8: CAP theorem](../diagrams/concept-cap-theorem.svg)

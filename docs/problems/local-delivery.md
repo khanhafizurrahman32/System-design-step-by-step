@@ -6,6 +6,8 @@ tags: [scaling-reads, easy]
 
 # Local delivery (Gopuff)
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 **Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) conditional updates · [Ch 5](../ddia/05-replication.md) replica lag
 
 *It looks like an ordering system, but most of the load is people checking what is available near them.*

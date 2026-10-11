@@ -5,6 +5,8 @@ description: One loop solves every system design problem. Start simple, find the
 
 # How to approach any design
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 Good designs aren't memorized. They are **derived**: you start from what the system must do, put numbers on how well it must do it, and add complexity only when a number forces you to.
 
 ![The design loop](../diagrams/design-loop.svg)

@@ -5,6 +5,8 @@ description: Track stock across warehouses with per-warehouse locks, deadlock-fr
 
 # LLD: Inventory management
 
+<span class="lvl lvl-i">Intermediate</span>
+
 ## Requirements
 
 - Track stock of each product in each warehouse.

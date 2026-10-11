@@ -6,6 +6,8 @@ tags: [pattern]
 
 # Long-running tasks
 
+<span class="lvl lvl-b">Beginner-friendly</span>
+
 *If work takes longer than a request should, accept it, queue it, and let the client check back.*
 
 > [!TIP]
