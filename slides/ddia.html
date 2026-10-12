@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DDIA in Diagrams</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;
+  --border:#30363d;--border2:#484f58;
+  --text:#cdd9e5;--text2:#adbac7;--text3:#768390;
+  --amber:#f0a429;--green:#57ab5a;--blue:#6cb6ff;--purple:#dcbdfb;
+  --red:#f47067;--teal:#39c5cf;--pink:#fc8dc7;
+  --sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden}
+a{color:var(--blue)}
+.top{height:46px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 14px}
+.brand{font-weight:800;font-size:13px;white-space:nowrap}
+.brand b{color:var(--accent,var(--amber))}
+.secsel{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:12px;padding:5px 8px;max-width:260px;font-family:var(--sans)}
+.links{display:flex;gap:6px;margin-left:auto;overflow-x:auto}
+.links a,.tbtn{font-family:var(--mono);font-size:10px;font-weight:600;padding:4px 9px;border-radius:5px;text-decoration:none;background:var(--bg3);color:var(--text2);border:1px solid var(--border);white-space:nowrap;cursor:pointer}
+.links a:hover,.tbtn:hover{border-color:var(--border2);color:var(--text)}
+.links a.cur{color:var(--accent,var(--amber));border-color:var(--accent,var(--amber))}
+.prog{height:3px;background:var(--bg3)}
+.prog div{height:100%;background:var(--accent,var(--amber));transition:width .25s}
+.stage{position:absolute;top:49px;bottom:52px;left:0;right:0;overflow-y:auto;padding:22px 28px}
+.slide{max-width:1180px;margin:0 auto;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.kick{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent,var(--amber));margin-bottom:6px}
+.slide h1{font-size:26px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px;line-height:1.2}
+.slide .sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:16px;max-width:900px}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+.grid.full{grid-template-columns:1fr}
+.dbox{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px}
+.dbox svg{width:100%;height:auto;display:block}
+.cap{font-size:13px;color:var(--text);background:var(--bg3);border-left:3px solid var(--accent,var(--amber));border-radius:0 6px 6px 0;padding:8px 12px;margin-top:10px;line-height:1.55;min-height:38px}
+.cap .sn{font-family:var(--mono);font-size:10px;color:var(--accent,var(--amber));margin-right:6px}
+.side{display:flex;flex-direction:column;gap:10px}
+.pts{list-style:none;display:flex;flex-direction:column;gap:7px}
+.pts li{font-size:13.5px;line-height:1.55;color:var(--text2);padding-left:16px;position:relative}
+.pts li:before{content:'';position:absolute;left:2px;top:8px;width:6px;height:6px;border-radius:2px;background:var(--accent,var(--amber))}
+.pts li b,.card b{color:var(--text)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;color:var(--text2)}
+.card .lab{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.c-say{border-color:rgba(87,171,90,.4);background:rgba(87,171,90,.06)} .c-say .lab{color:var(--green)}
+.c-trap{border-color:rgba(244,112,103,.4);background:rgba(244,112,103,.06)} .c-trap .lab{color:var(--red)}
+.c-num{border-color:rgba(108,182,255,.4);background:rgba(108,182,255,.06)} .c-num .lab{color:var(--blue)}
+.c-why{border-color:rgba(240,164,41,.4);background:rgba(240,164,41,.06)} .c-why .lab{color:var(--amber)}
+.c-q{border-color:rgba(220,189,251,.4);background:rgba(220,189,251,.06)} .c-q .lab{color:var(--purple)}
+.c-say .body{color:var(--text);font-style:italic}
+table.t{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+table.t th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border2)}
+table.t td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.45}
+table.t td:first-child{color:var(--text);font-weight:600}
+table.t tr:last-child td{border-bottom:none}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cards3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.title-slide{min-height:60vh;display:flex;flex-direction:column;justify-content:center}
+.title-slide h1{font-size:40px}
+.title-slide .sub{font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-family:var(--mono);font-size:10.5px;padding:3px 9px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.script{counter-reset:s;display:flex;flex-direction:column;gap:6px}
+.script div{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:13px;line-height:1.5;color:var(--text2);display:flex;gap:10px}
+.script div span.tm{font-family:var(--mono);font-size:11px;color:var(--accent,var(--amber));min-width:64px;font-weight:700}
+.script div b{color:var(--text)}
+.bot{position:absolute;bottom:0;left:0;right:0;height:52px;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 14px}
+.nbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.nbtn:hover{border-color:var(--accent,var(--amber))}
+.nbtn.pri{background:var(--accent,var(--amber));color:#111;border-color:transparent}
+.ctr{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.dots{display:flex;gap:4px;align-items:center}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--border2);display:block}
+.dots i.on{background:var(--accent,var(--amber))}
+.hint{font-size:11px;color:var(--text3);margin-left:auto}
+.ov{position:fixed;inset:0;background:rgba(13,17,23,.97);z-index:50;overflow-y:auto;padding:24px;display:none}
+.ov.show{display:block}
+.ov h2{font-size:18px;margin-bottom:12px}
+.ov .sec{margin-bottom:18px}
+.ov .sec h3{font-family:var(--mono);font-size:11px;color:var(--accent,var(--amber));text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.ov .its{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.ov .it{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;cursor:pointer;color:var(--text2)}
+.ov .it:hover{border-color:var(--accent,var(--amber));color:var(--text)}
+.ov .it.cur{border-color:var(--accent,var(--amber))}
+.ov .it span{font-family:var(--mono);font-size:10px;color:var(--text3);margin-right:6px}
+/* svg */
+.nd text{font-family:var(--sans);font-size:13px;font-weight:600}
+.nd .sb{font-size:10.5px;font-weight:400;opacity:.8}
+.el{transition:opacity .3s}
+.el.new{animation:pop .45s}
+@keyframes pop{0%{opacity:0}100%{opacity:1}}
+.el.dim{opacity:.32}
+.elab{font-family:var(--mono);font-size:10.5px}
+.ztxt{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.ftxt{font-family:var(--sans)}
+@media (max-width:820px){
+  .grid,.cards2,.cards3{grid-template-columns:1fr}
+  .stage{padding:14px 14px}
+  .slide h1{font-size:21px}
+  .title-slide h1{font-size:28px}
+  .brand{display:none}
+  .hint{display:none}
+  .secsel{max-width:150px}
+}
+
+.grid.full .dbox svg{max-width:880px;margin:0 auto}
+
+.qa{display:flex;flex-direction:column;gap:8px}
+.qi{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 13px}
+.qi.open{border-color:rgba(87,171,90,.45)}
+.qq{font-size:14px;font-weight:700;color:var(--text);display:flex;gap:8px}
+.qq span{font-family:var(--mono);font-size:11px;color:var(--accent,var(--amber));padding-top:2px}
+.qn{font-size:13px;color:var(--text2);line-height:1.55;margin-top:5px;padding-left:28px}
+.qn i{color:var(--text3)}
+.lst{margin:2px 0 0 16px}.lst li{margin-bottom:2px}
+.mono{font-family:var(--mono);font-size:11.5px;color:var(--teal)}
+</style></head><body>
+<script>/* Deck engine: slides + step reveal + SVG diagrams (free graph, sequence, flow) */
+(function(){
+const COL={b:'#6cb6ff',g:'#57ab5a',a:'#f0a429',p:'#dcbdfb',r:'#f47067',t:'#39c5cf',x:'#9aa4b2',k:'#fc8dc7',w:'#cdd9e5'};
+const col=c=>COL[c]||c||COL.x;
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let uid=0;
+
+function s0(s){return Array.isArray(s)?s[0]:(s||0)}
+function vis(s,cur){return Array.isArray(s)?(s[0]<=cur&&cur<=s[1]):(s||0)<=cur}
+function cls(s,cur){return 'el'+(s0(s)===cur&&cur>0?' new':'')}
+
+function markers(id){
+  return '<defs>'+Object.keys(COL).map(k=>`<marker id="m${id}${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${COL[k]}"/></marker>`).join('')+'</defs>';
+}
+
+function nodeSize(n){
+  const lines=String(n[3]).split('\n');
+  let mx=0;lines.forEach(l=>{const [m,s]=l.split('|');mx=Math.max(mx,(m||'').length*7.3,(s||'').length*6.1)});
+  const subs=lines.filter(l=>l.includes('|')).length;
+  const w=n[7]||Math.max(70,mx+26);
+  const h=n[8]||(24+lines.length*16+subs*13);
+  return [w,h];
+}
+
+function drawNode(n,cur,o){
+  const [id,x,y,label,c,shape,step]=n; if(!vis(step,cur))return '';
+  const [w,h]=nodeSize(n); const C=col(c); const X=x-w/2,Y=y-h/2;
+  let g=`<g class="nd ${cls(step,cur)}">`;
+  const fill=`fill="${C}" fill-opacity="0.13" stroke="${C}" stroke-width="1.6"`;
+  if(shape==='db'){
+    const e=7;
+    g+=`<path d="M${X},${Y+e} L${X},${Y+h-e} A${w/2},${e} 0 0 0 ${X+w},${Y+h-e} L${X+w},${Y+e} A${w/2},${e} 0 0 0 ${X},${Y+e} Z" ${fill}/><ellipse cx="${x}" cy="${Y+e}" rx="${w/2}" ry="${e}" fill="${C}" fill-opacity="0.25" stroke="${C}" stroke-width="1.6"/>`;
+  }else if(shape==='q'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="5" ${fill}/>`;
+    for(let i=1;i<=3;i++)g+=`<line x1="${X+w-6*i}" y1="${Y+4}" x2="${X+w-6*i}" y2="${Y+h-4}" stroke="${C}" stroke-opacity=".5"/>`;
+  }else if(shape==='pill'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="${h/2}" ${fill}/>`;
+  }else if(shape==='o'){
+    g+=`<ellipse cx="${x}" cy="${y}" rx="${w/2}" ry="${h/2}" fill="none" stroke="${C}" stroke-opacity=".6" stroke-width="2" stroke-dasharray="3 5"/>`;
+  }else if(shape==='n'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="6" fill="${C}" fill-opacity="0.05" stroke="${C}" stroke-dasharray="4 3"/>`;
+  }else if(shape==='x'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="8" ${fill}/><line x1="${X+4}" y1="${Y+4}" x2="${X+w-4}" y2="${Y+h-4}" stroke="${COL.r}" stroke-opacity=".45" stroke-width="2"/><line x1="${X+w-4}" y1="${Y+4}" x2="${X+4}" y2="${Y+h-4}" stroke="${COL.r}" stroke-opacity=".45" stroke-width="2"/>`;
+  }else{
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="8" ${fill}/>`;
+  }
+  const lines=String(label).split('\n');
+  const total=lines.reduce((a,l)=>a+(l.includes('|')?29:16),0);
+  let ty=y-total/2+12+(shape==='db'?4:0);
+  lines.forEach(l=>{const [m,s]=l.split('|');
+    g+=`<text x="${x}" y="${ty}" text-anchor="middle" fill="${shape==='x'?COL.r:'#e6edf3'}">${esc(m)}</text>`;
+    if(s!==undefined){ty+=13;g+=`<text class="sb" x="${x}" y="${ty}" text-anchor="middle" fill="${C}">${esc(s)}</text>`}
+    ty+=16;});
+  return g+'</g>';
+}
+
+function clip(cx,cy,w,h,dx,dy,pad){
+  if(!w)return [cx,cy];
+  const hw=w/2+pad,hh=h/2+pad;
+  const t=Math.min(dx?hw/Math.abs(dx):1e9,dy?hh/Math.abs(dy):1e9);
+  return [cx+dx*t,cy+dy*t];
+}
+
+function drawEdge(e,nodes,cur,mid){
+  const [f,to,label,st,step]=e; if(!vis(step,cur))return '';
+  const s=st||'';
+  const A=Array.isArray(f)?{x:f[0],y:f[1],w:0,h:0}:nodes[f], B=Array.isArray(to)?{x:to[0],y:to[1],w:0,h:0}:nodes[to];
+  if(!A||!B)return '';
+  const ck=(s.match(/[rgabptkx]/)||['x'])[0];
+  const C=COL[ck];
+  let curve=0; if(s.includes('c'))curve=-1; if(s.includes('C'))curve=1;
+  const dxx=B.x-A.x,dyy=B.y-A.y,len=Math.hypot(dxx,dyy)||1;
+  let cxp=(A.x+B.x)/2,cyp=(A.y+B.y)/2;
+  const bend=s.includes('cc')||s.includes('CC')?95:48;
+  if(curve){cxp+=-dyy/len*bend*curve;cyp+=dxx/len*bend*curve}
+  const [x1,y1]=clip(A.x,A.y,A.w,A.h,(curve?cxp:B.x)-A.x,(curve?cyp:B.y)-A.y,3);
+  const [x2,y2]=clip(B.x,B.y,B.w,B.h,(curve?cxp:A.x)-B.x,(curve?cyp:A.y)-B.y,4);
+  const dash=s.includes('d')?' stroke-dasharray="6 4"':'';
+  const mk=s.includes('n')?'':` marker-end="url(#m${mid}${ck})"`;
+  const ms=s.includes('2')?` marker-start="url(#m${mid}${ck})"`:'';
+  let path=curve?`M${x1},${y1} Q${cxp},${cyp} ${x2},${y2}`:`M${x1},${y1} L${x2},${y2}`;
+  let g=`<g class="${cls(step,cur)}"><path d="${path}" fill="none" stroke="${C}" stroke-width="1.7"${dash}${mk}${ms}/>`;
+  if(label){
+    let lx=curve?(x1+2*cxp+x2)/4:(x1+x2)/2, ly=curve?(y1+2*cyp+y2)/4:(y1+y2)/2;
+    const L=String(label).split('\n');const lw=Math.max(...L.map(l=>l.length))*6.4+10, lh=L.length*13+4;
+    const seg=Math.hypot(x2-x1,y2-y1);
+    if(!curve&&seg<lw+14){const ux=(x2-x1)/(seg||1),uy=(y2-y1)/(seg||1);let px=-uy,py=ux;if(py>0||(py===0&&px>0)){px=-px;py=-py}
+      const off=Math.abs(ux)>Math.abs(uy)?lh/2+5:lw/2+6;lx+=px*off;ly+=py*off;}
+    g+=`<rect x="${lx-lw/2}" y="${ly-lh/2}" width="${lw}" height="${lh}" rx="4" fill="#161b22" fill-opacity=".92"/>`;
+    L.forEach((l,i)=>g+=`<text class="elab" x="${lx}" y="${ly-lh/2+12+i*13}" text-anchor="middle" fill="${s.match(/[rgabptk]/)?C:'#adbac7'}">${esc(l)}</text>`);
+  }
+  return g+'</g>';
+}
+
+function normD(d){if(d._n)return d;(d.n||[]).forEach(n=>{if(typeof n[5]==='number'||Array.isArray(n[5]))n.splice(5,0,null);if(typeof n[6]==='number'&&n[6]>=20)n.splice(6,0,null)});d._n=1;return d}
+function drawFree(d,cur){normD(d);
+  const id=++uid; const W=d.w||800,H=d.h||360;
+  let out=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${markers(id)}`;
+  (d.z||[]).forEach(z=>{const [x,y,w,h,l,c,step]=z; if(!vis(step,cur))return; const C=col(c);
+    out+=`<g class="${cls(step,cur)}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${C}" fill-opacity=".04" stroke="${C}" stroke-opacity=".55" stroke-dasharray="5 4"/>${l?`<text class="ztxt" x="${x+10}" y="${y+15}" fill="${C}">${esc(l)}</text>`:''}</g>`});
+  const nodes={};
+  (d.n||[]).forEach(n=>{const [w,h]=nodeSize(n);nodes[n[0]]={x:n[1],y:n[2],w,h}});
+  (d.e||[]).forEach(e=>out+=drawEdge(e,nodes,cur,id));
+  (d.n||[]).forEach(n=>out+=drawNode(n,cur));
+  (d.t||[]).forEach(t=>{const [x,y,tx,c,step,size,anc,wt]=t; if(!vis(step,cur))return;
+    const a={s:'start',e:'end'}[anc]||'middle';
+    String(tx).split('\n').forEach((l,i)=>out+=`<text class="ftxt ${cls(step,cur)}" x="${x}" y="${y+i*(size||12)*1.3}" text-anchor="${a}" font-size="${size||12}" font-weight="${wt||500}" fill="${col(c||'x')}">${esc(l)}</text>`)});
+  return out+'</svg>';
+}
+
+function drawSeq(q,cur){
+  const id=++uid; const W=q.w||800; const A=q.a; const n=A.length; const m=Math.max(70,...A.map(a=>Math.max(84,a.split('|')[0].length*7.6+22)/2+6));
+  const xs=A.map((_,i)=>n===1?W/2:m+i*(W-2*m)/(n-1));
+  const ai=v=>typeof v==='number'?v:A.findIndex(a=>a.split('|')[0]===v);
+  const rh=q.rh||31; const rows=q.m.length; const H=72+rows*rh+14;
+  let out=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${markers(id)}`;
+  A.forEach((a,i)=>{const [nm,c]=a.split('|');const C=col(c||'b');const w=Math.max(84,nm.length*7.6+22);
+    out+=`<line x1="${xs[i]}" y1="44" x2="${xs[i]}" y2="${H-6}" stroke="${C}" stroke-opacity=".35" stroke-dasharray="4 4"/>`;
+    out+=`<rect x="${xs[i]-w/2}" y="12" width="${w}" height="32" rx="7" fill="${C}" fill-opacity=".14" stroke="${C}" stroke-width="1.5"/><text x="${xs[i]}" y="33" text-anchor="middle" font-size="13" font-weight="700" fill="#e6edf3" font-family="Inter,sans-serif">${esc(nm)}</text>`});
+  q.m.forEach((r,k)=>{const y=72+k*rh;
+    if(r[0]==='#'){const [,a,b,tx,c,step]=r; if(!vis(step,cur))return; const C=col(c||'a');
+      const i1=ai(a),i2=ai(b==null?a:b); const x1=Math.min(xs[i1],xs[i2])-62,x2=Math.max(xs[i1],xs[i2])+62;
+      const w=Math.min(W-8,Math.max(x2-x1,tx.length*6.5+16)); let cx=(x1+x2)/2; cx=Math.max(4+w/2,Math.min(W-4-w/2,cx));
+      out+=`<g class="${cls(step,cur)}"><rect x="${cx-w/2}" y="${y-13}" width="${w}" height="22" rx="5" fill="${C}" fill-opacity=".14" stroke="${C}" stroke-opacity=".7"/><text x="${cx}" y="${y+2}" text-anchor="middle" font-size="11.5" fill="${C}" font-family="Inter,sans-serif" font-weight="600">${esc(tx)}</text></g>`;return}
+    const [f,t,l,st,step]=r; if(!vis(step,cur))return; const s=st||'';
+    const ck=(s.match(/[rgabptk]/)||['x'])[0]; const C=COL[ck];
+    const i1=ai(f),i2=ai(t); const dash=s.includes('d')?' stroke-dasharray="6 4"':'';
+    let g=`<g class="${cls(step,cur)}">`;
+    if(i1===i2){const x=xs[i1];g+=`<path d="M${x},${y-6} h34 v14 h-30" fill="none" stroke="${C}" stroke-width="1.6"${dash} marker-end="url(#m${id}${ck})"/><text x="${x+42}" y="${y+5}" font-size="11.5" fill="${s.match(/[rgabptk]/)?C:'#adbac7'}" font-family="JetBrains Mono,monospace">${esc(l)}</text>`}
+    else{const x1=xs[i1]+(i2>i1?3:-3),x2=xs[i2]+(i2>i1?-5:5);
+      g+=`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${C}" stroke-width="1.7"${dash} marker-end="url(#m${id}${ck})"/>`;
+      if(s.includes('x'))g+=`<text x="${(x1+x2)/2}" y="${y+5}" text-anchor="middle" font-size="15" fill="${COL.r}" font-weight="800">✕</text>`;
+      g+=`<text x="${(x1+x2)/2}" y="${y-6}" text-anchor="middle" font-size="11.5" fill="${s.match(/[rgabptk]/)?C:'#adbac7'}" font-family="JetBrains Mono,monospace">${esc(l)}</text>`}
+    out+=g+'</g>';});
+  return out+'</svg>';
+}
+
+function drawFlow(f,cur){
+  // f.f: [[label,col,shape,edgeLabel,step],...]
+  const W=f.w||800; const items=f.f; const n=items.length; const gap=f.gap||34;
+  const bw=Math.min(170,(W-20-(n-1)*gap)/n); const H=f.h||120; const y=H/2;
+  const nodes=items.map((it,i)=>[ 'f'+i, 10+bw/2+i*(bw+gap), y, it[0], it[1]||'b', it[2], it[4], bw, f.bh]);
+  const edges=items.slice(0,-1).map((it,i)=>['f'+i,'f'+(i+1),it[3]||'',it[5]||'',items[i+1][4]]);
+  return drawFree({w:W,h:H,n:nodes,e:edges,t:f.t,z:f.z},cur);
+}
+
+function maxStep(s){
+  let m=0;
+  const scan=arr=>(arr||[]).forEach(x=>{const st=Array.isArray(x)?x:[];});
+  if(s.d){normD(s.d);['n','e','z','t'].forEach(k=>(s.d[k]||[]).forEach(x=>{const i={n:6,e:4,z:6,t:4}[k];m=Math.max(m,s0(x[i]))}))}
+  if(s.seq)s.seq.m.forEach(r=>m=Math.max(m,s0(r[0]==='#'?r[5]:r[4])));
+  if(s.flow)s.flow.f.forEach(r=>m=Math.max(m,s0(r[4])));
+  if(s.cap)m=Math.max(m,s.cap.length-1);
+  if(s.qa)m=Math.max(m,s.qa.length);
+  return m;
+}
+
+function cardHTML(c){
+  const [k,l,b]=c; const lab={say:'Say this in the interview',trap:'Trap',num:'Numbers',why:'Why it matters',q:'Interviewer asks'}[k];
+  return `<div class="card c-${k}"><div class="lab">${l||lab}</div><div class="body">${b}</div></div>`;
+}
+function tableHTML(t){return `<table class="t"><tr>${t.h.map(h=>`<th>${h}</th>`).join('')}</tr>${t.r.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table>`}
+
+function renderSlide(s,cur){
+  if(s.type==='title'){
+    return `<div class="slide title-slide"><div class="kick">${s.k||''}</div><h1>${s.t}</h1><div class="sub">${s.s||''}</div>${s.chips?`<div class="chips">${s.chips.map(c=>`<span class="chip">${c}</span>`).join('')}</div>`:''}${s.cards?`<div class="cards2" style="margin-top:18px">${s.cards.map(cardHTML).join('')}</div>`:''}${s.pts?`<ul class="pts" style="margin-top:16px">${s.pts.map(p=>`<li>${p}</li>`).join('')}</ul>`:''}</div>`;
+  }
+  let dg='';
+  if(s.d)dg=drawFree(s.d,cur); else if(s.seq)dg=drawSeq(s.seq,cur); else if(s.flow)dg=drawFlow(s.flow,cur);
+  const capTxt=s.cap?s.cap[Math.min(cur,s.cap.length-1)]:'';
+  const left=dg?`<div><div class="dbox">${dg}</div>${s.cap?`<div class="cap"><span class="sn">${cur+1}/${s.cap.length}</span>${capTxt}</div>`:''}</div>`:'';
+  let side='';
+  if(s.qa)side+=`<div class="qa">${s.qa.map((x,i)=>`<div class="qi${i<cur?' open':''}"><div class="qq"><span>Q${i+1}</span>${x[0]}</div><div class="qn">${i<cur?x[1]:'<i>Think it through and say your answer out loud, then press → to reveal.</i>'}</div></div>`).join('')}</div>`;
+  if(s.tbl)side+=tableHTML(s.tbl);
+  if(s.script)side+=`<div class="script">${s.script.map(r=>`<div><span class="tm">${r[0]}</span><span>${r[1]}</span></div>`).join('')}</div>`;
+  if(s.pts)side+=`<ul class="pts">${s.pts.map(p=>`<li>${p}</li>`).join('')}</ul>`;
+  if(s.c2)side+=`<div class="cards2">${s.c2.map(cardHTML).join('')}</div>`;
+  if(s.cards)side+=s.cards.map(cardHTML).join('');
+  const full=s.full||!dg||!side;
+  return `<div class="slide"><div class="kick">${s.k||s.sec||''}</div><h1>${s.t}</h1>${s.s?`<div class="sub">${s.s}</div>`:''}<div class="grid${full?' full':''}">${left}${side?`<div class="side">${side}</div>`:''}</div></div>`;
+}
+
+window.__maxStep=maxStep;
+window.Deck=function(meta,slides){
+  document.documentElement.style.setProperty('--accent',meta.accent||'#f0a429');
+  document.title=meta.title;
+  const secs=[];slides.forEach((s,i)=>{if(!secs.length||secs[secs.length-1].name!==s.sec)secs.push({name:s.sec,i})});
+  document.body.innerHTML=`
+  <div class="top"><div class="brand">${meta.brand}</div>
+   <select class="secsel" id="secsel">${secs.map(x=>`<option value="${x.i}">${esc(x.name)}</option>`).join('')}</select>
+   <span class="tbtn" id="ovb">☰ All slides</span>
+   <div class="links">${meta.links.map(l=>`<a href="${l[1]}" ${l[1]===meta.self?'class="cur"':''}>${l[0]}</a>`).join('')}</div></div>
+  <div class="prog"><div id="pg"></div></div>
+  <div class="stage" id="stage"></div>
+  <div class="bot"><button class="nbtn" id="pv">← Prev</button><button class="nbtn pri" id="nx">Next →</button>
+   <span class="ctr" id="ctr"></span><span class="dots" id="dots"></span>
+   <span class="hint">→ / Space: next step · ↓↑: skip slide · A: show all steps · O: overview</span></div>
+  <div class="ov" id="ov"></div>`;
+  const st=document.getElementById('stage');
+  let i=0,step=0;
+  try{const h=parseInt(location.hash.slice(1));if(h>0&&h<=slides.length)i=h-1;else{const v=parseInt(localStorage.getItem(meta.key)||'0');if(v>=0&&v<slides.length)i=v}}catch(e){}
+  function draw(){
+    const s=slides[i];const ms=maxStep(s);
+    st.innerHTML=renderSlide(s,step);st.scrollTop=0;
+    document.getElementById('pg').style.width=((i+1)/slides.length*100)+'%';
+    document.getElementById('ctr').textContent=`${i+1} / ${slides.length}`;
+    document.getElementById('dots').innerHTML=ms?Array.from({length:ms+1},(_,k)=>`<i class="${k<=step?'on':''}"></i>`).join(''):'';
+    let si=0;secs.forEach((x,k)=>{if(x.i<=i)si=k});document.getElementById('secsel').selectedIndex=si;
+    try{localStorage.setItem(meta.key,i);history.replaceState(null,'','#'+(i+1))}catch(e){}
+  }
+  function redrawKeepScroll(){const y=st.scrollTop;const s=slides[i];st.innerHTML=renderSlide(s,step);st.scrollTop=y;
+    const ms=maxStep(s);document.getElementById('dots').innerHTML=ms?Array.from({length:ms+1},(_,k)=>`<i class="${k<=step?'on':''}"></i>`).join(''):'';}
+  function go(n,full){if(n<0||n>=slides.length)return;i=n;step=full?maxStep(slides[i]):0;draw()}
+  function next(){if(step<maxStep(slides[i])){step++;redrawKeepScroll()}else go(i+1)}
+  function prev(){if(step>0){step--;redrawKeepScroll()}else go(i-1,true)}
+  document.getElementById('nx').onclick=next;document.getElementById('pv').onclick=prev;
+  document.getElementById('secsel').onchange=e=>go(+e.target.value);
+  const ov=document.getElementById('ov');
+  function openOv(){ov.innerHTML=`<h2>${esc(meta.title)} — all slides <span class="tbtn" onclick="document.getElementById('ov').classList.remove('show')">✕ close (Esc)</span></h2>`+secs.map((x,k)=>{const end=k+1<secs.length?secs[k+1].i:slides.length;
+      return `<div class="sec"><h3>${esc(x.name)}</h3><div class="its">${slides.slice(x.i,end).map((s,j)=>`<div class="it${x.i+j===i?' cur':''}" data-i="${x.i+j}"><span>${x.i+j+1}</span>${s.t.replace(/<[^>]+>/g,'')}</div>`).join('')}</div></div>`}).join('');
+    ov.classList.add('show');ov.querySelectorAll('.it').forEach(el=>el.onclick=()=>{ov.classList.remove('show');go(+el.dataset.i)})}
+  document.getElementById('ovb').onclick=openOv;
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='SELECT')return;
+    if(ov.classList.contains('show')){if(e.key==='Escape'||e.key==='o')ov.classList.remove('show');return}
+    if(['ArrowRight',' ','PageDown','j'].includes(e.key)){e.preventDefault();next()}
+    else if(['ArrowLeft','PageUp','k'].includes(e.key)){e.preventDefault();prev()}
+    else if(e.key==='ArrowDown'){e.preventDefault();go(i+1)}
+    else if(e.key==='ArrowUp'){e.preventDefault();go(i-1)}
+    else if(e.key==='a'||e.key==='A'){step=maxStep(slides[i]);redrawKeepScroll()}
+    else if(e.key==='o'||e.key==='Escape'){openOv()}
+    else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+  });
+  let tx=null,ty=null;st.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+  st.addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){dx<0?next():prev()}tx=null},{passive:true});
+  st.addEventListener('click',e=>{if(e.target.closest('svg'))next()});
+  draw();
+};
+})();
+</script>
+<script>const SLIDES=[
+{sec:'Start',type:'title',k:'Designing Data-Intensive Applications · Kleppmann',t:'DDIA in Diagrams',
+ s:'All 12 chapters, drawn instead of written. Every slide is one idea as a picture, a few lines on why it matters, and how it shows up in a system design interview.',
+ chips:['Part I · Foundations (Ch 1–4)','Part II · Distributed Data (Ch 5–9)','Part III · Derived Data (Ch 10–12)'],
+ cards:[['why','How to study this deck','Press <b>→</b> or <b>Space</b> to build each diagram one step at a time. Say out loud what the next step will be <b>before</b> you press it. If you guessed right, you understand it.'],
+        ['say','Interview payoff','Interviewers don\'t ask "explain chapter 7". They ask "two users book the last seat — what happens?" Every chapter ends with an <b>Interview angle</b> slide that maps the theory to those questions.']]},
+{sec:'Start',t:'The map: how the 12 chapters connect',k:'Overview',
+ d:{w:800,h:380,
+  z:[[20,20,240,340,'Part I · one machine','b'],[280,20,250,340,'Part II · many machines','p'],[550,20,230,340,'Part III · many systems','g']],
+  n:[['c1',140,70,'1 · Reliability|scale, load, latency','b'],['c2',140,145,'2 · Data models|relational · doc · graph','b'],['c3',140,220,'3 · Storage engines|LSM vs B-tree','b'],['c4',140,295,'4 · Encoding|schema evolution','b'],
+     ['c5',405,62,'5 · Replication|copies of the data','p',null,1,190],['c6',405,127,'6 · Partitioning|split the data','p',null,1,190],['c7',405,192,'7 · Transactions|concurrency on one DB','p',null,1,190],['c8',405,257,'8 · What breaks|network · clocks · pauses','p',null,1,190],['c9',405,322,'9 · Consensus|agree despite Ch 8','p',null,1,190],
+     ['c10',665,95,'10 · Batch|MapReduce · Spark','g',null,2],['c11',665,195,'11 · Streams|Kafka · CDC · Flink','g',null,2],['c12',665,295,'12 · The future|derived data · e2e','g',null,2]],
+  e:[['c8','c9','','r',1],['c10','c12','','d',2],['c11','c12','','d',2]]},
+ cap:['<b>Part I</b> is about one database on one machine: what "good" means, how data is shaped, stored, and encoded.','<b>Part II</b> spreads data across machines. Replication copies it, partitioning splits it. Ch 8 lists everything that breaks and Ch 9 shows how nodes still agree.','<b>Part III</b> connects many systems: the source of truth plus derived data (caches, search indexes, analytics) kept in sync with batch and stream processing.'],
+ pts:['<b>Ch 5, 6, 7, 9</b> are the heart of almost every system design interview.','<b>Ch 3</b> explains why Cassandra writes fast and Postgres reads fast.','<b>Ch 11</b> is Kafka, CDC, and the outbox pattern, all of which you already use.']},
+
+/* ───────── CH 1 ───────── */
+{sec:'Ch 1 · Reliable, Scalable, Maintainable',type:'title',k:'Chapter 1',t:'Reliable, Scalable, Maintainable',
+ s:'The three words every NFR discussion comes back to. This chapter gives them precise meaning: reliability means tolerating faults, scalability means describing load and performance with numbers, and maintainability means keeping the system easy to run and change.',
+ chips:['faults vs failures','load parameters','p99 latency','tail amplification','scale up vs out']},
+{sec:'Ch 1 · Reliable, Scalable, Maintainable',t:'Fault ≠ failure',k:'Reliability',
+ d:{w:800,h:330,
+  n:[['hw',110,70,'Hardware fault|disk dies, node reboots','r'],['sw',110,165,'Software fault|bug hits every node','r'],['hu',110,260,'Human fault|bad config push','r'],
+     ['ft',400,165,'Fault-tolerance\nmechanisms','a',null,1,170,150],
+     ['ok',680,120,'System keeps\nworking ✓','g',null,2],['fail',680,240,'Failure|users see errors','r','x',3]],
+  e:[['hw','ft','','r',1],['sw','ft','','r',1],['hu','ft','','r',1],['ft','ok','tolerated','g',2],['ft','fail','not tolerated','rd',3]],
+  t:[[400,105,'redundancy · retries','a',1,11],[400,235,'canary · rollback · limits','a',1,11]]},
+ cap:['A <b>fault</b> is one component going wrong. Faults are normal and constant at scale.','The design goal is mechanisms that absorb faults: replicas, retries, timeouts, canary deploys.','If the fault is absorbed, the user never notices. That is reliability.','A <b>failure</b> is when the whole system stops serving users. You design so faults don\'t become failures.'],
+ cards:[['num','Scale makes faults routine','Disks fail at roughly 2–5% per year. With 10,000 disks, expect <b>about one disk to die every day</b>.'],
+  ['trap','Most dangerous fault','A <b>software</b> fault is correlated: the same bug hits every replica at once (leap second, bad deploy). Redundancy doesn\'t help, so you need staged rollouts.']]},
+{sec:'Ch 1 · Reliable, Scalable, Maintainable',t:'Describing load: the Twitter timeline',k:'Scalability · load parameters',
+ s:'Load is not "lots of users". Load is a specific number, such as reads per second or the fan-out per post. Twitter\'s key number: 4.6k tweets/sec written, 300k timeline reads/sec.',
+ d:{w:800,h:340,
+  z:[[15,15,370,310,'Approach 1 · fan-out on READ','b'],[415,15,370,310,'Approach 2 · fan-out on WRITE','g',2]],
+  n:[['u1',90,80,'Post tweet','t'],['db',300,80,'tweets table','b','db'],['r1',90,250,'Read timeline','t',null,1],['j',300,250,'JOIN follows\n+ tweets','r',null,1],
+     ['u2',480,80,'Post tweet','t',null,2],['fo',705,80,'Fan-out\nworker','a',null,2],['c1',590,200,'timeline\ncache A','a','db',3],['c2',720,200,'timeline\ncache B','a','db',3],['r2',480,290,'Read','t',null,3]],
+  e:[['u1','db','cheap write','',0],['r1','j','expensive read','r',1],['j','db','','rd',1],['u2','fo','','g',2],['fo','c1','push','g',3],['fo','c2','push','g',3],['r2','c1','O(1) read','g',3]]},
+ cap:['Approach 1: writes are cheap, just insert the tweet.','But every timeline read joins follows × tweets. At 300k reads/sec the database can\'t keep up.','Approach 2: when someone tweets, a worker pushes the tweet ID into each follower\'s timeline cache.','Reads become one cache lookup. The cost moved to write time. A celebrity with 30M followers means 30M pushes, so Twitter uses a <b>hybrid</b>: celebrities are fanned out on read.'],
+ cards:[['say',null,'"The load parameter that matters here is fan-out per post, not total users. That number decides push vs pull."']]},
+{sec:'Ch 1 · Reliable, Scalable, Maintainable',t:'Describing performance: percentiles and tail latency',k:'Scalability · performance',
+ d:{w:800,h:340,
+  t:[[30,30,'Response time distribution (1000 requests)','w',0,13,'s',700]],
+  n:[['b1',70,200,'','g',null,0,30,160],['b2',110,215,'','g',null,0,30,130],['b3',150,235,'','g',null,0,30,90],['b4',190,255,'','a',null,0,30,50],['b5',230,265,'','a',null,0,30,30],['b6',270,272,'','r',null,0,30,16],['b7',310,276,'','r',null,0,30,8],
+     ['p50',110,95,'p50 = 40ms|half are faster','g','pill',1],['p99',290,140,'p99 = 900ms|1 in 100 slower','r','pill',1],
+     ['usr',470,180,'User request','t',null,2],['s1',650,70,'svc A · 20ms','g',null,2],['s2',650,130,'svc B · 25ms','g',null,2],['s3',650,190,'svc C · 18ms','g',null,2],['s4',650,250,'svc D · 900ms','r',null,2],['s5',650,310,'svc E · 22ms','g',null,2]],
+  e:[['usr','s1','','',2],['usr','s2','','',2],['usr','s3','','',2],['usr','s4','slow!','r',2],['usr','s5','','',2]],
+  t:[[440,325,'whole request = slowest call = 900ms','r',3,12,'m',700]]},
+ cap:['Most requests are fast, with a long tail of slow ones. Averages hide that tail.','Use percentiles. p50 is the typical user; p99 is your heaviest users, who often have the most data and are the most valuable.','<b>Tail latency amplification</b>: one user request fans out to many backends in parallel.','The user waits for the <b>slowest</b> backend. With 100 backends at 1% slow each, 63% of user requests hit at least one slow call.'],
+ cards:[['num','The math','P(no slow call) = 0.99<sup>100</sup> ≈ 0.37 → <b>63% of requests are slow</b>. This is why p99 of each service matters more than its average.'],
+  ['say',null,'"I\'ll set the SLO on p99, not average. Because the page fans out to several services, the tail compounds, so I\'ll add timeouts and hedged requests."']]},
+{sec:'Ch 1 · Reliable, Scalable, Maintainable',t:'Scaling up vs scaling out, and maintainability',k:'Scalability · maintainability',
+ tbl:{h:['Choice','What it means','When it wins'],r:[
+  ['Scale up (vertical)','Bigger machine: more cores, RAM, NVMe','Simple, no distribution bugs. A single Postgres box handles 10–50k TPS. Start here.'],
+  ['Scale out (horizontal)','More machines, shared-nothing','When one box is not enough or you need fault tolerance. Stateless services scale out easily; stateful ones (databases) are hard.'],
+  ['Elastic','Add or remove capacity automatically','Unpredictable load. Manual scaling is simpler and has fewer surprises.'],
+  ['Operability','Easy for ops to keep running','Monitoring, good defaults, predictable behaviour, runbooks.'],
+  ['Simplicity','Remove accidental complexity','Good abstractions, for example SQL hiding storage and concurrency.'],
+  ['Evolvability','Easy to change later','Loose coupling, schema evolution (Ch 4), tests.']]},
+ cards:[['trap','Over-scaling','There is no "magic scaling sauce". An architecture for 100k req/sec of 1KB reads looks nothing like one for 3 req/min of 2GB uploads. <b>Design for the load parameters you calculated.</b>']]},
+{sec:'Ch 1 · Reliable, Scalable, Maintainable',t:'Interview angle: Chapter 1',k:'Chapter 1 → interview',
+ c2:[['q',null,'"How will this scale?"<br>→ Name the <b>load parameter</b> (reads/sec, fan-out, data size), calculate it, then say which component breaks first.'],
+  ['q',null,'"What\'s your latency target?"<br>→ <b>p99 &lt; 200ms</b> for reads, not averages. Mention tail amplification if requests fan out.'],
+  ['q',null,'"What if a node dies?"<br>→ Separate fault from failure: "A node dying is a fault. Replicas plus health checks mean it never becomes a failure."'],
+  ['say',null,'"Before choosing components, let me pin down the load parameters: DAU, read:write ratio, and peak QPS, because they decide whether we need any distribution at all."']]},
+
+/* ───────── CH 2 ───────── */
+{sec:'Ch 2 · Data Models',type:'title',k:'Chapter 2',t:'Data Models & Query Languages',
+ s:'The shape of your data decides which database fits. Trees of data that are read together (one-to-many) suit documents. Data full of references (many-to-many) suits relational. Data where relationships are the point suits graphs.',
+ chips:['relational','document','graph','normalization','schema-on-read','locality']},
+{sec:'Ch 2 · Data Models',t:'One LinkedIn profile, two models',k:'Relational vs document',
+ d:{w:800,h:340,
+  z:[[15,15,380,310,'Relational · 3 tables + joins','b'],[410,15,375,310,'Document · one JSON tree','g',1]],
+  n:[['u',200,70,'users|id · name · region_id','b','db'],['p',110,200,'positions|user_id · title · org','b','db'],['e',290,200,'education|user_id · school','b','db'],
+     ['j',200,290,'3 queries or JOINs','r','pill'],
+     ['doc',595,170,'{ "name": "Asha",\n  "positions": [ … ],\n  "education": [ … ] }','g',null,1,300,130],
+     ['one',595,290,'1 read · data is local','g','pill',1]],
+  e:[['p','u','user_id',''],['e','u','user_id','']]},
+ cap:['Relational: a profile is split across tables and reassembled with joins. Mapping objects to tables like this is called <b>impedance mismatch</b>.','Document: a profile is a self-contained tree. One read fetches it all because the data has <b>locality</b>. This works when the data is one-to-many and read as a whole.'],
+ cards:[['why','When document wins','Data forms a tree, you always load the whole tree, and there are few cross-references. Examples: a resume, a product page, an order with its line items.']]},
+{sec:'Ch 2 · Data Models',t:'Where documents break: many-to-one and many-to-many',k:'Normalization',
+ d:{w:800,h:320,
+  n:[['d1',120,80,'Profile: Asha|org: "Acme"','g'],['d2',120,170,'Profile: Mina|org: "Acme"','g'],['d3',120,260,'Profile: Sam|org: "acme inc"','r',null,1],
+     ['org',520,170,'organizations|id=42 · "Acme" · logo · URL','b','db',2],
+     ['app',520,290,'App code now does the JOIN','a','pill',3]],
+  e:[['d1','org','org_id=42','b',2],['d2','org','org_id=42','b',2],['d3','org','org_id=42','b',2]]},
+ cap:['Storing the org name as text in every profile duplicates it.','Duplicates drift: a typo, a rename, or a logo change means updating thousands of documents.','Normalize: store an <b>ID</b> and keep the org in one place. That is a many-to-one relationship.','Document databases have weak join support, so the join moves into application code. As data gains references, the relational model wins again.'],
+ cards:[['say',null,'"Bookings reference hotels, users, and rooms, which is many-to-many, so I\'ll use Postgres. Each hotel\'s static content is one tree read as a whole, so it can live in a document store or as cached JSON."']]},
+{sec:'Ch 2 · Data Models',t:'Schema-on-write vs schema-on-read',k:'Schema flexibility',
+ tbl:{h:['','Schema-on-write (relational)','Schema-on-read (document)'],r:[
+  ['Analogy','Static typing: checked at compile time','Dynamic typing: checked at run time'],
+  ['Change a field','ALTER TABLE + migration (fast in Postgres; MySQL used to copy the whole table)','Just write new docs; code handles both old and new shapes'],
+  ['Good for','Uniform records with stable structure','Heterogeneous items: different shapes per type, or external data you don\'t control'],
+  ['Locality','Rows are spread across tables (but see Postgres JSONB, Spanner interleaving)','Whole doc stored together; rewrites the whole doc on update, so keep docs small'],
+  ['Joins','Native, optimized by query planner','Weak or none; done in application']]},
+ cards:[['trap','"NoSQL is schemaless"','There is always a schema, it\'s just <b>implicit</b> in the reading code. You still pay for migrations, just later and in more places.']]},
+{sec:'Ch 2 · Data Models',t:'Graph model: when relationships are the data',k:'Property graphs',
+ d:{w:800,h:340,
+  n:[['lucy',170,90,'Person: Lucy','k','pill'],['alain',170,260,'Person: Alain','k','pill'],['idaho',430,60,'Location: Idaho','t','pill',1],['us',650,110,'Country: USA','t','pill',1],
+     ['lon',430,200,'City: London','t','pill',2],['uk',650,260,'Country: UK','t','pill',2],['eu',650,170,'Continent: Europe','t','pill',2]],
+  e:[['lucy','alain','MARRIED','k2',0],['lucy','idaho','BORN_IN','t',1],['idaho','us','WITHIN','',1],['lucy','lon','LIVES_IN','t',2],['alain','lon','LIVES_IN','t',2],['lon','uk','WITHIN','',2],['uk','eu','WITHIN','',2]],
+  t:[[400,325,'Query: people born in the US who live in Europe → follow WITHIN* edges, any depth','a',3,12,'m',600]]},
+ cap:['Vertices (people, places) and edges (relationships), each with properties.','Edges chain at different depths: Idaho is in the USA, but a city might be in a county, in a state, in a country.','Anything can connect to anything. Adding a new kind of relationship needs no schema change.','A recursive query ("WITHIN, any number of hops") is one line in Cypher and painful in SQL (recursive CTE).'],
+ cards:[['why','In interviews','Fraud rings, "people you may know", knowledge graphs. Most interview problems don\'t need a graph DB; adjacency lists in Postgres or Redis are usually enough.']]},
+{sec:'Ch 2 · Data Models',t:'Interview angle: Chapter 2',k:'Chapter 2 → interview',
+ tbl:{h:['Data shape','Pick','Interview example'],r:[
+  ['Lots of cross-references, need transactions','Relational (Postgres)','Bookings, payments, inventory, users'],
+  ['Self-contained tree, read whole','Document (Mongo, DynamoDB item, JSONB)','Hotel content, product catalog page, chat message'],
+  ['Relationships are the query','Graph (Neo4j) or adjacency list','Social graph, recommendations, fraud'],
+  ['Huge write volume, simple key access','Wide-column (Cassandra)','Chat history, metrics, activity logs']]},
+ cards:[['say',null,'"I start from access patterns. The two hot queries are X and Y, and both are key lookups with one join, so Postgres with the right indexes covers it. I\'d only move to Cassandra if write volume passes about 50k/sec."']]},
+
+/* ───────── CH 3 ───────── */
+{sec:'Ch 3 · Storage & Retrieval',type:'title',k:'Chapter 3',t:'Storage & Retrieval',
+ s:'How a database actually stores bytes. Two families power almost everything: <b>log-structured</b> engines (LSM trees in Cassandra, RocksDB, Kafka) that append, and <b>page-oriented</b> engines (B-trees in Postgres, MySQL) that update in place. Plus why analytics needs column storage.',
+ chips:['append-only log','hash index','SSTable','LSM-tree','B-tree','WAL','column store','star schema']},
+{sec:'Ch 3 · Storage & Retrieval',t:'The simplest database: append-only log + hash index',k:'Log-structured storage (Bitcask)',
+ d:{w:800,h:330,
+  n:[['w',90,70,'set(k, v)','t','pill'],['log',420,70,'segment file (append only)\n42:"a" · 17:"b" · 42:"c" · 9:"d"','b',null,0,420,58],
+     ['hm',180,220,'In-memory hash map\n42 → offset 24\n17 → offset 8','a',null,1,220,74],
+     ['r',90,310,'get(42)','t','pill',2],
+     ['s1',470,220,'old segments','b','db',3],['cmp',660,220,'compaction|keep latest per key','g',null,3],['s2',660,305,'merged segment','g','db',3]],
+  e:[['w','log','append','',0],['hm','log','points to','ad',1],['r','hm','O(1) lookup','t',2],['s1','cmp','','g',3],['cmp','s2','','g',3]]},
+ cap:['Every write is <b>appended</b> to the end of a file. Sequential writes are the fastest thing a disk can do.','An in-memory hash map stores, for each key, the byte offset of its latest value.','A read is one hash lookup plus one disk seek.','Old values pile up, so background <b>compaction</b> merges segments and keeps only the latest value per key.'],
+ cards:[['trap','Limits','All keys must fit in RAM, and range queries ("all keys between A and F") are impossible. SSTables fix both.']]},
+{sec:'Ch 3 · Storage & Retrieval',t:'LSM-tree: how Cassandra and RocksDB write so fast',k:'SSTables + LSM',
+ d:{w:800,h:360,
+  z:[[15,15,300,330,'Memory','a'],[330,15,455,330,'Disk','b']],
+  n:[['w',90,60,'write(k,v)','t','pill'],['wal',530,60,'WAL (append)|crash recovery','b','q'],['mt',160,160,'Memtable|sorted tree (RB / skiplist)','a',null,0,230],
+     ['l0',450,160,'SSTable L0|sorted, immutable','b','db',1],['l1',650,160,'L1 (merged)','b','db',2],['l2',650,260,'L2 (bigger)','b','db',2],
+     ['rd',90,300,'read(k)','t','pill',3],['bf',260,300,'Bloom filter|"definitely not here"','p',null,3]],
+  e:[['w','wal','1. log','',0],['w','mt','2. insert','',0],['mt','l0','flush when full\n(~64MB)','',1],['l0','l1','compact','g',2],['l1','l2','compact','g',2],['rd','mt','check first','t',3],['rd','bf','','t',3],['bf','l0','skip most\nSSTables','pd',3]]},
+ cap:['A write goes to a WAL (for durability) and an in-memory sorted <b>memtable</b>. No random disk I/O.','When the memtable is full it is flushed as an <b>SSTable</b>, a sorted immutable file, with one sequential write.','Background <b>compaction</b> merges SSTables into bigger levels and drops overwritten or deleted keys (tombstones).','A read checks the memtable, then SSTables from newest to oldest. <b>Bloom filters</b> skip files that can\'t contain the key, so reads cost more than writes.'],
+ cards:[['num','Why it matters','Sequential writes only, so you get very high write throughput. Cassandra handles about <b>10k+ writes/sec per node</b> easily. That makes LSM the default for metrics, logs, chat, and events.']]},
+{sec:'Ch 3 · Storage & Retrieval',t:'B-tree: how Postgres and MySQL store data',k:'Page-oriented storage',
+ d:{w:800,h:340,
+  n:[['root',400,50,'root page|<100 · 100–300 · >300','b',null,0,320],
+     ['b1',170,150,'100 … 200','b',null,1],['b2',400,150,'200 … 300','b',null,1],['b3',630,150,'300 … 400','b',null,1],
+     ['l1',300,250,'leaf: 251 → row','g',null,2],['l2',500,250,'leaf: 277 → row','g',null,2],
+     ['wal',130,300,'WAL first|then overwrite page','a','q',3],['sp',680,290,'page full?\nsplit into 2','r',null,3]],
+  e:[['root','b1','','',1],['root','b2','','',1],['root','b3','','',1],['b2','l1','','g',2],['b2','l2','','g',2],['wal','l1','in-place\nupdate','ad',3]]},
+ cap:['Data lives in fixed-size <b>pages</b> (4–16KB). The root page holds key ranges that point to child pages.','Each level narrows the range. A branching factor of about 500 means <b>4 levels hold 256TB</b>.','The leaf page holds the row (or a pointer to it). A lookup is O(log n) page reads, usually 3–4.','Updates overwrite the page <b>in place</b>, after writing to the WAL first so a crash mid-write can be repaired. A full page splits in two.'],
+ cards:[['num','Why it matters','Predictable reads, and each key exists in exactly one place, which makes row locks and transactions simple. That is why OLTP and ACID databases are B-tree based.']]},
+{sec:'Ch 3 · Storage & Retrieval',t:'LSM vs B-tree: the trade-off you will be asked about',k:'Comparison',
+ tbl:{h:['','LSM-tree (Cassandra, RocksDB, HBase)','B-tree (Postgres, MySQL InnoDB)'],r:[
+  ['Writes','Faster: sequential appends, less write amplification','Slower: random page writes + WAL (each write ≥ 2 writes)'],
+  ['Reads','Slower: may check several SSTables (Bloom filters help)','Faster, predictable: one path root → leaf'],
+  ['Space','Compresses well, little fragmentation','Pages partly empty after splits'],
+  ['Weak spot','Compaction competes with live traffic, so p99 spikes','Write-heavy workloads hit I/O limits'],
+  ['Transactions','Key may exist in many files, so locking is harder','Key in one place: easy range locks'],
+  ['Pick when','Write-heavy: metrics, logs, chat, IoT, events','Read-heavy, transactional: bookings, payments, users']]},
+ cards:[['say',null,'"Ad clicks are write-heavy and append-only, around 10k/sec, so an LSM-based store like Cassandra fits. Bookings need transactions and point reads, so a B-tree store like Postgres fits."']]},
+{sec:'Ch 3 · Storage & Retrieval',t:'Index types you should name in interviews',k:'Secondary indexes',
+ tbl:{h:['Index','How','Use for'],r:[
+  ['B-tree (default)','Sorted tree on column(s)','Equality + range: WHERE created_at > X, ORDER BY'],
+  ['Composite','Sorted by (a, b): leftmost prefix rule','WHERE user_id=? ORDER BY ts DESC: one index scan'],
+  ['Covering / INCLUDE','Index stores extra columns','Index-only scans: no heap lookup'],
+  ['Clustered','Rows stored in index order','InnoDB primary key; range scans on PK are cheap'],
+  ['Hash','Hash map','Equality only; no ranges'],
+  ['Geospatial','R-tree, geohash, quadtree (PostGIS)','"Hotels within 5km": Yelp, Uber, Gopuff'],
+  ['Inverted','term → list of doc IDs','Full-text search: Elasticsearch, Postgres GIN'],
+  ['Bloom filter','Probabilistic set membership','"Seen this URL?" in a web crawler, LSM reads']]},
+ cards:[['trap','Indexes are not free','Each index slows down every write and uses disk. Index for the <b>hot read queries</b> you named, not for every column.']]},
+{sec:'Ch 3 · Storage & Retrieval',t:'OLTP vs OLAP, and the star schema',k:'Analytics',
+ d:{w:800,h:340,
+  n:[['f',400,175,'fact_bookings|booking_id · ts · user_id · hotel_id · price · nights','a',null,0,250,70],
+     ['d1',130,70,'dim_user|country · tier','b','db',1],['d2',670,70,'dim_hotel|city · stars','b','db',1],['d3',130,280,'dim_date|weekday · holiday','b','db',1],['d4',670,280,'dim_channel|app · web · partner','b','db',1]],
+  e:[['f','d1','','',1],['f','d2','','',1],['f','d3','','',1],['f','d4','','',1]]},
+ cap:['The <b>fact table</b> holds one row per event (each booking). It has billions of rows and is narrow but very long.','<b>Dimension tables</b> hold the who, what, where, and when. Queries filter on dimensions and aggregate facts: "revenue by city by weekday".'],
+ tbl:{h:['','OLTP','OLAP'],r:[['Pattern','Few rows by key','Scan millions, aggregate'],['Users','App / customers','Analysts, dashboards'],['Size','GB – TB','TB – PB'],['Engine','Postgres, MySQL','Snowflake, BigQuery, ClickHouse, Druid']]}},
+{sec:'Ch 3 · Storage & Retrieval',t:'Column-oriented storage: why analytics is fast',k:'Column stores',
+ d:{w:800,h:320,
+  z:[[15,15,370,290,'Row store: reads whole rows','r'],[415,15,370,290,'Column store: reads 2 columns','g',1]],
+  n:[['r1',200,80,'id · ts · user · hotel · price · …','r',null,0,330],['r2',200,135,'id · ts · user · hotel · price · …','r',null,0,330],['r3',200,190,'id · ts · user · hotel · price · …','r',null,0,330],
+     ['c1',510,160,'hotel\n…\n…\n…','g',null,1,80,190],['c2',600,160,'price\n…\n…\n…','g',null,1,80,190],['c3',700,160,'(other cols\nnot read)','x','n',1,100,190],
+     ['q',200,265,'SUM(price) GROUP BY hotel','t','pill']],
+  t:[[600,290,'+ compression (bitmap / run-length): 10× smaller','g',2,12]]},
+ cap:['A row store reads every column of every row from disk, even though the query needs two.','A column store keeps each column in its own file and reads only <b>hotel</b> and <b>price</b>, so it touches far less disk.','Values in one column look alike, so they compress very well. Vectorized CPU processing on top makes these scans 10–100× faster.'],
+ cards:[['say',null,'"The ad-click dashboard is an OLAP query, so I won\'t run it on the OLTP Postgres. Clicks flow through Kafka into a column store like ClickHouse or Druid for aggregation."']]},
+{sec:'Ch 3 · Storage & Retrieval',t:'Interview angle: Chapter 3',k:'Chapter 3 → interview',
+ c2:[['q',null,'"Why Cassandra for this?"<br>→ "LSM-tree storage: writes are sequential appends to memtable + commit log, so write throughput is very high. Reads are slower, which is fine for this append-heavy workload."'],
+  ['q',null,'"How do you make this query fast?"<br>→ Name the <b>exact index</b>: "a composite index on (user_id, created_at DESC) turns it into a single index range scan."'],
+  ['q',null,'"Where do analytics queries run?"<br>→ Never on the OLTP primary. Use CDC or Kafka into a column store (ClickHouse, BigQuery, Druid).'],
+  ['q',null,'"What does a WAL do?"<br>→ Log the change before applying it. After a crash, replay the log. The same idea powers replication (Ch 5) and CDC (Ch 11).']]},
+
+/* ───────── CH 4 ───────── */
+{sec:'Ch 4 · Encoding & Evolution',type:'title',k:'Chapter 4',t:'Encoding & Evolution',
+ s:'Data outlives code. During a rolling deploy, old and new versions of your service run at the same time, reading each other\'s data. Encoding formats such as Protobuf, Avro, and JSON decide whether that works or silently corrupts data.',
+ chips:['backward compat','forward compat','Protobuf field tags','Avro schemas','schema registry','REST / RPC / messages']},
+{sec:'Ch 4 · Encoding & Evolution',t:'Rolling upgrade: old and new code at the same time',k:'Why compatibility matters',
+ seq:{a:['Service v2|g','Database|b','Service v1|a'],m:[
+  ['Service v2','Database','write {name, email, phone*}','g',0],
+  ['Service v1','Database','read record','',1],
+  ['Database','Service v1','{name, email, phone}','',1],
+  ['#','Service v1',null,'v1 doesn\'t know "phone"','a',2],
+  ['Service v1','Database','write back {name, email}','r',3],
+  ['#','Service v2','Service v1','phone is silently LOST','r',3]]},
+ cap:['New code (v2) adds a field, <b>phone</b>, and writes it.','Old code (v1), still running on other nodes, reads that record.','v1 decodes it into its own model class, which has no phone field.','v1 updates the name and writes the whole object back, and phone is gone. Old code must <b>preserve unknown fields</b>.'],
+ cards:[['why','The two directions','<b>Backward compatible</b>: new code reads old data (easy).<br><b>Forward compatible</b>: old code reads new data (hard, which is this slide).']]},
+{sec:'Ch 4 · Encoding & Evolution',t:'Protobuf / Thrift: field tags make evolution safe',k:'Binary encoding',
+ d:{w:800,h:320,
+  n:[['js',150,80,'JSON  ~80 bytes\n{"userName":"Asha",\n "favNumber":1337}','x',0,240,76],
+     ['pb',150,230,'Protobuf  ~33 bytes\ntag 1 → "Asha"\ntag 2 → 1337','g',null,1,240,76],
+     ['r1',530,70,'✓ Add field: new tag 3|old code skips unknown tag','g',null,2,330],
+     ['r2',530,140,'✓ Remove field: never reuse tag|mark reserved','g',null,2,330],
+     ['r3',530,210,'✗ Make new field required|old data lacks it → crash','r',null,3,330],
+     ['r4',530,280,'✗ Change a tag number|data decodes to wrong field','r',null,3,330]],
+  e:[['js','pb','field names → numbers','g',1]]},
+ cap:['JSON repeats field names in every record and has no schema. Large, and number types are ambiguous (precision is lost above 2⁵³).','Protobuf replaces names with <b>tag numbers</b> plus a schema file, so records are about 2–3× smaller and faster to parse.','Rules that keep compatibility: add new <b>optional</b> fields with new tags; never reuse a removed tag.','Breaking changes: required fields, renumbering tags, or changing a type in an incompatible way.'],
+ cards:[['why','Avro alternative','Avro has no tags. The reader resolves the <b>writer\'s schema</b> against its own <b>reader schema</b> by field name, so a <b>schema registry</b> stores every version. This is common with Kafka.']]},
+{sec:'Ch 4 · Encoding & Evolution',t:'Three ways data flows between processes',k:'Modes of dataflow',
+ d:{w:800,h:340,
+  z:[[15,15,770,95,'1 · through databases','b'],[15,122,770,95,'2 · through service calls (REST / gRPC)','g',1],[15,229,770,100,'3 · through async messages (Kafka, SQS)','p',2]],
+  n:[['a1',130,68,'Service v2','b'],['db',400,68,'Database','b','db'],['a2',670,68,'Service v1 (later)','b'],
+     ['b1',130,175,'Client','g',null,1],['b2',670,175,'Server','g',null,1],
+     ['c1',130,283,'Producer','p',null,2],['q',400,283,'Broker / log','p','q',2],['c2',670,283,'Consumer(s)','p',null,2]],
+  e:[['a1','db','write','b'],['db','a2','read years later','bd'],['b1','b2','request / response','g2',1],['c1','q','publish','p',2],['q','c2','consume async','p',2]]},
+ cap:['<b>Database</b>: like sending a message to your future self. Data written years ago must still decode, so "data outlives code".','<b>Service calls</b>: a network call is not a local function call. It can time out, be retried and run twice, or have unknown outcome. Version your APIs.','<b>Messages</b>: the sender doesn\'t wait. A broker buffers, retries, and fans out. Producer and consumer evolve independently, so a schema registry keeps them compatible.'],
+ cards:[['trap','RPC illusion','"Just call it like a function" hides timeouts, retries, and partial failure. Design every remote call as <b>idempotent</b> with a timeout.']]},
+{sec:'Ch 4 · Encoding & Evolution',t:'Interview angle: Chapter 4',k:'Chapter 4 → interview',
+ c2:[['q',null,'"How do you deploy schema changes with zero downtime?"<br>→ <b>Expand → migrate → contract</b>: add the nullable column, deploy code that writes both, backfill, switch reads, and only then drop the old column.'],
+  ['q',null,'"How do Kafka producers and consumers evolve?"<br>→ Avro or Protobuf with a <b>schema registry</b> enforcing backward-compatible changes. Consumers upgrade on their own schedule.'],
+  ['q',null,'"REST or gRPC between services?"<br>→ gRPC (Protobuf, HTTP/2) for internal high-QPS calls; REST/JSON for public APIs and browsers.'],
+  ['say',null,'"Every message carries a schema version, and we only add optional fields. That lets the booking service deploy without coordinating with its consumers."']]},
+];
+
+SLIDES.push(
+/* ───────── CH 5 ───────── */
+{sec:'Ch 5 · Replication',type:'title',k:'Chapter 5 · Part II begins',t:'Replication',
+ s:'Keep a copy of the same data on several machines: for fault tolerance (a node dies, a copy survives), read scaling (spread reads), and latency (a copy near the user). Copying is easy. Handling <b>changes</b> to data that is copied is the hard part.',
+ chips:['leader / follower','sync vs async','failover','replication lag','read-your-writes','multi-leader','leaderless quorums']},
+{sec:'Ch 5 · Replication',t:'Single-leader replication',k:'Leader-based (Postgres, MySQL, Redis, Kafka)',
+ d:{w:800,h:340,
+  n:[['cw',100,90,'Client (write)','t','pill'],['L',370,90,'Leader|accepts all writes','a','db'],
+     ['f1',230,250,'Follower 1','b','db',1],['f2',370,250,'Follower 2','b','db',1],['f3',510,250,'Follower 3','b','db',1],
+     ['cr',700,250,'Clients (read)','t','pill',2]],
+  e:[['cw','L','INSERT','',0],['L','f1','repl log','a',1],['L','f2','','a',1],['L','f3','','a',1],['cr','f3','SELECT','t',2]],
+  t:[[700,300,'reads scale by adding followers','t',2,11]]},
+ cap:['All writes go to one node, the <b>leader</b>. It writes locally first.','The leader streams a <b>replication log</b> (the WAL or row changes) to every follower, and each applies the changes in the same order.','Reads can go to any follower. This is <b>read scaling</b>, but followers may be a little behind: replication lag.'],
+ cards:[['why','Why it is the default','No write conflicts are possible, because one node orders all writes. You only need multi-leader or leaderless when you need writes in several regions or no single point of write failure.']]},
+{sec:'Ch 5 · Replication',t:'Synchronous vs asynchronous followers',k:'Durability vs latency',
+ seq:{a:['Client|t','Leader|a','Follower 1 (sync)|b','Follower 2 (async)|b'],m:[
+  ['Client','Leader','write x=5','',0],
+  ['Leader','Follower 1 (sync)','replicate','a',1],
+  ['Follower 1 (sync)','Leader','ack','g',1],
+  ['Leader','Client','OK (durable on 2 nodes)','g',2],
+  ['Leader','Follower 2 (async)','replicate (no wait)','ad',3],
+  ['#','Follower 2 (async)',null,'lags ms … minutes','r',3]]},
+ cap:['The client writes to the leader.','The leader waits for the <b>synchronous</b> follower to confirm. Now 2 copies exist.','Only then does the client get OK. The cost: if that follower is slow, every write is slow.','The <b>async</b> follower is updated in the background. It is fast, but if the leader dies now, writes the async follower never got are lost.'],
+ cards:[['why','Semi-synchronous','The usual setup is <b>one</b> sync follower and the rest async. A write is on at least 2 nodes, and one slow follower doesn\'t block everything. If the sync follower fails, another async one is promoted to sync.'],
+  ['num','Typical lag','Normally well under 1 second. Under load or across regions it can be seconds to minutes.']]},
+{sec:'Ch 5 · Replication',t:'Failover: what goes wrong when the leader dies',k:'Leader failure',
+ d:{w:800,h:340,
+  n:[['L',150,90,'Old leader|wrote id=101,102','a','db',[0,0]],['F',450,90,'Follower|has up to id=100','b','db',[0,1]],
+     ['X',150,90,'Old leader DEAD','r','x',[1,3]],['NL',450,90,'NEW leader|promoted by timeout','g','db',2,200],
+     ['N',450,240,'New writes reuse\nid=101, 102 ✗','r',null,3,200],['R',150,240,'Old leader comes back:\n"I am leader!"','r',null,4,200],['SB',300,320,'SPLIT BRAIN → two leaders accept writes','r','pill',4]],
+  e:[['L','F','async, behind','ad',[0,0]],['NL','N','','r',3],['R','NL','both write','r2',4]]},
+ cap:['The leader has accepted writes 101 and 102 that the async follower hasn\'t received yet.','The leader crashes. A timeout (say 30s) declares it dead. Too short a timeout gives false failovers; too long means more downtime.','The most up-to-date follower is <b>promoted</b>. Clients and other followers are reconfigured to use it.','Writes 101 and 102 are lost, and new writes reuse those IDs. At GitHub this exposed private data, because Redis cached the old IDs.','If the old leader returns and still thinks it is leader, there are two leaders: <b>split brain</b>. A fix is <b>fencing</b>: shut it down (STONITH) or reject its epoch number (Ch 8).'],
+ cards:[['say',null,'"Failover is automatic via Sentinel or Patroni, but async replication means we can lose the last second of writes. For payments I\'d use synchronous commit to one replica."']]},
+{sec:'Ch 5 · Replication',t:'How the replication log is implemented',k:'Log formats',
+ tbl:{h:['Method','What is sent','Problem / benefit'],r:[
+  ['Statement-based','The SQL: UPDATE … SET ts=NOW()','NOW(), RAND(), auto-increment differ per replica, so data diverges. Mostly abandoned.'],
+  ['WAL shipping','Raw storage-engine bytes (Postgres physical)','Exact copy, but tied to the storage format, so replicas must run the same DB version (no zero-downtime upgrade).'],
+  ['Logical (row-based)','"row id=7: col price 100→120"','Decoupled from storage, so versions can differ. External tools can read it, which is <b>CDC</b> (Debezium, Ch 11).'],
+  ['Trigger-based','App-level trigger writes a change table','Flexible (replicate a subset, transform) but slow and fragile.']]},
+ cards:[['why','The big idea','A replication log, a WAL, a Kafka topic, and a CDC stream are all the same thing: <b>an ordered log of changes that others replay</b>. Chapter 11 builds on this.']]},
+{sec:'Ch 5 · Replication',t:'Replication lag anomaly 1: read-your-writes',k:'Lag anomalies',
+ seq:{a:['User|t','Leader|a','Follower|b'],m:[
+  ['User','Leader','POST comment "Great hotel!"','',0],
+  ['Leader','User','201 Created','g',0],
+  ['Leader','Follower','replicate…','ad',1],
+  ['User','Follower','GET /comments (page refresh)','',2],
+  ['Follower','User','[ ] my comment is missing!','r',2],
+  ['#','User',null,'Fix: read own data from leader','g',3]]},
+ cap:['The user writes to the leader and gets success.','Replication to the follower is still in flight.','The page refresh reads from a follower that hasn\'t received the write yet.','The fixes give <b>read-after-write consistency</b>: read the user\'s own profile from the leader; for about 1 minute after a write, route that user to the leader; or have the client remember its last write LSN and read only from a replica that has caught up to it.'],
+ cards:[['say',null,'"After a user edits their booking, I route that user\'s reads to the primary for a few seconds. Everyone else reads from replicas."']]},
+{sec:'Ch 5 · Replication',t:'Lag anomalies 2 and 3: monotonic reads and consistent prefix',k:'Lag anomalies',
+ seq:{a:['User|t','Follower A (fresh)|g','Follower B (stale)|r'],m:[
+  ['User','Follower A (fresh)','GET comments','',0],
+  ['Follower A (fresh)','User','3 comments','g',0],
+  ['User','Follower B (stale)','GET comments (refresh, different replica)','',1],
+  ['Follower B (stale)','User','2 comments ← time went backwards','r',1],
+  ['#','User','Follower B (stale)','Fix: sticky replica = hash(user_id) % replicas','g',2],
+  ['#','User','Follower B (stale)','Consistent prefix: answer seen before the question','a',3]]},
+ cap:['The first read hits a fresh replica and shows 3 comments.','The refresh hits a staler replica and shows 2. The user sees data disappear. <b>Monotonic reads</b> means never going backwards.','The fix: each user always reads from the same replica (hash of user ID). If it fails, re-route.','<b>Consistent prefix reads</b>: across partitions a reader can see a reply before the message it replies to. The fix is to keep causally related writes in the same partition, for example partitioning chat by conversation_id.'],
+ cards:[['why','Interview link','WhatsApp and Messenger partition by <b>conversation_id</b> so messages in a chat keep their order. That is the consistent-prefix guarantee.']]},
+{sec:'Ch 5 · Replication',t:'Multi-leader replication',k:'Multi-region writes',
+ d:{w:800,h:340,
+  z:[[20,30,330,290,'Region: Singapore','b'],[450,30,330,290,'Region: Frankfurt','p']],
+  n:[['u1',120,90,'User A','t','pill'],['L1',230,190,'Leader SG','a','db'],['u2',680,90,'User B','t','pill'],['L2',570,190,'Leader EU','a','db'],
+     ['c',400,290,'CONFLICT: title = "B" or "C"?','r','pill',2]],
+  e:[['u1','L1','title="B"','',1],['u2','L2','title="C"','',1],['L1','L2','async replication','a2',0],['L1','c','','rd',2],['L2','c','','rd',2]]},
+ cap:['One leader per region. Each accepts local writes (low latency) and replicates asynchronously to the other.','Two users edit the same record in different regions at the same moment. Both succeed locally.','When the changes meet, there is a <b>conflict</b>. Resolution options: last-write-wins (silently loses data), merge values, CRDTs, or ask the user.'],
+ cards:[['why','Best fix: avoid conflicts','Route each user, or each record, to a <b>home region</b>. Their writes always go to one leader, and conflicts only happen during failover.'],
+  ['q',null,'Google Docs and CRDT editors are multi-leader: every client is a "leader" that merges concurrent edits.']]},
+{sec:'Ch 5 · Replication',t:'Leaderless replication and quorums (Dynamo, Cassandra)',k:'Leaderless',
+ d:{w:800,h:340,
+  n:[['c',110,170,'Client','t','pill'],['n1',430,70,'Node 1|v7 ✓','g','db'],['n2',430,170,'Node 2|v7 ✓','g','db'],['n3',430,270,'Node 3|v6 (was down)','r','db'],
+     ['rr',680,270,'read repair|write v7 back','a',null,3]],
+  e:[['c','n1','write v7','g',0],['c','n2','write v7','g',0],['c','n3','✗ missed','rd',0],['n1','c','read → v7','bc',1],['n3','c','read → v6','rdC',1],['n3','rr','','a',3],['rr','n3','fixed','ac',3]],
+  t:[[110,240,'n=3, w=2, r=2','a',2,13,'m',700],[110,262,'w + r > n → overlap','a',2,12],[110,282,'at least 1 node has latest','a',2,12]]},
+ cap:['No leader. The client (or coordinator) sends the write to all 3 replicas. Node 3 is down, but 2 of 3 acks is enough (<b>w=2</b>).','Reads also go to several nodes (<b>r=2</b>). One may return stale v6.','Because <b>w + r &gt; n</b>, the read set and write set overlap, so at least one response has the latest version. Pick the highest version.','<b>Read repair</b> writes the latest value back to the stale node. A background <b>anti-entropy</b> process (Merkle trees) fixes values that are never read.'],
+ cards:[['num','Tuning','n=3, w=2, r=2 is balanced. w=3, r=1 gives fast reads and fragile writes. w=1, r=3 gives fast writes. Cassandra\'s <b>QUORUM</b> = ⌊n/2⌋+1.']]},
+{sec:'Ch 5 · Replication',t:'Quorum edge cases',k:'Leaderless · caveats',
+ tbl:{h:['Concept','What it is','Gotcha'],r:[
+  ['Sloppy quorum','If home nodes are unreachable, write to any w reachable nodes','Higher write availability, but w+r>n no longer guarantees you read the latest'],
+  ['Hinted handoff','Temporary node keeps a "hint" and forwards when home node returns','Data is eventually delivered'],
+  ['Concurrent writes','Two clients write the same key at once','Nodes may apply them in different orders, so you need conflict resolution'],
+  ['Last-write-wins (LWW)','Highest timestamp wins','Drops concurrent writes silently, and clock skew can drop newer ones (Ch 8). Cassandra default.'],
+  ['Version vectors','Per-replica counters to detect concurrency','Shows "these two writes are concurrent": keep both (siblings) or merge'],
+  ['Quorum ≠ linearizable','Even with w+r>n','Timing edge cases still exist (Ch 9); use consensus for strict guarantees']]},
+ cards:[['say',null,'"Cassandra with QUORUM reads and writes at RF=3 tolerates one node down. For counters I\'d avoid LWW and use Cassandra counters or a Redis INCR."']]},
+{sec:'Ch 5 · Replication',t:'Interview angle: Chapter 5',k:'Chapter 5 → interview',
+ c2:[['q',null,'"Your DB primary dies. What happens?"<br>→ Automated failover promotes a replica (Patroni, RDS Multi-AZ, ~30s). With async replication the last seconds of writes can be lost, so use sync commit for money.'],
+  ['q',null,'"User updates a price and refreshes but sees the old price."<br>→ Replication lag. Read-your-writes: route that user to the primary for N seconds, or track LSN.'],
+  ['q',null,'"Multi-region active-active?"<br>→ Multi-leader with conflict risk. Prefer a <b>home region per user or hotel</b>, and CRDTs for things like counters.'],
+  ['q',null,'"Why Cassandra over Postgres replicas?"<br>→ Leaderless: no failover pause, tunable consistency, write availability during node loss. The cost is conflicts and LWW.']]},
+
+/* ───────── CH 6 ───────── */
+{sec:'Ch 6 · Partitioning',type:'title',k:'Chapter 6',t:'Partitioning (Sharding)',
+ s:'When data or write load is too big for one machine, split it. Each record belongs to exactly one partition. The goals are to spread data and load evenly, avoid <b>hot spots</b>, and move as little data as possible when nodes are added.',
+ chips:['key-range','hash partitioning','hot spots','secondary indexes','rebalancing','consistent hashing','request routing']},
+{sec:'Ch 6 · Partitioning',t:'Key-range vs hash partitioning',k:'How to split',
+ d:{w:800,h:330,
+  z:[[15,20,770,135,'By key range: sorted, like encyclopedia volumes','b'],[15,175,770,140,'By hash of key: even spread','g',1]],
+  n:[['r1',120,90,'P1: A – F','b','db'],['r2',300,90,'P2: G – M','b','db'],['r3',480,90,'P3: N – S','b','db'],['r4',660,90,'P4: T – Z','b','db'],
+     ['h1',120,250,'P1: hash 0–25%','g','db',1],['h2',300,250,'P2: 25–50%','g','db',1],['h3',480,250,'P3: 50–75%','g','db',1],['h4',660,250,'P4: 75–100%','g','db',1]],
+  t:[[400,145,'✓ range scans   ✗ timestamp keys → all of today\'s writes hit the LAST partition','a',0,11.5],[400,305,'✓ even load   ✗ range scans hit ALL partitions (Cassandra: hash partition key, sort by clustering key)','a',1,11.5]]},
+ cap:['<b>Key range</b>: efficient range queries. But sequential keys (timestamps, auto-increment IDs) send all writes to one partition, a hot spot.','<b>Hash</b>: hash(key) spreads keys evenly, so load is uniform. You lose range queries on the key. The compound-key trick: hash the first part (user_id), sort within it by the second (timestamp).'],
+ cards:[['say',null,'"I\'ll partition messages by hash(conversation_id) and cluster by message timestamp, so one conversation\'s history is a single-partition range scan."']]},
+{sec:'Ch 6 · Partitioning',t:'Skew and hot spots: the celebrity problem',k:'Hot keys',
+ d:{w:800,h:330,
+  n:[['w',110,165,'10M writes/sec\nfor key "Messi"','r',null,0,150],['p',400,165,'One partition|melting 🔥','r','db'],
+     ['k0',640,60,'Messi#00','g','db',1],['k1',640,130,'Messi#01','g','db',1],['k2',640,200,'…','g','db',1],['k3',640,270,'Messi#99','g','db',1],
+     ['rd',400,300,'reads: query 100 keys + merge','a','pill',2]],
+  e:[['w','p','all hash the same','r',0],['p','k0','random suffix','g',1],['p','k1','','g',1],['p','k2','','g',1],['p','k3','','g',1]]},
+ cap:['Hashing can\'t fix a single hot <b>key</b>. Every write for "Messi" goes to the same partition.','Split the key: append a random suffix 00–99 so writes spread over 100 partitions.','The cost moves to reads, which must fetch all 100 sub-keys and merge. Only do this for keys you <b>know</b> are hot, and track which ones those are.'],
+ cards:[['why','Interview examples','Live comments on a celebrity post, Ticketmaster\'s Taylor Swift on-sale, YouTube view counters, an ad campaign\'s click counter. All use <b>key splitting or write buffering</b>.']]},
+{sec:'Ch 6 · Partitioning',t:'Secondary indexes: local vs global',k:'Partitioning + indexes',
+ d:{w:800,h:340,
+  z:[[15,15,375,310,'Local (document-partitioned)','b'],[410,15,375,310,'Global (term-partitioned)','g',1]],
+  n:[['q1',200,60,'WHERE color=red','t','pill'],['a1',90,180,'P1|cars 1–500\nindex: red→[3,9]','b',null,0,135],['a2',300,180,'P2|cars 501–999\nindex: red→[612]','b',null,0,140],['m',200,290,'scatter / gather','r','pill'],
+     ['q2',600,60,'WHERE color=red','t','pill',1],['g1',500,180,'Index P-A|colors a–r\nred→[3,9,612]','g',null,1,140],['g2',700,180,'Index P-B|colors s–z','g',null,1,120],['w2',600,290,'writes update remote index (async)','a','pill',1]],
+  e:[['q1','a1','','r',0],['q1','a2','','r',0],['q2','g1','1 partition','g',1]]},
+ cap:['<b>Local</b>: each partition indexes only its own documents. Writes are simple (one partition), but a query by color must ask <b>every</b> partition and merge, so tail latency compounds. Used by MongoDB, Cassandra, and Elasticsearch shards.','<b>Global</b>: the index itself is partitioned by term. A read hits one index partition, but a write must update index partitions on other nodes, usually <b>asynchronously</b>, so the index lags. Used by DynamoDB GSIs.'],
+ cards:[['trap','DynamoDB GSI','Global secondary indexes are <b>eventually consistent</b>. A read right after a write via the GSI may miss it.']]},
+{sec:'Ch 6 · Partitioning',t:'Rebalancing: never use hash mod N',k:'Adding nodes',
+ d:{w:800,h:330,
+  n:[['m1',160,70,'hash(k) % 3 → node 1','b'],['m2',160,130,'hash(k) % 4 → node 3','r'],['mx',160,195,'~75% of keys move ✗','r','pill'],
+     ['n1',470,90,'Node A|P1 P2 P3 P4','b','db',1,140],['n2',650,90,'Node B|P5 P6 P7 P8','b','db',1,140],
+     ['n3',560,250,'New Node C|P4 P8 (stolen)','g','db',2,160],['ok',300,290,'only 2 of 8 partitions move ✓','g','pill',2]],
+  e:[['m1','m2','add node','r',0],['n1','n3','P4','g',2],['n2','n3','P8','g',2]]},
+ cap:['With mod N, changing N from 3 to 4 changes the answer for about 75% of keys, so almost all data moves.','Better: create <b>many more partitions than nodes</b> up front (for example 1,000 partitions on 10 nodes). Key→partition never changes; only partition→node does.','A new node <b>steals a few whole partitions</b> from each existing node. Used by Elasticsearch, Kafka, Riak, and Couchbase. Consistent hashing (next slide) is the ring version of this idea.'],
+ cards:[['why','Other strategies','<b>Dynamic</b>: split a partition when it grows past ~10GB (HBase, MongoDB). <b>Per-node</b>: a fixed number of partitions per node (Cassandra vnodes).']]},
+{sec:'Ch 6 · Partitioning',t:'Consistent hashing: the ring',k:'Consistent hashing',
+ d:{w:800,h:360,
+  t:[[400,183,'hash ring','x',0,12],[400,200,'0 … 2³²','x',0,11]],
+  n:[['ring',400,180,'','x','o',0,280,280],
+     ['A',400,40,'Node A','b','pill'],['B',540,180,'Node B','b','pill'],['C',400,320,'Node C','b','pill'],['D',260,180,'Node D','b','pill'],
+     ['k1',505,85,'key 1','a','pill',1],['k2',300,285,'key 2','a','pill',1],
+     ['E',505,275,'Node E (new)','g','pill',2],
+     ['v',680,90,'virtual nodes:\neach server = 100–200\npoints on the ring','p','n',3,190]],
+  e:[['k1','B','clockwise →','a',1],['k2','D','→','a',1],['E','C','takes keys between\nB and E only','gd',2]]},
+ cap:['Hash both nodes and keys onto the same circle.','A key belongs to the <b>first node clockwise</b> from it.','Add node E: only keys between B and E move (from C to E). That is about 1/N of the data, not 75%.','With few nodes, arcs are uneven. <b>Virtual nodes</b> place each server at many points so load evens out, and a bigger server gets more points.'],
+ cards:[['say',null,'"Cache keys are placed on a consistent-hash ring with virtual nodes, so adding a cache node remaps only about 1/N of keys and avoids a cold-cache stampede on the database."']]},
+{sec:'Ch 6 · Partitioning',t:'Request routing: who knows where key K lives?',k:'Service discovery',
+ d:{w:800,h:330,
+  n:[['c1',120,70,'Client','t','pill'],['any',360,70,'Any node','b',null,0],['own',600,70,'Owner node','g'],
+     ['c2',120,175,'Client','t','pill'],['rt',360,175,'Routing tier','a',null,1],['own2',600,175,'Owner node','g',null,1],
+     ['c3',120,280,'Partition-aware\nclient','t','pill',2],['own3',600,280,'Owner node','g',null,2],
+     ['zk',360,280,'ZooKeeper / etcd|partition → node map','p','db',3]],
+  e:[['c1','any','','',0],['any','own','forward\n(gossip)','',0],['c2','rt','','a',1],['rt','own2','','a',1],['c3','own3','direct','g',2],['zk','rt','watch','pd',3],['zk','c3','','pd',3]]},
+ cap:['① Contact any node, which forwards the request if needed. Nodes learn the map via <b>gossip</b>. Used by Cassandra and Riak.','② A partition-aware <b>routing tier</b> forwards the request. Used by MongoDB mongos and Vitess VTGate.','③ A <b>smart client</b> knows the map and goes straight to the owner. Used by Kafka clients, Redis Cluster clients, and Cassandra drivers.','The map itself lives in a coordination service (ZooKeeper, etcd, KRaft), and routers or clients <b>watch</b> it for changes.']},
+{sec:'Ch 6 · Partitioning',t:'Interview angle: Chapter 6',k:'Chapter 6 → interview',
+ c2:[['q',null,'"How would you shard this?"<br>→ Name the <b>shard key</b> from the hottest query: "hash(user_id), because every hot query filters by user". Then name the cost: cross-user queries scatter.'],
+  ['q',null,'"What about the celebrity or hot hotel?"<br>→ Key splitting with a suffix, write buffering in Redis or Kafka, and a cache in front for reads.'],
+  ['q',null,'"Adding shards later?"<br>→ Pre-split into many logical partitions (e.g., 1024) mapped to few physical nodes, or consistent hashing. Never mod N.'],
+  ['trap','Sharding too early','A single Postgres handles ~10–50k TPS and multiple TB. Shard only when the <b>calculation</b> says one primary can\'t take the write load.']]},
+
+/* ───────── CH 7 ───────── */
+{sec:'Ch 7 · Transactions',type:'title',k:'Chapter 7',t:'Transactions',
+ s:'A transaction groups reads and writes into one unit: all of it happens or none of it does, and concurrent transactions don\'t see each other\'s half-finished work. Most interview "contention" questions, such as seat booking, inventory, payments, and auctions, come down to which <b>isolation anomaly</b> you are defending against.',
+ chips:['ACID','dirty reads','read skew','MVCC','lost update','write skew','phantoms','2PL','SSI']},
+{sec:'Ch 7 · Transactions',t:'What ACID really means',k:'ACID',
+ tbl:{h:['Letter','Common belief','What it actually guarantees'],r:[
+  ['A · Atomicity','"Atomic like threads"','<b>Abortability</b>: on any error mid-transaction, all writes are rolled back. Safe to retry.'],
+  ['C · Consistency','"DB keeps data consistent"','Your <b>application\'s invariants</b> (debits = credits). This one is mostly the app\'s job, not the DB\'s.'],
+  ['I · Isolation','"Transactions are serial"','Concurrent transactions don\'t interfere. The strength depends on the <b>isolation level</b>, and most DBs default to weaker than serializable.'],
+  ['D · Durability','"Never lost"','Committed data survives crashes (WAL + fsync, or replication). Nothing is 100%.']]},
+ cards:[['trap','The default is not serializable','Postgres defaults to <b>Read Committed</b>. MySQL InnoDB defaults to Repeatable Read. Neither prevents write skew, so your booking code can double-book unless you add locks.']]},
+{sec:'Ch 7 · Transactions',t:'Read committed: no dirty reads, no dirty writes',k:'Weakest useful level',
+ seq:{a:['Tx 1|a','Database|b','Tx 2|p'],m:[
+  ['Tx 1','Database','UPDATE balance = 0 (not committed)','',0],
+  ['Tx 2','Database','SELECT balance','',1],
+  ['Database','Tx 2','sees 0 ✗ dirty read','r',1],
+  ['Tx 1','Database','ROLLBACK','r',2],
+  ['#','Tx 2',null,'Tx 2 acted on data that never existed','r',2],
+  ['#','Tx 1','Tx 2','Read committed: Tx 2 sees the OLD value until Tx 1 commits','g',3]]},
+ cap:['Tx 1 writes but hasn\'t committed.','Without isolation, Tx 2 reads the uncommitted value: a <b>dirty read</b>.','Tx 1 rolls back. Tx 2 made decisions based on a value that never existed.','<b>Read committed</b> prevents dirty reads (readers see the last committed value) and dirty writes (row locks until commit). It is the Postgres default.']},
+{sec:'Ch 7 · Transactions',t:'Read skew → snapshot isolation (MVCC)',k:'Repeatable read',
+ seq:{a:['Alice (reading)|t','Account 1|b','Account 2|b','Transfer Tx|a'],m:[
+  ['#','Account 1','Account 2','start: 500 + 500 = 1000','x',0],
+  ['Alice (reading)','Account 1','SELECT → 500','',0],
+  ['Transfer Tx','Account 1','+100 → 600','a',1],
+  ['Transfer Tx','Account 2','−100 → 400 · COMMIT','a',1],
+  ['Alice (reading)','Account 2','SELECT → 400','',2],
+  ['#','Alice (reading)',null,'Alice sees 900. $100 vanished?','r',2],
+  ['#','Alice (reading)','Account 2','Snapshot isolation: Alice\'s whole tx reads the snapshot from its start → 500 + 500','g',3]]},
+ cap:['Alice reads account 1 (500) in the middle of a transfer.','The transfer commits between her two reads.','She reads account 2 after the commit: 500 + 400 = 900. This is <b>read skew</b>, and it breaks backups, analytics, and integrity checks.','<b>Snapshot isolation</b>: each transaction sees a consistent snapshot as of its start. It is implemented with <b>MVCC</b>: rows keep multiple versions tagged with created_by/deleted_by transaction IDs. Readers never block writers.'],
+ cards:[['why','MVCC in one line','UPDATE = mark old version deleted by tx 13 + insert new version created by tx 13. Your snapshot ignores versions created after you started. VACUUM cleans up old versions later.']]},
+{sec:'Ch 7 · Transactions',t:'Lost update: read-modify-write races',k:'Concurrent writes',
+ seq:{a:['User A|t','Database|b','User B|p'],m:[
+  ['User A','Database','SELECT likes → 42','',0],
+  ['User B','Database','SELECT likes → 42','',0],
+  ['User A','Database','UPDATE likes = 43','',1],
+  ['User B','Database','UPDATE likes = 43','r',1],
+  ['#','Database',null,'expected 44 → one update LOST','r',1],
+  ['#','User A','User B','Fix 1: UPDATE likes = likes + 1 (atomic)','g',2],
+  ['#','User A','User B','Fix 2: SELECT … FOR UPDATE (lock the row)','g',3],
+  ['#','User A','User B','Fix 3: UPDATE … WHERE version = 7 (compare-and-set)','g',4]]},
+ cap:['Both read the same value.','Both write value+1. The second write overwrites the first, so one like is lost.','<b>Atomic operations</b> are the best fix when possible: the DB does read+write as one step. Redis INCR works the same way.','<b>Pessimistic lock</b>: SELECT FOR UPDATE makes the second reader wait. Good under high contention.','<b>Optimistic (CAS)</b>: a version column; if 0 rows are updated, retry. Good under low contention. Postgres Repeatable Read also auto-detects lost updates and aborts.'],
+ cards:[['say',null,'"For the auction, bids use a conditional write, UPDATE … SET max_bid=? WHERE max_bid &lt; ?, so concurrent bids can\'t overwrite each other."']]},
+{sec:'Ch 7 · Transactions',t:'Write skew: the double-booking bug',k:'The anomaly that bites interviews',
+ seq:{a:['Alice (doctor)|t','Database|b','Bob (doctor)|p'],m:[
+  ['#','Database',null,'rule: at least 1 doctor on call','a',0],
+  ['Alice (doctor)','Database','COUNT on-call → 2 ✓','',0],
+  ['Bob (doctor)','Database','COUNT on-call → 2 ✓','',0],
+  ['Alice (doctor)','Database','UPDATE alice off-call · COMMIT','',1],
+  ['Bob (doctor)','Database','UPDATE bob off-call · COMMIT','',1],
+  ['#','Database',null,'0 doctors on call ✗','r',1],
+  ['#','Alice (doctor)','Bob (doctor)','Same shape: two users book the last room','r',2],
+  ['#','Alice (doctor)','Bob (doctor)','Fix: SELECT … FOR UPDATE on the rows checked · or SERIALIZABLE','g',3]]},
+ cap:['Both check a condition across rows and see it is safe.','Each updates a <b>different</b> row, so there is no write conflict and snapshot isolation allows both. The invariant is broken.','This is the pattern of every booking bug: "check availability, then insert booking". If the check finds no rows to lock, it is a <b>phantom</b>.','Fixes: lock the rows you checked; use SERIALIZABLE; add a unique constraint; or <b>materialize the conflict</b> by creating a row per seat or room-night so there is something to lock.'],
+ cards:[['say',null,'"Each seat is a row with status AVAILABLE/HELD/SOLD. A hold is UPDATE seats SET status=HELD WHERE id=? AND status=AVAILABLE. If one row was updated I won it, if zero someone else did. No write skew possible."']]},
+{sec:'Ch 7 · Transactions',t:'Isolation levels: what each prevents',k:'Cheat sheet',
+ tbl:{h:['Anomaly','Read Committed','Snapshot / Repeatable Read','Serializable'],r:[
+  ['Dirty read / write','✓ prevented','✓','✓'],
+  ['Read skew (non-repeatable read)','✗','✓ prevented','✓'],
+  ['Lost update','✗ (use atomic op / lock)','✓ Postgres detects; MySQL ✗','✓'],
+  ['Write skew','✗','✗','✓ prevented'],
+  ['Phantoms','✗','✗ (mostly)','✓ prevented'],
+  ['Default in','Postgres, Oracle, SQL Server','MySQL InnoDB','CockroachDB, FoundationDB']]},
+ cards:[['why','Serializable, three ways','<b>Actual serial execution</b>: one thread, stored procedures (VoltDB, Redis Lua). <b>2PL</b>: readers block writers and vice versa, with predicate locks; slow, deadlocks. <b>SSI</b>: optimistic; detect stale reads at commit and abort (Postgres SERIALIZABLE).']]},
+{sec:'Ch 7 · Transactions',t:'Two-phase locking vs serializable snapshot isolation',k:'Serializability',
+ d:{w:800,h:320,
+  z:[[15,15,375,290,'2PL: pessimistic','r'],[410,15,375,290,'SSI: optimistic','g',1]],
+  n:[['t1',110,80,'Tx 1 reads row','b'],['lk',300,80,'shared lock','a'],['t2',110,170,'Tx 2 wants write','p'],['wt',300,170,'BLOCKED\nuntil Tx 1 ends','r'],['dl',200,260,'risk: deadlocks · slow p99','r','pill'],
+     ['s1',510,80,'Tx 1 reads (snapshot)','b',null,1],['s2',510,170,'Tx 2 writes · commits','p',null,1],['s3',690,125,'Tx 1 commits?\nDB: your read\nis stale → ABORT','g',null,1,150,80],['rt',600,260,'app retries · no blocking','g','pill',1]],
+  e:[['t1','lk','','a',0],['t2','wt','','r',0],['s1','s3','','g',1],['s2','s3','','g',1]]},
+ cap:['<b>2PL</b>: readers hold shared locks and writers need exclusive locks, both held until commit. Correct, but throughput drops and p99 latency is unpredictable under contention.','<b>SSI</b>: everyone runs on snapshots without blocking. At commit, the DB checks whether anything you read has since changed and, if so, aborts you. Fast at low contention. Under high contention there are many aborts, so retries are needed.']},
+{sec:'Ch 7 · Transactions',t:'Interview angle: Chapter 7',k:'Chapter 7 → interview',
+ c2:[['q',null,'"Two users book the last room at the same time."<br>→ Write skew. Use a row per room-night + <b>conditional UPDATE</b>, or SELECT FOR UPDATE, or a unique constraint on (room, date).'],
+  ['q',null,'"Like counter at 50k/sec?"<br>→ Not row locks. Use atomic INCR in Redis, sharded counters, or batch into the DB asynchronously. The lost update is avoided because the increment is atomic.'],
+  ['q',null,'"Optimistic or pessimistic?"<br>→ Low contention: optimistic version check. High contention on few rows (hot seat map): pessimistic lock or a queue to serialize.'],
+  ['q',null,'"Transaction across 2 services?"<br>→ No distributed ACID. Use a <b>saga</b> with compensations plus the outbox pattern (Ch 9 and 12).']]},
+
+/* ───────── CH 8 ───────── */
+{sec:'Ch 8 · Trouble with Distributed Systems',type:'title',k:'Chapter 8',t:'The Trouble with Distributed Systems',
+ s:'On one machine, things either work or crash. Across machines you get <b>partial failure</b>: some parts work, some don\'t, and you often can\'t tell which. The three villains are unreliable networks, unreliable clocks, and process pauses.',
+ chips:['partial failure','timeouts','clock skew','LWW danger','GC pauses','leases','fencing tokens','majority quorum']},
+{sec:'Ch 8 · Trouble with Distributed Systems',t:'The network: you cannot tell why there was no reply',k:'Unreliable networks',
+ d:{w:800,h:330,
+  n:[['a1',100,60,'Client','t','pill'],['b1',600,60,'Server','b'],
+     ['a2',100,160,'Client','t','pill',1],['b2',600,160,'Server (crashed)','r','x',1],
+     ['a3',100,260,'Client','t','pill',2],['b3',600,260,'Server','g',null,2],
+     ['q',350,320,'From the client\'s side, all three look IDENTICAL: a timeout','a','pill',3]],
+  e:[['a1','b1','request lost ✗','rd',0],['a2','b2','request','',1],['a3','b3','request ✓','g',2],['b3','a3','reply lost ✗','rdC',2]]},
+ cap:['① The request was lost in the network (or is still queued in a switch).','② The request arrived, but the server crashed or is in a long GC pause.','③ The server <b>did the work</b>, but the reply was lost. A retry runs it twice.','The client only knows "no reply before the timeout". That is why every retried operation must be <b>idempotent</b>.'],
+ cards:[['say',null,'"Payment calls to the provider can time out after the charge succeeded. Every request carries an idempotency key, so a retry is safe."'],
+  ['num','Choosing a timeout','Too short means healthy nodes are declared dead and failover storms follow. Too long means users wait. Use p99.9 latency × margin, or adaptive (phi-accrual) detectors.']]},
+{sec:'Ch 8 · Trouble with Distributed Systems',t:'Clocks: last-write-wins can drop the newer write',k:'Unreliable clocks',
+ seq:{a:['Client A|t','Node 1 (clock +3ms fast)|r','Node 2 (accurate)|b','Client B|p'],m:[
+  ['Client A','Node 1 (clock +3ms fast)','set x=1  ts=42.004','',0],
+  ['Node 1 (clock +3ms fast)','Node 2 (accurate)','replicate x=1 @42.004','ad',0],
+  ['Client B','Node 2 (accurate)','set x=2  ts=42.003  (really LATER)','',1],
+  ['#','Node 2 (accurate)',null,'LWW: 42.004 > 42.003 → keep x=1','r',2],
+  ['#','Client A','Client B','x=2 silently discarded ✗','r',2]]},
+ cap:['Node 1\'s clock runs a few ms fast. Client A\'s write gets timestamp 42.004.','Client B writes later in real time, but Node 2\'s accurate clock says 42.003.','Last-write-wins compares timestamps, and the causally later write <b>loses</b>. No error is raised. NTP accuracy is only tens of ms at best.'],
+ cards:[['why','Two kinds of clock','<b>Time-of-day</b> (System.currentTimeMillis) can jump backwards after an NTP sync. Never use it to measure durations. <b>Monotonic</b> (System.nanoTime) only moves forward and is for durations and timeouts.'],
+  ['q',null,'Google Spanner uses <b>TrueTime</b>: clocks return an interval [earliest, latest], and a commit waits out the uncertainty (~7ms).']]},
+{sec:'Ch 8 · Trouble with Distributed Systems',t:'Process pauses: the expired-lease bug',k:'GC pauses',
+ seq:{a:['Client 1|t','Lock service|p','Storage|b','Client 2|a'],m:[
+  ['Client 1','Lock service','acquire lease (10s)','',0],
+  ['Lock service','Client 1','granted','g',0],
+  ['#','Client 1',null,'stop-the-world GC: 15s','r',1],
+  ['#','Lock service',null,'lease expires','a',2],
+  ['Client 2','Lock service','acquire lease','',2],
+  ['Lock service','Client 2','granted','g',2],
+  ['Client 2','Storage','write file','',3],
+  ['Client 1','Storage','write file (thinks it holds the lock!)','r',4],
+  ['#','Storage',null,'CORRUPTED','r',4]]},
+ cap:['Client 1 takes a lease, a lock with a timeout.','Then it pauses: a GC pause, VM migration, swapping, or a laptop lid closing. The thread doesn\'t know it paused.','The lease expires and is given to Client 2.','Client 2 writes, correctly.','Client 1 wakes up, checks nothing, and writes. Two writers think they own the lock.'],
+ cards:[['trap','Checking the time does not help','"Check lease validity before writing" still races, because the pause can happen <b>between</b> the check and the write.']]},
+{sec:'Ch 8 · Trouble with Distributed Systems',t:'Fencing tokens: the fix',k:'Fencing',
+ seq:{a:['Client 1|t','Lock service|p','Storage|b','Client 2|a'],m:[
+  ['Lock service','Client 1','lease + token 33','g',0],
+  ['#','Client 1',null,'GC pause…','r',0],
+  ['Lock service','Client 2','lease + token 34','g',1],
+  ['Client 2','Storage','write (token 34) ✓','g',1],
+  ['#','Storage',null,'highest seen = 34','b',1],
+  ['Client 1','Storage','write (token 33)','r',2],
+  ['Storage','Client 1','REJECTED: 33 < 34','r',2]]},
+ cap:['Every lock grant comes with a <b>monotonically increasing token</b>. ZooKeeper\'s zxid or an etcd revision works.','The storage remembers the highest token it has seen.','A late writer with an old token is rejected. The protection is enforced by the <b>resource</b>, not trusted to the client.'],
+ cards:[['say',null,'"A Redis lock alone isn\'t safe under GC pauses. I\'d pair the lock with a fencing token, for example a version column the DB checks: UPDATE … WHERE version &lt; :token."'],
+  ['why','Truth = majority','A node can\'t trust its own view ("am I still leader?"). Decisions are made by a <b>quorum</b> of nodes, which is the basis of Ch 9.']]},
+{sec:'Ch 8 · Trouble with Distributed Systems',t:'System models and Byzantine faults',k:'Assumptions',
+ tbl:{h:['Model','Assumes','Reality'],r:[
+  ['Timing: synchronous','Bounded network delay, pauses, clock drift','Not realistic'],
+  ['Timing: partially synchronous','Usually bounded, sometimes not','<b>The realistic model</b>; algorithms must stay safe when bounds break'],
+  ['Timing: asynchronous','No timing assumptions at all','Very restrictive; no timeouts'],
+  ['Node: crash-stop','Crashed nodes never return','Simplifies proofs'],
+  ['Node: crash-recovery','Nodes crash and return; disk survives, RAM doesn\'t','<b>Realistic</b> for datacenters'],
+  ['Node: Byzantine','Nodes may lie or act maliciously','Blockchains, aerospace. Rarely needed inside one company.']]},
+ cards:[['why','Safety vs liveness','<b>Safety</b>: nothing bad ever happens (no two leaders). This must always hold. <b>Liveness</b>: something good eventually happens (a leader gets elected). This may wait for the network to heal.']]},
+{sec:'Ch 8 · Trouble with Distributed Systems',t:'Interview angle: Chapter 8',k:'Chapter 8 → interview',
+ c2:[['q',null,'"What if the payment provider times out?"<br>→ Outcome unknown. Retry with the <b>same idempotency key</b>, or reconcile with a status query. Never blindly charge again.'],
+  ['q',null,'"Distributed lock with Redis?"<br>→ Fine for efficiency (avoid duplicate work). For correctness add <b>fencing tokens</b>, or use the DB\'s own conditional writes.'],
+  ['q',null,'"Order events by timestamp?"<br>→ Wall clocks skew. Use a sequence from one leader, a Kafka partition offset, or logical clocks (Ch 9).'],
+  ['q',null,'"How do you detect a dead node?"<br>→ Heartbeats + timeouts tuned to p99.9, and accept false positives. Leader election by majority, with epochs to fence the old leader.']]},
+
+/* ───────── CH 9 ───────── */
+{sec:'Ch 9 · Consistency & Consensus',type:'title',k:'Chapter 9',t:'Consistency & Consensus',
+ s:'Given everything in Ch 8, how do nodes <b>agree</b>? This chapter covers linearizability (behave like one copy), ordering and causality, distributed transactions (2PC), and consensus (Raft, Paxos, ZooKeeper), the tools behind leader election, locks, and uniqueness.',
+ chips:['linearizability','CAP','causality','Lamport clocks','total order broadcast','2PC','Raft','ZooKeeper']},
+{sec:'Ch 9 · Consistency & Consensus',t:'Linearizability: behave as if there is one copy',k:'Strongest single-object guarantee',
+ seq:{a:['Referee|a','Leader|b','Follower (lagging)|r','Alice|t','Bob|p'],m:[
+  ['Referee','Leader','score = FINAL 2–1','',0],
+  ['Alice','Leader','read','',1],
+  ['Leader','Alice','FINAL 2–1','g',1],
+  ['#','Alice','Bob','Alice: "it\'s over!" Bob refreshes after hearing her','a',2],
+  ['Bob','Follower (lagging)','read','',2],
+  ['Follower (lagging)','Bob','still playing 1–1 ✗','r',2],
+  ['#','Leader','Bob','Linearizable: once ANY reader sees the new value, all later reads must too','g',3]]},
+ cap:['The final score is written to the leader.','Alice reads it.','Bob reads <b>after</b> Alice (he heard her shout), from a lagging replica, and sees an older value. That violates linearizability.','<b>Linearizability</b> means every operation appears to take effect atomically at one point in time, consistent with real-time order. It is a recency guarantee on a single object.'],
+ cards:[['trap','Not the same as serializability','<b>Serializable</b> is about transactions over many objects (isolation, Ch 7). <b>Linearizable</b> is about recency of a single object. "Strict serializability" is both.']]},
+{sec:'Ch 9 · Consistency & Consensus',t:'When you actually need linearizability',k:'Use cases',
+ d:{w:800,h:330,
+  n:[['l1',140,60,'Leader election / locks','a'],['l2',140,130,'Uniqueness constraints|username, seat #42, account balance ≥ 0','a',null,0,250],
+     ['web',110,250,'Web server','b',null,1],['st',400,200,'File storage|(replicated)','g','db',1],['mq',400,300,'Queue','p','q',1],['rs',680,250,'Resizer','b',null,1]],
+  e:[['web','st','1. upload full image','',1],['web','mq','2. "resize img 7"','p',1],['mq','rs','','p',1],['rs','st','3. fetch → OLD version? ✗','r',2]]},
+ cap:['Leader election and locks need every node to agree on <b>one</b> holder, and uniqueness constraints need everyone to agree on who got there first. Both require linearizable storage.','<b>Cross-channel timing</b>: the web server stores an image, then sends a message through a different channel (the queue).','If the resizer reads a lagging storage replica, it resizes the old image. Two channels give a race. The fix is linearizable storage, or putting the version number in the message.'],
+ cards:[['why','Everything else','Feeds, likes, view counts, search results: <b>eventual consistency is fine</b>. Saying this explicitly is a strong staff signal.']]},
+{sec:'Ch 9 · Consistency & Consensus',t:'Which systems are linearizable, and CAP done right',k:'CAP · PACELC',
+ tbl:{h:['Replication','Linearizable?','Why'],r:[
+  ['Single-leader (reads from leader)','Potentially yes','If reads hit the leader and the leader is really the leader (fencing)'],
+  ['Consensus (Raft / ZooKeeper / etcd)','Yes','Designed for it'],
+  ['Multi-leader','No','Concurrent writes on different leaders'],
+  ['Leaderless (Dynamo / Cassandra)','Probably not','LWW + clock skew, sloppy quorums, timing edge cases']]},
+ cards:[['why','CAP, correctly stated','Network <b>partitions will happen</b>. When one does, choose: refuse some requests to stay consistent (<b>CP</b>), or answer from possibly stale data (<b>AP</b>). It is a decision per feature, not per database.'],
+  ['num','PACELC','<b>E</b>lse, when there is no partition, you trade <b>L</b>atency vs <b>C</b>onsistency. Linearizability is slow even when nothing fails, because each operation waits for a quorum round trip.'],
+  ['say',null,'"Inventory and payments are CP: I\'d rather reject than oversell. Hotel search and reviews are AP: stale by a few seconds is fine."']]},
+{sec:'Ch 9 · Consistency & Consensus',t:'Ordering: Lamport timestamps',k:'Causality without clocks',
+ seq:{a:['Node A|b','Node B|g','Node C|p'],m:[
+  ['#','Node A',null,'counter=1 → write (1,A)','b',0],
+  ['Node A','Node B','msg with (1,A)','',1],
+  ['#','Node B',null,'max(0,1)+1 = 2 → write (2,B)','g',1],
+  ['Node B','Node C','msg with (2,B)','',2],
+  ['#','Node C',null,'max(0,2)+1 = 3 → write (3,C)','p',2],
+  ['#','Node A','Node C','Order: compare counter, tie-break by node ID → a TOTAL order consistent with causality','a',3]]},
+ cap:['Each node keeps a counter and tags every operation with (counter, nodeId).','On receiving a message, a node sets counter = max(own, received) + 1. Causality is carried along with the message.','So if A happened before C, then A\'s timestamp is smaller than C\'s.','The limit: the order is only known <b>after the fact</b>. To decide "username taken?" right now you must know nobody else is claiming it concurrently, which needs <b>total order broadcast</b>, which is consensus.'],
+ cards:[['why','Total order broadcast','Deliver all messages to all nodes in the same order, reliably. This is exactly a <b>replicated log</b>: Kafka partitions (within a partition), Raft logs, ZooKeeper\'s zab.']]},
+{sec:'Ch 9 · Consistency & Consensus',t:'Two-phase commit (2PC)',k:'Distributed atomic commit',
+ seq:{a:['Coordinator|a','Payments DB|b','Bookings DB|g'],m:[
+  ['Coordinator','Payments DB','PREPARE','',0],
+  ['Coordinator','Bookings DB','PREPARE','',0],
+  ['Payments DB','Coordinator','YES (promise to commit)','g',1],
+  ['Bookings DB','Coordinator','YES','g',1],
+  ['#','Coordinator',null,'write COMMIT decision to log','a',2],
+  ['Coordinator','Payments DB','COMMIT','g',2],
+  ['Coordinator','Bookings DB','COMMIT','g',2],
+  ['#','Coordinator','Bookings DB','If coordinator dies after PREPARE → participants stuck "in doubt", holding locks','r',3]]},
+ cap:['Phase 1: ask every participant "can you commit?"','A YES is a binding promise: the participant must be able to commit even after a crash, so it holds locks.','The coordinator logs its decision (the commit point), then tells everyone.','The weakness is that 2PC <b>blocks</b>. If the coordinator dies, participants hold locks until it recovers. This is why microservices use <b>sagas</b> instead.'],
+ cards:[['say',null,'"I won\'t use 2PC across the payment and booking services. I\'ll use a saga: reserve room → charge → confirm, with compensations (release room, refund), driven by events with the outbox pattern."']]},
+{sec:'Ch 9 · Consistency & Consensus',t:'Consensus: Raft in one picture',k:'Raft / Paxos / Zab',
+ d:{w:800,h:340,
+  n:[['L',400,70,'Leader (term 5)','a','db'],['f1',160,180,'Follower','b','db'],['f2',320,250,'Follower','b','db'],['f3',480,250,'Follower','b','db'],['f4',640,180,'Follower','b','db'],
+     ['c',400,320,'entry committed once a MAJORITY (3/5) has it','g','pill',2]],
+  e:[['L','f1','append','a',1],['L','f2','append','a',1],['L','f3','append','a',1],['L','f4','append','a',1],],
+  t:[[680,60,'Leader dies →','r',3,12,'m',700],[680,78,'timeout → candidate,','r',3,11],[680,94,'term 6, needs majority','r',3,11],[680,110,'of votes → new leader','r',3,11]]},
+ cap:['A cluster of 5 nodes (tolerates 2 failures). One elected leader per <b>term</b> (epoch).','The leader appends each command to its log and replicates it to followers.','An entry is <b>committed</b> once a majority store it. Any future majority overlaps this one, so committed entries are never lost.','If the leader goes silent, a follower times out, increments the term, and asks for votes. A majority makes it leader. A higher term <b>fences</b> the old leader.'],
+ cards:[['num','Sizing','2f+1 nodes tolerate f failures: 3 nodes → 1, 5 nodes → 2. Every write needs a majority round trip, so consensus is used for <b>metadata</b>, not bulk data.']]},
+{sec:'Ch 9 · Consistency & Consensus',t:'ZooKeeper / etcd: consensus as a service',k:'Coordination services',
+ d:{w:800,h:320,
+  n:[['zk',400,160,'ZooKeeper / etcd|3 or 5 nodes · Raft/Zab','p','db',0,190],
+     ['u1',140,60,'Leader election|Kafka controller, HA scheduler','b',null,1,230],['u2',660,60,'Locks + fencing|zxid / revision = token','b',null,1,210],
+     ['u3',140,270,'Service discovery|who is alive (ephemeral nodes)','b',null,2,240],['u4',660,270,'Config + partition map|shard → node, watched by routers','b',null,2,240]],
+  e:[['u1','zk','','p2',1],['u2','zk','','p2',1],['u3','zk','','p2',2],['u4','zk','','p2',2]]},
+ cap:['You almost never implement consensus yourself. You use a small, strongly consistent store.','Common uses: elect one active scheduler or controller; distributed locks with fencing tokens.','Membership via <b>ephemeral nodes</b> that vanish when a session dies; config and shard maps that clients <b>watch</b> for changes.'],
+ cards:[['say',null,'"The job scheduler runs active-passive. Leader election goes through etcd with a lease, and the lease revision is the fencing token on job-claim writes."']]},
+{sec:'Ch 9 · Consistency & Consensus',t:'Interview angle: Chapter 9',k:'Chapter 9 → interview',
+ c2:[['q',null,'"Is this CP or AP?"<br>→ Answer <b>per feature</b>: booking and payment are CP, search and feeds are AP. Mention PACELC latency cost.'],
+  ['q',null,'"Transaction spanning booking + payment services?"<br>→ Not 2PC (blocking, coupling). Use a <b>saga</b> + outbox + idempotent consumers.'],
+  ['q',null,'"Exactly one scheduler must run."<br>→ Leader election via ZooKeeper or etcd (consensus), lease + fencing token.'],
+  ['q',null,'"Unique usernames across regions?"<br>→ Needs linearizable compare-and-set: one strongly consistent store (Spanner, CockroachDB, or a single-leader region for usernames).']]}
+);
+
+SLIDES.push(
+/* ───────── CH 10 ───────── */
+{sec:'Ch 10 · Batch Processing',type:'title',k:'Chapter 10 · Part III begins',t:'Batch Processing',
+ s:'Take a big, bounded, <b>immutable</b> input, run a pure function over it, and produce a derived output. Because inputs are never modified, a buggy job is fixed by re-running it. That property, being able to recompute from source, runs through all of Part III.',
+ chips:['Unix philosophy','MapReduce','HDFS','shuffle','sort-merge join','broadcast join','Spark DAG']},
+{sec:'Ch 10 · Batch Processing',t:'The Unix philosophy: small tools, one interface',k:'Where batch comes from',
+ flow:{w:800,h:130,gap:22,f:[['access.log','x','db'],['awk $7','b'],['sort','b',null,'',1],['uniq -c','b',null,'',1],['sort -rn','b',null,'',2],['head -5','g',null,'',2]]},
+ cap:['Read the log and extract the URL field from each line.','Sort so identical URLs are adjacent, then count each run. When the data is bigger than memory, sort spills to disk, so this scales past RAM.','Sort by count and take the top 5. Six tiny programs, composed through one uniform interface: a stream of lines.'],
+ pts:['<b>Immutable input</b>: run it as many times as you like and nothing breaks.','<b>Uniform interface</b>: every tool reads and writes files, so you can wire anything to anything.','<b>Separation of logic and wiring</b>: the program doesn\'t know where its input came from.','MapReduce is this same idea spread across thousands of machines, with HDFS as the "file".']},
+{sec:'Ch 10 · Batch Processing',t:'MapReduce: map, shuffle, reduce',k:'Distributed batch',
+ d:{w:800,h:340,
+  n:[['i1',80,80,'HDFS block 1','b','db'],['i2',80,170,'HDFS block 2','b','db'],['i3',80,260,'HDFS block 3','b','db'],
+     ['m1',260,80,'Mapper','a',null,1],['m2',260,170,'Mapper','a',null,1],['m3',260,260,'Mapper','a',null,1],
+     ['sh',440,170,'SHUFFLE|partition by hash(key)\nsort by key','p',null,2,150,90],
+     ['r1',620,110,'Reducer A|keys a–m','g',null,3],['r2',620,230,'Reducer B|keys n–z','g',null,3],
+     ['o',740,170,'HDFS\noutput','b','db',3,80]],
+  e:[['i1','m1','','',1],['i2','m2','','',1],['i3','m3','','',1],['m1','sh','(k,v)','a',2],['m2','sh','','a',2],['m3','sh','','a',2],['sh','r1','','p',3],['sh','r2','','p',3],['r1','o','','g',3],['r2','o','','g',3]]},
+ cap:['Input is split into blocks, replicated across machines (HDFS).','The scheduler runs a <b>mapper</b> next to each block (move the compute to the data). Mappers emit key-value pairs.','The <b>shuffle</b> sends every pair with the same key to the same reducer and sorts them. This is the expensive network step.','Each <b>reducer</b> sees all values for its keys together, aggregates them, and writes output files. If a task fails, just rerun that task, because inputs are immutable.'],
+ cards:[['num','Scale','Mapper output goes to local disk; reducers pull over the network. Jobs at Google and Yahoo processed petabytes daily, and the same pattern now runs in Spark, BigQuery, and Snowflake.']]},
+{sec:'Ch 10 · Batch Processing',t:'Joins in batch: bring related records together',k:'Sort-merge · broadcast · partitioned',
+ d:{w:800,h:330,
+  n:[['ev',110,80,'Click events|(user_id, url)','b','db'],['us',110,240,'User DB snapshot|(user_id, birth_year)','b','db'],
+     ['m1',330,80,'Mapper: key=user_id','a'],['m2',330,240,'Mapper: key=user_id','a'],
+     ['r',580,160,'Reducer for user 104|profile first, then all clicks\n→ (url, age) pairs','g',null,1,230,80],
+     ['bc',580,295,'Small table? BROADCAST it to every mapper (in-memory hash)','p','pill',2]],
+  e:[['ev','m1','','',0],['us','m2','','',0],['m1','r','','a',1],['m2','r','','a',1]]},
+ cap:['Goal: "which URLs are popular with which age group?" Don\'t query the user DB per event (millions of random lookups). Take a <b>snapshot</b> of it.','<b>Sort-merge join</b>: both mappers emit user_id as the key. The shuffle delivers one user\'s profile and clicks to the same reducer, adjacent. One linear pass joins them.','<b>Broadcast hash join</b>: if one side is small (a hotel dimension table), load it into each mapper\'s memory. No shuffle is needed. <b>Partitioned hash join</b>: both sides partitioned the same way, so join partition by partition.'],
+ cards:[['trap','Skew','One hot key (a celebrity user) sends millions of records to one reducer. Fixes: skewed-join handling (sample hot keys, spread them across reducers), the same idea as Ch 6.']]},
+{sec:'Ch 10 · Batch Processing',t:'Beyond MapReduce: dataflow engines and batch outputs',k:'Spark · Flink · outputs',
+ d:{w:800,h:320,
+  z:[[15,15,770,130,'MapReduce: every stage writes to HDFS (3× replicated)','r'],[15,170,770,135,'Spark / Flink: one DAG, intermediate state in memory','g',1]],
+  n:[['a1',110,80,'Job 1','a'],['h1',260,80,'HDFS','r','db'],['a2',410,80,'Job 2','a'],['h2',560,80,'HDFS','r','db'],['a3',700,80,'Job 3','a'],
+     ['s1',110,240,'stage 1','g',null,1],['s2',330,240,'stage 2','g',null,1],['s3',550,240,'stage 3','g',null,1],['o',710,240,'output','b','db',1]],
+  e:[['a1','h1','','r'],['h1','a2','','r'],['a2','h2','','r'],['h2','a3','','r'],['s1','s2','memory / local','g',1],['s2','s3','','g',1],['s3','o','','g',1]]},
+ cap:['Chaining MapReduce jobs <b>materializes</b> every intermediate result to replicated HDFS: slow, and each job waits for the whole previous one.','Dataflow engines run the whole workflow as one <b>DAG</b> and pipeline data between operators. On failure they recompute lost partitions from <b>lineage</b>, so typically 10–100× faster.'],
+ cards:[['why','What batch jobs produce','Search indexes (build offline, swap atomically), pre-computed recommendations, ML features, read-only KV stores bulk-loaded into serving. A bad output is rolled back by pointing at yesterday\'s files.']]},
+{sec:'Ch 10 · Batch Processing',t:'Interview angle: Chapter 10',k:'Chapter 10 → interview',
+ c2:[['q',null,'"Web crawler for 10B pages?"<br>→ The frontier queue feeds fetchers. Text extraction and dedup run as batch (Spark) over S3. Re-runnable because raw pages are stored immutably.'],
+  ['q',null,'"Daily top-K or reconciliation reports?"<br>→ Nightly batch over the event log in S3 or the warehouse. The streaming path gives fast approximate results and batch gives exact ones (Ch 12, Lambda).'],
+  ['q',null,'"How do you rebuild the search index?"<br>→ Batch-build a new index from the source of truth, then atomically switch the alias. Old index kept for rollback.'],
+  ['say',null,'"Raw events land immutably in S3, partitioned by date. Any derived table can be recomputed from them, which is our safety net for bugs."']]},
+
+/* ───────── CH 11 ───────── */
+{sec:'Ch 11 · Stream Processing',type:'title',k:'Chapter 11',t:'Stream Processing',
+ s:'Batch with the input never ending. Events are processed shortly after they happen. This is Kafka, CDC, the outbox pattern, event sourcing, windowed aggregation, and exactly-once semantics: the backbone of most modern interview designs.',
+ chips:['message brokers','Kafka partitions','consumer groups','CDC','outbox','event sourcing','windows','watermarks','exactly-once']},
+{sec:'Ch 11 · Stream Processing',t:'Two kinds of message broker',k:'Queue vs log',
+ tbl:{h:['','Queue (RabbitMQ, SQS, JMS)','Log (Kafka, Kinesis, Pulsar)'],r:[
+  ['After consume','Message deleted once acked','Message stays; consumer just advances an offset'],
+  ['Ordering','Lost under parallel consumers + redelivery','Strict order <b>within a partition</b>'],
+  ['Parallelism','Any consumer takes any message (load balancing)','One consumer per partition per group'],
+  ['Replay','No: gone after ack','Yes: reset offset, re-read days of history'],
+  ['Slow message','Others continue (per-message ack)','Blocks its partition (head-of-line)'],
+  ['Best for','Task queues: send email, resize image, each job independent','Event streams: ordering matters, multiple consumers, replay, CDC']]},
+ cards:[['say',null,'"Image resize jobs go on SQS, since they are independent with per-message retry. Booking events go on Kafka, since order per booking matters and several services consume them."']]},
+{sec:'Ch 11 · Stream Processing',t:'Kafka: partitions, offsets, consumer groups',k:'Log-based broker',
+ d:{w:800,h:340,
+  n:[['pr',90,170,'Producers|key = booking_id','t',null,0,130],
+     ['p0',380,80,'P0 │0│1│2│3│4│5│ →','a','q',null,250],['p1',380,170,'P1 │0│1│2│3│ →','a','q',null,250],['p2',380,260,'P2 │0│1│2│3│4│ →','a','q',null,250],
+     ['c1',680,110,'Group A · consumer 1|reads P0 (offset 3)','g',null,1,190],['c2',680,230,'Group A · consumer 2|reads P1, P2','g',null,1,190],
+     ['an',680,320,'Group B: analytics (own offsets)','p','pill',2]],
+  e:[['pr','p0','hash(key) % 3','',0],['pr','p1','','',0],['pr','p2','','',0],['p0','c1','','g',1],['p1','c2','','g',1],['p2','c2','','g',1],['p2','an','independent','pd',2]]},
+ cap:['A topic is split into <b>partitions</b>, each an append-only log. The producer picks a partition by hashing the key, so all events for one booking land in one partition, in order.','Within a <b>consumer group</b>, each partition is read by exactly one consumer, so maximum parallelism equals the partition count. Consumers commit their <b>offset</b>; after a crash they resume from it.','Another group reads the same data independently with its own offsets. Adding consumers doesn\'t cost the producer anything.'],
+ cards:[['num','Numbers','~5–10k msg/sec per partition is a comfortable planning number; a broker handles ~1M msg/sec. Default retention is 7 days. Choose partitions = target throughput ÷ per-consumer throughput.']]},
+{sec:'Ch 11 · Stream Processing',t:'The dual-write problem',k:'Why not just write to both?',
+ seq:{a:['Client 1|t','Database|b','Search index|a','Client 2|p'],m:[
+  ['Client 1','Database','set price = 100','',0],
+  ['Client 2','Database','set price = 120','',0],
+  ['Client 2','Search index','set price = 120','',1],
+  ['Client 1','Search index','set price = 100','r',1],
+  ['#','Database','Search index','DB says 120, search says 100: permanently inconsistent','r',2],
+  ['#','Client 1','Client 2','+ if the 2nd write fails, the two systems also disagree','r',3]]},
+ cap:['Two clients update the same item, and the DB applies them in one order.','The search index receives them in a different order (the network reorders them).','The two systems now disagree <b>permanently</b>, and nothing will repair it.','And if the app crashes between the two writes, one system has the change and the other doesn\'t. Writing to two systems is never atomic.'],
+ cards:[['say',null,'"I won\'t dual-write to Postgres and Elasticsearch. I\'ll write only to Postgres and stream changes to Elasticsearch with CDC, so one order, defined by the DB log, reaches every consumer."']]},
+{sec:'Ch 11 · Stream Processing',t:'Change data capture (CDC) and the outbox pattern',k:'One source of truth → many views',
+ d:{w:800,h:375,
+  d_:0,n:[['app',90,90,'App','t','pill'],['db',280,90,'Postgres|orders + outbox (1 tx)','b','db',null,190],
+     ['wal',280,220,'WAL / binlog','b','q',1],['dz',470,220,'Debezium|CDC connector','p',null,1],['k',650,220,'Kafka','a','q',1],
+     ['es',700,70,'Elasticsearch','g','db',2],['rc',560,330,'Redis cache','g','db',2],['dw',740,330,'Warehouse','g','db',2]],
+  e:[['app','db','INSERT order\n+ INSERT outbox','',0],['db','wal','','',1],['wal','dz','tail','p',1],['dz','k','','p',1],['k','es','','g',2],['k','rc','','g',2],['k','dw','','g',2]]},
+ cap:['<b>Outbox</b>: in the <b>same transaction</b> as the business write, insert an event row into an outbox table. Either both commit or neither does, so there is no dual-write problem.','A CDC connector tails the database\'s replication log (Ch 5) and publishes each change, including the outbox rows, to Kafka in commit order.','Every derived system (search, cache, warehouse) consumes the log and updates itself. Each can be rebuilt by replaying from offset 0, or from a snapshot plus the log.'],
+ cards:[['why','Consumers must be idempotent','The relay can publish an event twice (crash after publish, before marking sent). Consumers dedupe by event ID or use upserts.']]},
+{sec:'Ch 11 · Stream Processing',t:'Event sourcing: store what happened, derive the state',k:'Events as the source of truth',
+ d:{w:800,h:300,
+  n:[['e1',90,80,'RoomHeld|seat 12A','b'],['e2',240,80,'PaymentTaken|$120','b'],['e3',390,80,'HoldExtended|+5 min','b'],['e4',540,80,'BookingConfirmed','b'],['e5',690,80,'BookingCancelled','r',null,1],
+     ['s1',220,230,'Current state view|status = CANCELLED','g','db',2,170],['s2',540,230,'Audit / analytics view|all history kept','g','db',2,190]],
+  e:[['e1','e2','','n'],['e2','e3','','n'],['e3','e4','','n'],['e4','e5','','n',1],['e4','s1','fold events','gd',2],['e5','s2','replay','gd',2]]},
+ cap:['Instead of updating a row in place, append immutable <b>events</b> that describe what the user did.','A cancellation is a new event, not a deletion. History is never lost.','State is a <b>derived view</b>, a fold over the events. You can build new views later by replaying, and debug by replaying to any point in time.'],
+ cards:[['trap','Costs','Replay gets slow, so you need snapshots. Schema evolution of old events is hard (Ch 4). "Delete my data" (GDPR) conflicts with immutability. Use it for audit-heavy domains (payments, ledgers), not everywhere.'],
+  ['why','CDC vs event sourcing','CDC derives events from DB row changes (low level). Event sourcing makes app-level events the truth (high level, intent preserved).']]},
+{sec:'Ch 11 · Stream Processing',t:'Time and windows',k:'Event time vs processing time',
+ d:{w:800,h:340,
+  t:[[20,40,'Tumbling (1 min): fixed, no overlap','b',0,12,'s',700],[20,120,'Hopping (5 min, every 1 min): overlapping','g',1,12,'s',700],[20,200,'Sliding: all events within 5 min of each other','a',2,12,'s',700],[20,280,'Session: closes after N min of inactivity','p',3,12,'s',700]],
+  n:[['t1',110,65,'','b',null,0,170,18],['t2',290,65,'','b',null,0,170,18],['t3',470,65,'','b',null,0,170,18],['t4',650,65,'','b',null,0,170,18],
+     ['h1',180,145,'','g',null,1,310,16],['h2',260,155,'','g',null,1,310,16],['h3',340,165,'','g',null,1,310,16],
+     ['sl',380,228,'','a',null,2,300,18],
+     ['se1',150,305,'user active','p',null,3,190,22],['se2',520,305,'active again','p',null,3,150,22]],
+  t2:[]},
+ cap:['<b>Tumbling</b>: "clicks per minute". Each event belongs to exactly one window.','<b>Hopping</b>: a 5-minute average updated every minute. Windows overlap, so each event belongs to several.','<b>Sliding</b>: "two failed logins within 5 minutes of each other". The window is defined by the events themselves.','<b>Session</b>: group a user\'s activity until a gap, as in web analytics and Strava activities.'],
+ cards:[['trap','Event time ≠ processing time','A phone offline in a tunnel sends events 10 minutes late. Bucket by <b>event time</b> (when it happened), not arrival time. A <b>watermark</b> says "probably all events up to T have arrived"; later stragglers are dropped or used to correct the result.']]},
+{sec:'Ch 11 · Stream Processing',t:'Stream joins',k:'Three kinds',
+ tbl:{h:['Join','Example','How'],r:[
+  ['Stream–stream (window join)','Search event + click event within 1 hour → click-through rate','Buffer both streams in state, indexed by session ID, for the window length'],
+  ['Stream–table (enrichment)','Click event + user profile → add country and age','Keep a <b>local copy</b> of the table in the processor, updated by CDC. No remote DB call per event.'],
+  ['Table–table (materialized view)','Tweets ⋈ follows → each user\'s timeline cache','Both are changelogs; maintain the joined view incrementally (fan-out on write from Ch 1)']]},
+ cards:[['why','Time-dependence','A join with a changing table depends on <b>when</b>: tax rate at sale time vs today\'s rate. To keep a join reproducible, give versioned records an ID and join on that version.']]},
+{sec:'Ch 11 · Stream Processing',t:'Exactly-once really means effectively-once',k:'Fault tolerance',
+ d:{w:800,h:320,
+  n:[['src',90,150,'Kafka source|offsets','a','q'],['op1',290,150,'Aggregate|state: counts','b'],['op2',490,150,'Sink','b'],['out',690,150,'DB / Kafka','g','db'],
+     ['ck',290,280,'Checkpoint store (S3)|state + source offsets','p','db',1,230],
+     ['bar',290,45,'barrier #42 flows with data','p','pill',1]],
+  e:[['src','op1','events','',0],['op1','op2','','',0],['op2','out','','',0],['op1','ck','snapshot','pd',1],
+     ['op2','out','','g',2]],
+  t:[[690,205,'idempotent upsert','g',2,11.5],[690,222,'or transactional write','g',2,11.5]]},
+ cap:['A failure mid-stream means some events were processed but their results weren\'t saved, or vice versa.','<b>Checkpointing</b> (Flink): barriers flow through the data. Each operator snapshots its state and the source offsets together. On failure, restore the snapshot and replay from those offsets. Spark does the same with <b>micro-batches</b>.','Replay means some outputs are sent twice. Make the sink <b>idempotent</b> (upsert by key, dedupe by event ID) or <b>transactional</b> (Kafka transactions commit offsets + outputs atomically). Duplicates still happen; they just have no effect.'],
+ cards:[['say',null,'"Flink checkpoints every 10s. The sink upserts (ad_id, minute) → count, so replays after a failure overwrite instead of double-counting."']]},
+{sec:'Ch 11 · Stream Processing',t:'Interview angle: Chapter 11',k:'Chapter 11 → interview',
+ c2:[['q',null,'"Ad click aggregation at 10k/sec?"<br>→ Kafka partitioned by ad_id → Flink 1-min tumbling windows on event time → OLAP store. Raw clicks to S3 for batch reconciliation.'],
+  ['q',null,'"Keep search, cache, and DB in sync?"<br>→ CDC (Debezium) or outbox → Kafka → idempotent consumers. Never dual-write.'],
+  ['q',null,'"Kafka or SQS?"<br>→ Ordering, replay, or many consumers → Kafka. Independent tasks with per-message retry and DLQ → SQS.'],
+  ['q',null,'"Exactly-once?"<br>→ "At-least-once delivery plus idempotent processing equals effectively-once. I make the consumer idempotent with an event ID."']]},
+
+/* ───────── CH 12 ───────── */
+{sec:'Ch 12 · The Future of Data Systems',type:'title',k:'Chapter 12',t:'The Future of Data Systems',
+ s:'The book\'s conclusion: there is no one database that does everything. Build systems as a <b>source of truth plus derived views</b> connected by logs. Push correctness to the ends with idempotency, and separate "eventually up to date" (timeliness) from "never wrong" (integrity).',
+ chips:['derived data','unbundling the DB','Lambda vs Kappa','end-to-end argument','idempotency keys','timeliness vs integrity','audit']},
+{sec:'Ch 12 · The Future of Data Systems',t:'Unbundling the database',k:'Data integration',
+ d:{w:800,h:340,
+  n:[['app',90,170,'Application\nwrites','t','pill'],['sor',260,170,'System of record|Postgres','b','db'],['log',450,170,'Ordered log|Kafka / CDC','a','q',null,140,60],
+     ['v1',680,50,'Cache|Redis','g','db',1],['v2',680,130,'Search|Elasticsearch','g','db',1],['v3',680,210,'Analytics|ClickHouse / BigQuery','g','db',1,180],['v4',680,290,'ML features / recs','g','db',1,170]],
+  e:[['app','sor','','',0],['sor','log','','a',0],['log','v1','','g',1],['log','v2','','g',1],['log','v3','','g',1],['log','v4','','g',1]]},
+ cap:['One <b>system of record</b> accepts writes. Its change log is the single ordered history of what happened.','Every other store is a <b>derived view</b>, like an index or materialized view, except in separate specialized systems. Any view can be dropped and rebuilt by replaying the log. Inside one database these are "indexes"; across a company they are "unbundled" into Kafka plus separate stores.'],
+ cards:[['say',null,'"Postgres is the source of truth for bookings. Search, the cache, and analytics are derived views fed from CDC, so they are eventually consistent and rebuildable."']]},
+{sec:'Ch 12 · The Future of Data Systems',t:'Lambda vs Kappa architecture',k:'Batch + stream',
+ d:{w:800,h:330,
+  z:[[15,15,770,150,'Lambda: two code paths','a'],[15,180,770,140,'Kappa: one stream path, reprocess by replay','g',1]],
+  n:[['e',90,90,'Events','t','q'],['b',330,60,'Batch layer|exact, hours late','b'],['s',330,125,'Speed layer|approx, seconds','a'],['m',580,90,'Serving: merge','p'],
+     ['e2',90,250,'Kafka log|long retention','t','q',1,130],['s2',330,250,'Stream job v1 → v2','g',null,1,160],['m2',580,250,'Serving table','p','db',1]],
+  e:[['e','b','','b'],['e','s','','a'],['b','m','','b'],['s','m','','a'],['e2','s2','replay from 0\nfor v2','g',1],['s2','m2','','g',1]]},
+ cap:['<b>Lambda</b>: a fast approximate stream path plus a slow exact batch path, merged at query time. Correct, but the same logic is written twice in two frameworks.','<b>Kappa</b>: one streaming codebase. To fix a bug or change logic, start v2 reading the log from the beginning, let it catch up, and switch reads over. This needs long log retention, such as Kafka tiered storage.'],
+ cards:[['why','In interviews','Top-K and ad clicks often still use a Lambda-like design: Flink for real-time dashboards, nightly batch reconciliation for billing accuracy. Say why: <b>money needs exact numbers</b>.']]},
+{sec:'Ch 12 · The Future of Data Systems',t:'The end-to-end argument: idempotency keys',k:'Correctness at the edges',
+ seq:{a:['Mobile app|t','API|b','Payments DB|g'],m:[
+  ['#','Mobile app',null,'generate request_id = uuid-7f3','a',0],
+  ['Mobile app','API','POST /pay  Idempotency-Key: 7f3','',0],
+  ['API','Payments DB','INSERT … (request_id UNIQUE)','g',1],
+  ['API','Mobile app','200 OK (lost in network ✗)','rd',1],
+  ['Mobile app','API','retry, same key 7f3','',2],
+  ['API','Payments DB','INSERT → unique violation','a',2],
+  ['API','Mobile app','return the stored original result','g',3]]},
+ cap:['The <b>client</b> generates a unique ID for the operation, once, before the first attempt.','The server records it with a unique constraint in the same transaction as the effect.','The response is lost and the client retries. TCP, load-balancer, and DB-level dedup can\'t catch this, because it is a new connection and a new request.','The duplicate hits the unique constraint, and the server returns the original result. Only an <b>end-to-end</b> ID from the origin catches every duplicate.'],
+ cards:[['say',null,'"Every mutating API takes an Idempotency-Key from the client. It is stored with a unique index, results are cached for 24h, and retries are always safe."']]},
+{sec:'Ch 12 · The Future of Data Systems',t:'Timeliness vs integrity',k:'Two kinds of "consistency"',
+ tbl:{h:['','Timeliness','Integrity'],r:[
+  ['Means','Users see an up-to-date state','No corruption: no lost or double money, no contradictions'],
+  ['If violated','Temporary and self-healing: "wait and refresh"','<b>Permanent</b>: needs manual repair'],
+  ['Example','Booking shows in "My trips" 2s late','Room sold twice; card charged twice'],
+  ['Mechanism','Read-your-writes, sync replication','Idempotency, unique constraints, atomic log append, reconciliation'],
+  ['Can relax?','Often yes (eventual consistency)','Almost never']]},
+ cards:[['why','Apologize vs prevent','Airlines overbook on purpose and compensate later. Some constraints can be checked <b>asynchronously</b> with a compensating action. Decide per invariant how much a violation costs.'],
+  ['why','Trust, but verify','Run <b>reconciliation and audit</b> jobs that recompute derived data from source and compare (ledger sums, inventory counts). Bugs and bit-rot happen; detect them.']]},
+{sec:'Ch 12 · The Future of Data Systems',t:'Interview angle: Chapter 12',k:'Chapter 12 → interview',
+ c2:[['q',null,'"How do you guarantee no double charge?"<br>→ Client idempotency key + unique constraint + the payment provider\'s idempotency + a daily reconciliation job against provider settlement files.'],
+  ['q',null,'"Search shows a stale price."<br>→ "Search is a derived view. Timeliness can lag seconds; the <b>checkout price is read from the source of truth</b> (integrity)."'],
+  ['q',null,'"How would you change the aggregation logic?"<br>→ Kappa: deploy v2 consumer from offset 0 to a new table, compare, switch.'],
+  ['say',null,'"I separate integrity from timeliness: money and inventory are strongly consistent and audited; everything the user browses is a derived, eventually consistent view."']]},
+
+/* ───────── WRAP UP ───────── */
+{sec:'Wrap-up',t:'DDIA chapter → interview problems',k:'Cross-reference',
+ tbl:{h:['Chapter','Concept','Shows up in'],r:[
+  ['1 Reliability / load','Fan-out load parameter, p99','News Feed, Instagram, Twitter-style feeds'],
+  ['2 Data models','Document vs relational','Yelp, Ticketmaster, Dropbox metadata'],
+  ['3 Storage','LSM vs B-tree, column stores, geo / inverted index','Metrics (Datadog), Ad clicks, Yelp, Post Search'],
+  ['4 Encoding','Schema evolution, gRPC vs REST','Any microservice design; Kafka schemas'],
+  ['5 Replication','Lag, read-your-writes, failover, quorum','Bitly, Distributed Cache, WhatsApp, Google Docs'],
+  ['6 Partitioning','Shard key, hot keys, consistent hashing','Distributed Cache, Live Comments, Top-K, Rate Limiter'],
+  ['7 Transactions','Lost update, write skew, row locks','Ticketmaster, Auction, Payments, Robinhood, Gopuff inventory'],
+  ['8 Distributed trouble','Timeouts, idempotency, fencing','Payments, Job Scheduler, Uber matching locks'],
+  ['9 Consensus','Leader election, linearizable CAS, sagas vs 2PC','Job Scheduler, Payments, unique usernames'],
+  ['10 Batch','MapReduce, joins, rebuildable outputs','Web Crawler, Top-K reconciliation, recommendations'],
+  ['11 Streams','Kafka, CDC, windows, exactly-once','Ad Clicks, Top-K, Metrics, Strava, Price Tracking'],
+  ['12 Future','Derived data, end-to-end idempotency','Payments, every system with search + cache']]}},
+{sec:'Wrap-up',type:'title',k:'Done',t:'Next: the Learn deck, then the Interview deck',
+ s:'You now have the "why" underneath every pattern. The <b>Learn deck</b> applies it to the 7 patterns, 9 core concepts, and 29 problems step by step. The <b>Interview deck</b> turns each problem into a 45-minute script you can rehearse out loud.',
+ cards:[['why','Review loop','Re-run this deck in "show all" mode (press <b>A</b> on each slide) the night before. One minute per chapter and say the interview angle out loud.'],['say',null,'"The underlying issue here is [Ch 7 write skew / Ch 5 replication lag / Ch 8 unknown outcome], so I\'ll use [fix]." This is the sentence that signals depth.']]}
+);
+
+Deck({"title":"DDIA in Diagrams","brand":"DDIA <b>in Diagrams</b>","accent":"#6cb6ff","links":[["Handbook","../"],["DDIA","ddia.html"],["Learn","learn.html"],["Interview","interview.html"]],"self":"ddia.html","key":"pub-deck-ddia"}, SLIDES);</script>
+</body></html>

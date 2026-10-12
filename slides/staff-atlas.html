@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Staff-Level Problem Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: masthead with the staff lens, then a filter bar, then 29 problem cards grouped by pattern (or one wide table). */
+:root{
+  --bg:#f3f4f0; --surface:#fbfbf8; --line:#d9dcd3; --fg:#1b1f23; --muted:#5c636b;
+  --accent:#0d6b66; --staff:#a14d06; --staff-bg:#fbefe1; --num-bg:#e7f2ee;
+  --p-reads:#2563a8; --p-writes:#7a4bb5; --p-rt:#0d7d8c; --p-cont:#b4362f; --p-multi:#8a6300; --p-blob:#3f7a32;
+  --display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif;
+  --body:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171a; --surface:#1b1f23; --line:#2e343a; --fg:#e6e8e3; --muted:#9aa3ab;
+  --accent:#4cc2b8; --staff:#f0a35c; --staff-bg:#2e2418; --num-bg:#16302c;
+  --p-reads:#79aef0; --p-writes:#b996ee; --p-rt:#5ccbd9; --p-cont:#f08a82; --p-multi:#e2b54a; --p-blob:#8fcf7d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171a; --surface:#1b1f23; --line:#2e343a; --fg:#e6e8e3; --muted:#9aa3ab;
+  --accent:#4cc2b8; --staff:#f0a35c; --staff-bg:#2e2418; --num-bg:#16302c;
+  --p-reads:#79aef0; --p-writes:#b996ee; --p-rt:#5ccbd9; --p-cont:#f08a82; --p-multi:#e2b54a; --p-blob:#8fcf7d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);margin:0}
+.wrap{max-width:1440px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+h1{font:800 clamp(30px,4.4vw,52px)/1.02 var(--display);letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+.lede{max-width:70ch;color:var(--muted);margin:0 0 22px;font-size:16px}
+.lens{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:26px}
+.lens div{background:var(--surface);padding:12px 14px;min-width:0}
+.lens b{display:block;font:600 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--staff);margin-bottom:4px}
+.lens span{font-size:13.5px;color:var(--fg)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.chip,.seg button{font:500 13px/1 var(--body);border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:7px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.seg{display:inline-flex;margin-left:auto;gap:0}
+.seg button{border-radius:0}.seg button:first-child{border-radius:999px 0 0 999px}.seg button:last-child{border-radius:0 999px 999px 0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+input[type=search]{font:14px var(--body);padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);min-width:0;width:200px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{font:500 12px var(--mono);color:var(--muted)}
+.group h2{font:800 22px/1.1 var(--display);margin:26px 0 12px;display:flex;align-items:center;gap:10px}
+.group h2 i{width:12px;height:12px;border-radius:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--pc);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;min-width:0}
+.card header{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.card h3{font:600 17px/1.25 var(--display);margin:0}
+.diff{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}
+.core{font-size:14px;color:var(--muted);margin:0}
+.num{font:500 12.5px/1.45 var(--mono);background:var(--num-bg);border-radius:6px;padding:6px 9px;font-variant-numeric:tabular-nums}
+.f{margin:0}
+.f dt{font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.f dd{margin:0;font-size:13.5px}
+.f.staff dt{color:var(--staff)}
+.f.staff dd{background:var(--staff-bg);border-radius:6px;padding:6px 9px}
+.compact .more{display:none}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;min-width:1300px;font-size:13px}
+th,td{text-align:left;vertical-align:top;padding:9px 11px;border-bottom:1px solid var(--line)}
+th{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;background:var(--surface)}
+td:first-child{font-weight:600;border-left:4px solid var(--pc);white-space:nowrap}
+td.n{font:500 12px var(--mono)}
+td.s{background:var(--staff-bg)}
+.empty{color:var(--muted);padding:30px 0}
+@media (max-width:640px){.seg{margin-left:0}input[type=search]{width:100%}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.card h3 a,td a{color:inherit;text-decoration:none;border-bottom:1px solid var(--line)}.card h3 a:hover,td a:hover{border-color:var(--accent)}.lede a{color:var(--accent)}
+</style>
+
+</head><body>
+<div class="wrap">
+  <h1>29 problems, through a staff engineer's eyes</h1>
+  <p class="lede"><a href="../">← System Design, Step by Step</a><br>A senior answer gets a working design. A staff answer also says which number decided it, what trade-off it accepts, what will break before anyone asks, and how it will be run and changed. Each card gives you those for one problem.</p>
+
+  <div class="lens" aria-label="What changes at staff level">
+    <div><b>Frame</b><span>Name the one tension the problem is really about.</span></div>
+    <div><b>Quantify</b><span>Find the number that forces the design, and say it out loud.</span></div>
+    <div><b>Decide</b><span>Pick one option and state the trade-off you accept.</span></div>
+    <div><b>Anticipate</b><span>Raise failure modes before the interviewer does.</span></div>
+    <div><b>Operate</b><span>SLOs, the metrics you'd watch, and how you'd roll it out.</span></div>
+    <div><b>Evolve</b><span>What changes at 10× scale, and when you'd make that change.</span></div>
+  </div>
+
+  <div class="bar" role="toolbar" aria-label="Filters">
+    <div id="chips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    <input id="q" type="search" placeholder="Search: Redis, idempotency…" aria-label="Search problems">
+    <span class="count" id="count"></span>
+    <div class="seg" role="group" aria-label="View">
+      <button id="v-full" aria-pressed="true">Full cards</button>
+      <button id="v-compact" aria-pressed="false">Compact</button>
+      <button id="v-table" aria-pressed="false">Table</button>
+    </div>
+  </div>
+
+  <main id="out"></main>
+</div>
+
+<script>
+const PAT = {reads:['Scaling reads','--p-reads'],writes:['Scaling writes','--p-writes'],rt:['Real-time updates','--p-rt'],cont:['Contention','--p-cont'],multi:['Multi-step / long tasks','--p-multi'],blob:['Large blobs','--p-blob']};
+const P = [
+ ['URL shortener (Bitly)','reads','Easy','Serve redirects fast at 100:1 read-heavy, and make codes unique without coordination.','~100k redirects/s peak vs ~12 writes/s; 1B links × 500 B ≈ 500 GB, one Postgres.','Cache-aside Redis plus replicas; counter + base62 with servers leasing ID ranges. Accept guessable codes, or add a reversible shuffle.','A viral link expiring from cache (stampede); losing the counter node (leased ranges make gaps harmless); phishing links.','Senior: cache in front of the DB. Staff: treats 301 vs 302 as a product decision (analytics vs load), adds abuse scanning, serves redirects from the edge for global latency.','SLO: p99 redirect < 100 ms. Watch hit ratio and DB miss QPS. Next step at 10×: edge key-value store at the CDN.'],
+ ['Rate limiter','reads','Medium','Count requests atomically across many gateways while adding under 10 ms.','1M checks/s ≈ 10–20 Redis shards; ~1 GB of bucket state.','Token bucket in a Redis Lua script. Accept approximate limits for very hot tenants (local allowances synced periodically).','Redis outage: fail-open or fail-closed, decided per endpoint; clock skew in refill (use Redis time); one tenant overloading a shard.','Senior: algorithm + Redis. Staff: plan tiers, global vs regional limits, rules as versioned config with shadow mode, and protecting the limiter itself.','Watch rejection rate per rule, limiter p99, Redis CPU. Roll out new rules in shadow (log-only) first.'],
+ ['Business discovery (Yelp)','reads','Medium','2-D "near me" search and correct ratings, without over-engineering.','10M businesses × 1 KB ≈ 10 GB; ~20k searches/s at peak.','One Postgres + PostGIS + replicas + page cache. Accept simpler ranking for far less to operate; add Elasticsearch only when relevance needs it.','Replica lag hiding a new review; hot cities skewing load; review spam.','Senior: adds a geo index. Staff: uses the 10 GB number to argue against a search cluster, and defines the trigger and CDC migration path for adding one later.','Watch search p99, replica lag, cache hit. Trigger for Elasticsearch: fuzzy relevance or QPS beyond replicas.'],
+ ['News feed (Facebook)','reads','Medium','Fan-out cost at write time vs latency at read time.','115k feed reads/s; ~1.2M feed inserts/s with fan-out on write; celebrities with 100M followers.','Hybrid: push to followers below a threshold (~100k), pull celebrity posts at read. Accept a merge step at read and feeds up to a minute stale.','Fan-out backlog after a celebrity post; Redis memory (only active users, capped lists); deletes and unfollows propagating.','Senior: fan-out on write. Staff: picks the threshold from numbers, rebuilds feeds for inactive users on demand, separates ranking into its own service, counts memory cost.','Watch feed p99, fan-out lag, worker queue depth, Redis memory. Next: candidate generation + ranking model.'],
+ ['News aggregator (Google News)','reads','Easy','The feed is the same for everyone in a region, so the edge can serve it.','~12k reads/s, 50k+/s on breaking news; ~1 new article/s.','Precompute per region and category, cache at the CDN for ~60 s. Accept a minute of staleness.','Many CDN entries expiring at once (serve stale, stagger TTLs); publisher outages; duplicate stories.','Senior: adds a cache. Staff: spots that the response is not personalised, calculates origin load after the CDN, sets an adaptive crawl budget.','Watch CDN hit ratio, origin QPS, ingest-to-visible lag.'],
+ ['Local delivery (Gopuff)','reads','Easy','Huge browse traffic on availability; strict stock at checkout.','~10k browse/s at peak vs ~12 orders/s; the 10k-row warehouse list fits in memory.','Browse is AP (cache + replicas); checkout is CP (conditional decrements in one transaction). Accept occasional "sold out at checkout".','Flash-sale hot rows; cache showing stock that is gone; travel-time API outage (fall back to distance).','Senior: a transaction on order. Staff: states consistency per path, partitions stock by region so no transaction crosses shards, plans for the third-party API failing.','Watch checkout failures due to stock, availability p99, external API spend.'],
+ ['Dating app (Tinder)','reads','Medium','Write-heavy swipes, and a mutual match must never be missed.','~100k swipes/s at peak; precomputed stacks ≈ 32 GB.','Precomputed stacks + Bloom filter of swiped profiles; one atomic operation per pair of users for matches. Accept rare skipped profiles from Bloom false positives.','Two right-swipes at the same instant (write skew); stacks stale after the user moves; bots.','Senior: stores swipes. Staff: names the race precisely, uses a pair-keyed atomic op, sizes precomputation, weighs recommendation quality against cost.','Watch match detection latency, stack freshness, swipe write lag.'],
+ ['Distributed cache','reads','Medium','Build the cache itself: eviction, distribution, failover.','1 TB ÷ ~32 GB per node ≈ 32+ nodes; each node ≫ 100k ops/s, so memory sets the count.','Consistent hashing with virtual nodes, async replica per primary. Accept losing a few writes on failover.','Hot key overloading one node; scale-out causing cold misses and a DB stampede; split brain on promotion.','Senior: LRU + consistent hashing. Staff: membership via a config service, gradual warm-up on scale-out, client routing vs proxy trade-off.','Watch hit ratio, evictions, per-node p99 and memory, rebalance traffic.'],
+ ['Top-K videos (YouTube)','writes','Hard','Count ~800k events/s and rank across hour, day, month and all time.','70B views/day ≈ 800k/s; 4B videos × 8 B ≈ 32 GB of counters.','Kafka partitioned by video; in-memory counts and local heaps; merge. Accept ~1 min freshness, with a batch recount for exact totals.','One viral video skewing a partition (pre-aggregate at producers); counts lost on restart (checkpoint); late events.','Senior: streaming counts. Staff: proves the merge is exact, chooses exact vs Count-Min per window, adds a reconciliation path.','Watch consumer lag, window freshness, stream vs batch difference.'],
+ ['Ad click aggregator','writes','Hard','Counts that are fast for dashboards and exact for billing.','10k clicks/s at peak, 100M/day, ~10 GB/day raw.','Kafka → Flink (dedupe by signed impression ID) → OLAP store, plus a nightly batch recount. Accept running two paths to get money right.','Click fraud; double counting on replay (idempotent upserts); events arriving after the window closed.','Senior: stream aggregation. Staff: adds batch reconciliation because it is money, signed impression IDs, and an audit trail for advertiser disputes.','Watch stream vs batch difference, consumer lag, dedupe rate.'],
+ ['Web crawler','writes','Hard','A politeness-limited pipeline that must finish 10B pages in 5 days.','~23k pages/s; ~46 GB/s of bandwidth; ~20 PB raw.','Separate fetch and parse stages with queues and raw pages in S3. Accept storage cost to make each stage independently retryable.','Crawler traps; breaking per-domain rate limits; DNS as a bottleneck; duplicate content.','Senior: queue + workers. Staff: sizes the fleet by bandwidth not CPU, prices the storage, prioritises the frontier, treats robots.txt as a hard rule.','Watch pages/s, per-domain errors, frontier size, dedupe ratio.'],
+ ['Metrics monitoring (Datadog)','writes','Hard','A write firehose plus alerts within a minute.','5M points/s; ~600 GB/day compressed.','Kafka → time-series DB with compression and downsampling; alerts evaluated on the stream. Accept lower resolution for old data.','Cardinality explosion from user-ID tags; who monitors the monitoring; alert storms.','Senior: a TSDB. Staff: cardinality limits as policy, alert path separate from query path, retention tiers priced out.','Watch ingest lag, dropped points, alert evaluation latency, active series count.'],
+ ['Fitness tracking (Strava)','writes','Medium','Do the work on the phone; make uploads reliable.','10M activities/day; ~1 TB/day of tracks.','Record on device; idempotent, resumable upload; process asynchronously. Accept no live server view by default.','Duplicate uploads; device clock and timezone errors; leaking home locations (privacy zones).','Senior: upload then process. Staff: rejects streaming every GPS point with numbers, adds privacy zones, considers leaderboard cheating.','Watch upload success, processing lag, leaderboard freshness.'],
+ ['Post search (Facebook)','writes','Medium','Index a firehose whose ranking signals change constantly.','~12k posts/s and ~10× that in likes.','Inverted index built from the stream, sharded by term; like-based ranking updated in batches or at thresholds. Accept slightly stale like ranking.','Hot terms overloading one shard; privacy (who may see a post) enforced at query time; reindexing.','Senior: "use Elasticsearch". Staff: explains the inverted index, term vs document partitioning, and privacy-aware retrieval.','Watch index lag, query p99, shard skew.'],
+ ['Price tracker (CamelCamelCamel)','writes','Medium','Too many products to crawl often, so spend the crawl budget where it matters.','500M products; ~6k pages/s to crawl each one daily.','Crawl by priority (trackers, volatility) + validated crowd-sourced prices + event-driven alerts. Accept staler prices on the long tail.','Being blocked by the site; poisoned extension data; alert spam.','Senior: a cron crawl and a scan of subscriptions. Staff: prioritises by value, validates crowd data, reacts to price events instead of scanning.','Watch freshness of tracked products, alert latency, crawl budget used.'],
+ ['Ride sharing (Uber)','rt','Hard','A flood of location updates and exclusive driver assignment.','250k location writes/s; ~100 ride requests/s on average.','Redis GEO for locations; offer to one driver at a time with a driver lock and conditional assignment; durable per-region queue. Accept slightly slower matching.','A driver assigned twice; matcher crashing mid-match; city hot spots and surge.','Senior: geo index + matching. Staff: cells per city to isolate failures, surge as a feedback loop, regional failover.','Watch time-to-match p95, offer acceptance, location update lag.'],
+ ['Live comments (Facebook Live)','rt','Medium','Fan-out to a million viewers in under 200 ms.','1M viewers × 1k comments/s ≈ 1B deliveries/s for one stream.','SSE + pub/sub per video, viewers of a video routed to the same servers; sample comments on mega-streams. Accept that not every viewer sees every comment.','Reconnection storms after a deploy; slow consumers; moderation.','Senior: WebSocket + pub/sub. Staff: points out nobody can read 1k comments/s and samples, plans for reconnect storms, sizes connections per server.','Watch delivery p99, connections per server, dropped messages.'],
+ ['Collaborative editor (Google Docs)','rt','Hard','Every client must converge to the same document.','~500 ops/s on a hot document; correctness, not scale.','One owner server per document running OT, with an op log and snapshots. Accept a short pause when the owner fails over.','Owner failover; merging offline edits; very large documents.','Senior: names OT or CRDT. Staff: chooses between them from requirements (offline, server cost), assigns ownership via a coordination service, plans version history.','Watch op latency, convergence errors, snapshot size.'],
+ ['Stock trading (Robinhood)','rt','Hard','Push prices to millions, and never lose or duplicate an order.','Thousands of updates/s across ~10k symbols; 20M users, so push not poll.','Persist the order as pending before calling the exchange, reconcile on timeout; throttle prices per symbol. Accept coarser price updates in the app.','Unknown outcome on exchange timeout; duplicate orders; market-open spike.','Senior: separate price and order paths. Staff: an order state machine, reconciliation against exchange reports, audit requirements, graceful degradation at open.','Watch order ack latency, reconciliation breaks, price fan-out lag.'],
+ ['Online auction','rt','Medium','One hot row, and bids must be strictly ordered.','~1k bids/s on one auction in its final seconds.','Conditional update on the auction row; a Kafka partition per auction for the hottest ones. Accept serialized throughput per auction.','Deadline fairness (use server time); sniping; durability of an accepted bid.','Senior: a lock. Staff: anti-sniping as a product decision, serializing through a log for extreme auctions, an audit trail.','Watch bid acceptance latency, rejected-bid rate, partition lag.'],
+ ['LLM chat (ChatGPT)','rt','Hard','GPUs are scarce; every queueing choice is a cost choice.','~12k generations/s, each holding a GPU for seconds.','Priority queue with admission control in front of the GPU pool, streamed tokens. Accept 429s or waiting for the free tier.','Client disconnecting mid-stream; GPU pool failures; runaway cost.','Senior: streaming. Staff: capacity planned in GPU-seconds, fairness and priority policy, batching for throughput, cost per request.','Watch time-to-first-token, queue wait, GPU utilisation, cost per 1k tokens.'],
+ ['Chat app (WhatsApp)','rt','Medium','Route between servers, deliver to offline devices, keep order.','~600k messages/s; hundreds of millions of open connections.','WebSockets + user→server registry + per-user pub/sub; persist before ack; an inbox per device. Accept at-least-once delivery with client dedupe.','Server crash holding connections; order within a chat; multi-device sync; what end-to-end encryption rules out.','Senior: WebSockets + a database. Staff: delivery semantics, draining connections during deploys, the limits end-to-end encryption puts on server features.','Watch delivery latency, undelivered inbox size, reconnect rate.'],
+ ['Ticketmaster','cont','Medium','No seat sold twice while 10M people arrive at once.','~100k seats vs 10M users: bookings are capped, reads are not.','Conditional-update holds; virtual waiting room; browse is AP, booking is CP. Accept fans waiting in a queue.','Payment timing out while the hold expires; bots; the read storm hitting the booking database.','Senior: row locking. Staff: the waiting room as load control, bot mitigation and fairness, shielding the booking path.','Watch hold success rate, queue length, admit rate, booking p99.'],
+ ['Payment system (Stripe)','multi','Hard','Stay correct when a call to the bank has an unknown outcome.','~10k TPS: moderate. Correctness is the problem.','Pending record first, idempotency keys, outbox, double-entry ledger, daily reconciliation. Accept extra writes for auditability.','Processor timeouts; duplicate webhooks; partial refunds; PCI scope creep.','Senior: idempotency keys. Staff: ledger design, reconciliation, isolating card data to shrink compliance scope.','Watch reconciliation breaks, age of pending payments, webhook delivery success.'],
+ ['Online judge (LeetCode)','multi','Medium','Run untrusted code safely, through contest spikes.','~100 submissions/s at peak; ~500 sandboxes running at once.','Queue + microVM sandboxes + autoscaling workers. Accept a few seconds of latency.','Sandbox escape; noisy neighbours; contest start spike (pre-warm capacity).','Senior: queue + containers. Staff: defence in depth for isolation, pre-warming before contests, fairness between users.','Watch queue wait, sandbox start time, verdict latency.'],
+ ['Job scheduler','multi','Hard','10k jobs/s, each within 2 s of its time, never lost.','864M executions/day.','Time-bucketed store + poller + delay queue + leases. Accept at-least-once execution, so jobs must be idempotent.','Poller leader failing; clock drift; duplicate execution; every cron job firing at :00.','Senior: a jobs table and a queue. Staff: reasons through the two-tier design, leader election with fencing, isolation between tenants.','Watch schedule-to-start lag p99, missed jobs, retries.'],
+ ['Video platform (YouTube)','blob','Hard','Reliable huge uploads and smooth playback anywhere.','~1 PB/day raw uploads.','Presigned multipart uploads, a segment-parallel transcoding DAG, CDN delivery. Accept encoding long-tail formats lazily.','Transcode failures and retries; storage cost; popularity spikes.','Senior: S3 + CDN. Staff: a cost model (storage tiers, lazy encoding), DAG retries, CDN strategy.','Watch upload success, time to playable, CDN hit ratio, rebuffer rate.'],
+ ['File storage and sync (Dropbox)','blob','Easy','Sync efficiently and handle conflicting edits.','A 50 GB file is ~10k chunks; a 1-byte edit changes one chunk.','Content-defined chunking with dedupe, a change log with cursors. Accept "conflicted copy" files for offline edits.','Conflicts; partial uploads; cross-user dedupe leaking whether a file exists.','Senior: chunking. Staff: conflict UX, the privacy risk of cross-user dedupe, change-log retention.','Watch sync latency, bytes uploaded per change, conflict rate.'],
+ ['Photo sharing (Instagram)','blob','Medium','A feed plus a media pipeline.','~115k feed reads/s; ~200 TB/day of media.','Presigned uploads, async processing, CDN; hybrid fan-out. Accept a post appearing only after processing.','Processing backlog; celebrity fan-out; storage cost.','Senior: feed + S3. Staff: storage tiering and cost, processing SLOs, regional reads.','Watch time to visible, feed p99, CDN hit ratio.'],
+];
+const SLUG = {"URL shortener (Bitly)":"url-shortener","Rate limiter":"rate-limiter","Business discovery (Yelp)":"business-discovery","News feed (Facebook)":"news-feed","News aggregator (Google News)":"news-aggregator","Local delivery (Gopuff)":"local-delivery","Dating app (Tinder)":"dating-app","Distributed cache":"distributed-cache","Top-K videos (YouTube)":"top-k-videos","Ad click aggregator":"ad-click-aggregator","Web crawler":"web-crawler","Metrics monitoring (Datadog)":"metrics-monitoring","Fitness tracking (Strava)":"fitness-tracking","Post search (Facebook)":"post-search","Price tracker (CamelCamelCamel)":"price-tracker","Ride sharing (Uber)":"ride-sharing","Live comments (Facebook Live)":"live-comments","Collaborative editor (Google Docs)":"collaborative-editor","Stock trading (Robinhood)":"stock-trading","Online auction":"online-auction","LLM chat (ChatGPT)":"llm-chat","Chat app (WhatsApp)":"chat-app","Ticketmaster":"ticketmaster","Payment system (Stripe)":"payment-system","Online judge (LeetCode)":"online-judge","Job scheduler":"job-scheduler","Video platform (YouTube)":"video-platform","File storage and sync (Dropbox)":"file-sync","Photo sharing (Instagram)":"photo-sharing"};
+const items = P.map(([name,pat,diff,core,num,call,raise,beyond,run])=>({name,pat,diff,core,num,call,raise,beyond,run}));
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+let active = new Set(Object.keys(PAT)), view = 'full';
+try{ view = localStorage.getItem('atlas-view') || 'full'; }catch(e){}
+
+const chips = document.getElementById('chips');
+Object.entries(PAT).forEach(([k,[label,c]])=>{
+  const b=document.createElement('button'); b.className='chip'; b.setAttribute('aria-pressed','true');
+  b.innerHTML=`<i style="background:var(${c})"></i>${label}`;
+  b.onclick=()=>{ active.has(k)?active.delete(k):active.add(k); if(!active.size) Object.keys(PAT).forEach(x=>active.add(x)); render(); };
+  b.dataset.k=k; chips.appendChild(b);
+});
+const q=document.getElementById('q'); q.oninput=render;
+['full','compact','table'].forEach(v=>document.getElementById('v-'+v).onclick=()=>{view=v; try{localStorage.setItem('atlas-view',v)}catch(e){} render();});
+
+function card(p){
+  const c=PAT[p.pat][1];
+  return `<article class="card" style="--pc:var(${c})"><header><h3><a href="../problems/${SLUG[p.name]}/">${esc(p.name)}</a></h3><span class="diff">${p.diff} · ${PAT[p.pat][0]}</span></header>
+  <p class="core">${esc(p.core)}</p>
+  <div class="num">${esc(p.num)}</div>
+  <dl class="f staff"><dt>Staff call and trade-off</dt><dd>${esc(p.call)}</dd></dl>
+  <dl class="f more"><dt>Raise before you're asked</dt><dd>${esc(p.raise)}</dd></dl>
+  <dl class="f more"><dt>Senior stops at · staff goes on to</dt><dd>${esc(p.beyond)}</dd></dl>
+  <dl class="f more"><dt>Run it</dt><dd>${esc(p.run)}</dd></dl></article>`;
+}
+function render(){
+  chips.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed', active.has(b.dataset.k)));
+  ['full','compact','table'].forEach(v=>document.getElementById('v-'+v).setAttribute('aria-pressed', v===view));
+  const term=q.value.trim().toLowerCase();
+  const list=items.filter(p=>active.has(p.pat) && (!term || Object.values(p).join(' ').toLowerCase().includes(term)));
+  document.getElementById('count').textContent=`${list.length} of ${items.length}`;
+  const out=document.getElementById('out');
+  if(!list.length){ out.innerHTML='<p class="empty">No problems match. Clear the search or turn a pattern back on.</p>'; return; }
+  if(view==='table'){
+    out.innerHTML=`<div class="tablewrap"><table><thead><tr><th>Problem</th><th>The real problem</th><th>Deciding number</th><th>Staff call and trade-off</th><th>Raise before asked</th><th>Senior → staff</th><th>Run it</th></tr></thead><tbody>${
+      list.map(p=>`<tr style="--pc:var(${PAT[p.pat][1]})"><td><a href="../problems/${SLUG[p.name]}/">${esc(p.name)}</a></td><td>${esc(p.core)}</td><td class="n">${esc(p.num)}</td><td class="s">${esc(p.call)}</td><td>${esc(p.raise)}</td><td>${esc(p.beyond)}</td><td>${esc(p.run)}</td></tr>`).join('')}</tbody></table></div>`;
+    return;
+  }
+  out.className = view==='compact' ? 'compact' : '';
+  out.innerHTML=Object.entries(PAT).filter(([k])=>list.some(p=>p.pat===k)).map(([k,[label,c]])=>
+    `<section class="group"><h2><i style="background:var(${c})"></i>${label}</h2><div class="grid">${list.filter(p=>p.pat===k).map(card).join('')}</div></section>`).join('');
+}
+render();
+</script>
+
+</body></html>

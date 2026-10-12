@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>System Design: Learn Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;
+  --border:#30363d;--border2:#484f58;
+  --text:#cdd9e5;--text2:#adbac7;--text3:#768390;
+  --amber:#f0a429;--green:#57ab5a;--blue:#6cb6ff;--purple:#dcbdfb;
+  --red:#f47067;--teal:#39c5cf;--pink:#fc8dc7;
+  --sans:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;--mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden}
+a{color:var(--blue)}
+.top{height:46px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 14px}
+.brand{font-weight:800;font-size:13px;white-space:nowrap}
+.brand b{color:var(--accent,var(--amber))}
+.secsel{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;font-size:12px;padding:5px 8px;max-width:260px;font-family:var(--sans)}
+.links{display:flex;gap:6px;margin-left:auto;overflow-x:auto}
+.links a,.tbtn{font-family:var(--mono);font-size:10px;font-weight:600;padding:4px 9px;border-radius:5px;text-decoration:none;background:var(--bg3);color:var(--text2);border:1px solid var(--border);white-space:nowrap;cursor:pointer}
+.links a:hover,.tbtn:hover{border-color:var(--border2);color:var(--text)}
+.links a.cur{color:var(--accent,var(--amber));border-color:var(--accent,var(--amber))}
+.prog{height:3px;background:var(--bg3)}
+.prog div{height:100%;background:var(--accent,var(--amber));transition:width .25s}
+.stage{position:absolute;top:49px;bottom:52px;left:0;right:0;overflow-y:auto;padding:22px 28px}
+.slide{max-width:1180px;margin:0 auto;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.kick{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent,var(--amber));margin-bottom:6px}
+.slide h1{font-size:26px;font-weight:800;letter-spacing:-.4px;margin-bottom:6px;line-height:1.2}
+.slide .sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:16px;max-width:900px}
+.grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+.grid.full{grid-template-columns:1fr}
+.dbox{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px}
+.dbox svg{width:100%;height:auto;display:block}
+.cap{font-size:13px;color:var(--text);background:var(--bg3);border-left:3px solid var(--accent,var(--amber));border-radius:0 6px 6px 0;padding:8px 12px;margin-top:10px;line-height:1.55;min-height:38px}
+.cap .sn{font-family:var(--mono);font-size:10px;color:var(--accent,var(--amber));margin-right:6px}
+.side{display:flex;flex-direction:column;gap:10px}
+.pts{list-style:none;display:flex;flex-direction:column;gap:7px}
+.pts li{font-size:13.5px;line-height:1.55;color:var(--text2);padding-left:16px;position:relative}
+.pts li:before{content:'';position:absolute;left:2px;top:8px;width:6px;height:6px;border-radius:2px;background:var(--accent,var(--amber))}
+.pts li b,.card b{color:var(--text)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:13px;line-height:1.55;color:var(--text2)}
+.card .lab{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.c-say{border-color:rgba(87,171,90,.4);background:rgba(87,171,90,.06)} .c-say .lab{color:var(--green)}
+.c-trap{border-color:rgba(244,112,103,.4);background:rgba(244,112,103,.06)} .c-trap .lab{color:var(--red)}
+.c-num{border-color:rgba(108,182,255,.4);background:rgba(108,182,255,.06)} .c-num .lab{color:var(--blue)}
+.c-why{border-color:rgba(240,164,41,.4);background:rgba(240,164,41,.06)} .c-why .lab{color:var(--amber)}
+.c-q{border-color:rgba(220,189,251,.4);background:rgba(220,189,251,.06)} .c-q .lab{color:var(--purple)}
+.c-say .body{color:var(--text);font-style:italic}
+table.t{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+table.t th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);background:var(--bg3);padding:7px 10px;text-align:left;border-bottom:1px solid var(--border2)}
+table.t td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.45}
+table.t td:first-child{color:var(--text);font-weight:600}
+table.t tr:last-child td{border-bottom:none}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cards3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.title-slide{min-height:60vh;display:flex;flex-direction:column;justify-content:center}
+.title-slide h1{font-size:40px}
+.title-slide .sub{font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-family:var(--mono);font-size:10.5px;padding:3px 9px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.script{counter-reset:s;display:flex;flex-direction:column;gap:6px}
+.script div{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:13px;line-height:1.5;color:var(--text2);display:flex;gap:10px}
+.script div span.tm{font-family:var(--mono);font-size:11px;color:var(--accent,var(--amber));min-width:64px;font-weight:700}
+.script div b{color:var(--text)}
+.bot{position:absolute;bottom:0;left:0;right:0;height:52px;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 14px}
+.nbtn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)}
+.nbtn:hover{border-color:var(--accent,var(--amber))}
+.nbtn.pri{background:var(--accent,var(--amber));color:#111;border-color:transparent}
+.ctr{font-family:var(--mono);font-size:11px;color:var(--text3)}
+.dots{display:flex;gap:4px;align-items:center}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--border2);display:block}
+.dots i.on{background:var(--accent,var(--amber))}
+.hint{font-size:11px;color:var(--text3);margin-left:auto}
+.ov{position:fixed;inset:0;background:rgba(13,17,23,.97);z-index:50;overflow-y:auto;padding:24px;display:none}
+.ov.show{display:block}
+.ov h2{font-size:18px;margin-bottom:12px}
+.ov .sec{margin-bottom:18px}
+.ov .sec h3{font-family:var(--mono);font-size:11px;color:var(--accent,var(--amber));text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.ov .its{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}
+.ov .it{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;cursor:pointer;color:var(--text2)}
+.ov .it:hover{border-color:var(--accent,var(--amber));color:var(--text)}
+.ov .it.cur{border-color:var(--accent,var(--amber))}
+.ov .it span{font-family:var(--mono);font-size:10px;color:var(--text3);margin-right:6px}
+/* svg */
+.nd text{font-family:var(--sans);font-size:13px;font-weight:600}
+.nd .sb{font-size:10.5px;font-weight:400;opacity:.8}
+.el{transition:opacity .3s}
+.el.new{animation:pop .45s}
+@keyframes pop{0%{opacity:0}100%{opacity:1}}
+.el.dim{opacity:.32}
+.elab{font-family:var(--mono);font-size:10.5px}
+.ztxt{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.ftxt{font-family:var(--sans)}
+@media (max-width:820px){
+  .grid,.cards2,.cards3{grid-template-columns:1fr}
+  .stage{padding:14px 14px}
+  .slide h1{font-size:21px}
+  .title-slide h1{font-size:28px}
+  .brand{display:none}
+  .hint{display:none}
+  .secsel{max-width:150px}
+}
+
+.grid.full .dbox svg{max-width:880px;margin:0 auto}
+
+.qa{display:flex;flex-direction:column;gap:8px}
+.qi{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 13px}
+.qi.open{border-color:rgba(87,171,90,.45)}
+.qq{font-size:14px;font-weight:700;color:var(--text);display:flex;gap:8px}
+.qq span{font-family:var(--mono);font-size:11px;color:var(--accent,var(--amber));padding-top:2px}
+.qn{font-size:13px;color:var(--text2);line-height:1.55;margin-top:5px;padding-left:28px}
+.qn i{color:var(--text3)}
+.lst{margin:2px 0 0 16px}.lst li{margin-bottom:2px}
+.mono{font-family:var(--mono);font-size:11.5px;color:var(--teal)}
+</style></head><body>
+<script>/* Deck engine: slides + step reveal + SVG diagrams (free graph, sequence, flow) */
+(function(){
+const COL={b:'#6cb6ff',g:'#57ab5a',a:'#f0a429',p:'#dcbdfb',r:'#f47067',t:'#39c5cf',x:'#9aa4b2',k:'#fc8dc7',w:'#cdd9e5'};
+const col=c=>COL[c]||c||COL.x;
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+let uid=0;
+
+function s0(s){return Array.isArray(s)?s[0]:(s||0)}
+function vis(s,cur){return Array.isArray(s)?(s[0]<=cur&&cur<=s[1]):(s||0)<=cur}
+function cls(s,cur){return 'el'+(s0(s)===cur&&cur>0?' new':'')}
+
+function markers(id){
+  return '<defs>'+Object.keys(COL).map(k=>`<marker id="m${id}${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${COL[k]}"/></marker>`).join('')+'</defs>';
+}
+
+function nodeSize(n){
+  const lines=String(n[3]).split('\n');
+  let mx=0;lines.forEach(l=>{const [m,s]=l.split('|');mx=Math.max(mx,(m||'').length*7.3,(s||'').length*6.1)});
+  const subs=lines.filter(l=>l.includes('|')).length;
+  const w=n[7]||Math.max(70,mx+26);
+  const h=n[8]||(24+lines.length*16+subs*13);
+  return [w,h];
+}
+
+function drawNode(n,cur,o){
+  const [id,x,y,label,c,shape,step]=n; if(!vis(step,cur))return '';
+  const [w,h]=nodeSize(n); const C=col(c); const X=x-w/2,Y=y-h/2;
+  let g=`<g class="nd ${cls(step,cur)}">`;
+  const fill=`fill="${C}" fill-opacity="0.13" stroke="${C}" stroke-width="1.6"`;
+  if(shape==='db'){
+    const e=7;
+    g+=`<path d="M${X},${Y+e} L${X},${Y+h-e} A${w/2},${e} 0 0 0 ${X+w},${Y+h-e} L${X+w},${Y+e} A${w/2},${e} 0 0 0 ${X},${Y+e} Z" ${fill}/><ellipse cx="${x}" cy="${Y+e}" rx="${w/2}" ry="${e}" fill="${C}" fill-opacity="0.25" stroke="${C}" stroke-width="1.6"/>`;
+  }else if(shape==='q'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="5" ${fill}/>`;
+    for(let i=1;i<=3;i++)g+=`<line x1="${X+w-6*i}" y1="${Y+4}" x2="${X+w-6*i}" y2="${Y+h-4}" stroke="${C}" stroke-opacity=".5"/>`;
+  }else if(shape==='pill'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="${h/2}" ${fill}/>`;
+  }else if(shape==='o'){
+    g+=`<ellipse cx="${x}" cy="${y}" rx="${w/2}" ry="${h/2}" fill="none" stroke="${C}" stroke-opacity=".6" stroke-width="2" stroke-dasharray="3 5"/>`;
+  }else if(shape==='n'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="6" fill="${C}" fill-opacity="0.05" stroke="${C}" stroke-dasharray="4 3"/>`;
+  }else if(shape==='x'){
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="8" ${fill}/><line x1="${X+4}" y1="${Y+4}" x2="${X+w-4}" y2="${Y+h-4}" stroke="${COL.r}" stroke-opacity=".45" stroke-width="2"/><line x1="${X+w-4}" y1="${Y+4}" x2="${X+4}" y2="${Y+h-4}" stroke="${COL.r}" stroke-opacity=".45" stroke-width="2"/>`;
+  }else{
+    g+=`<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="8" ${fill}/>`;
+  }
+  const lines=String(label).split('\n');
+  const total=lines.reduce((a,l)=>a+(l.includes('|')?29:16),0);
+  let ty=y-total/2+12+(shape==='db'?4:0);
+  lines.forEach(l=>{const [m,s]=l.split('|');
+    g+=`<text x="${x}" y="${ty}" text-anchor="middle" fill="${shape==='x'?COL.r:'#e6edf3'}">${esc(m)}</text>`;
+    if(s!==undefined){ty+=13;g+=`<text class="sb" x="${x}" y="${ty}" text-anchor="middle" fill="${C}">${esc(s)}</text>`}
+    ty+=16;});
+  return g+'</g>';
+}
+
+function clip(cx,cy,w,h,dx,dy,pad){
+  if(!w)return [cx,cy];
+  const hw=w/2+pad,hh=h/2+pad;
+  const t=Math.min(dx?hw/Math.abs(dx):1e9,dy?hh/Math.abs(dy):1e9);
+  return [cx+dx*t,cy+dy*t];
+}
+
+function drawEdge(e,nodes,cur,mid){
+  const [f,to,label,st,step]=e; if(!vis(step,cur))return '';
+  const s=st||'';
+  const A=Array.isArray(f)?{x:f[0],y:f[1],w:0,h:0}:nodes[f], B=Array.isArray(to)?{x:to[0],y:to[1],w:0,h:0}:nodes[to];
+  if(!A||!B)return '';
+  const ck=(s.match(/[rgabptkx]/)||['x'])[0];
+  const C=COL[ck];
+  let curve=0; if(s.includes('c'))curve=-1; if(s.includes('C'))curve=1;
+  const dxx=B.x-A.x,dyy=B.y-A.y,len=Math.hypot(dxx,dyy)||1;
+  let cxp=(A.x+B.x)/2,cyp=(A.y+B.y)/2;
+  const bend=s.includes('cc')||s.includes('CC')?95:48;
+  if(curve){cxp+=-dyy/len*bend*curve;cyp+=dxx/len*bend*curve}
+  const [x1,y1]=clip(A.x,A.y,A.w,A.h,(curve?cxp:B.x)-A.x,(curve?cyp:B.y)-A.y,3);
+  const [x2,y2]=clip(B.x,B.y,B.w,B.h,(curve?cxp:A.x)-B.x,(curve?cyp:A.y)-B.y,4);
+  const dash=s.includes('d')?' stroke-dasharray="6 4"':'';
+  const mk=s.includes('n')?'':` marker-end="url(#m${mid}${ck})"`;
+  const ms=s.includes('2')?` marker-start="url(#m${mid}${ck})"`:'';
+  let path=curve?`M${x1},${y1} Q${cxp},${cyp} ${x2},${y2}`:`M${x1},${y1} L${x2},${y2}`;
+  let g=`<g class="${cls(step,cur)}"><path d="${path}" fill="none" stroke="${C}" stroke-width="1.7"${dash}${mk}${ms}/>`;
+  if(label){
+    let lx=curve?(x1+2*cxp+x2)/4:(x1+x2)/2, ly=curve?(y1+2*cyp+y2)/4:(y1+y2)/2;
+    const L=String(label).split('\n');const lw=Math.max(...L.map(l=>l.length))*6.4+10, lh=L.length*13+4;
+    const seg=Math.hypot(x2-x1,y2-y1);
+    if(!curve&&seg<lw+14){const ux=(x2-x1)/(seg||1),uy=(y2-y1)/(seg||1);let px=-uy,py=ux;if(py>0||(py===0&&px>0)){px=-px;py=-py}
+      const off=Math.abs(ux)>Math.abs(uy)?lh/2+5:lw/2+6;lx+=px*off;ly+=py*off;}
+    g+=`<rect x="${lx-lw/2}" y="${ly-lh/2}" width="${lw}" height="${lh}" rx="4" fill="#161b22" fill-opacity=".92"/>`;
+    L.forEach((l,i)=>g+=`<text class="elab" x="${lx}" y="${ly-lh/2+12+i*13}" text-anchor="middle" fill="${s.match(/[rgabptk]/)?C:'#adbac7'}">${esc(l)}</text>`);
+  }
+  return g+'</g>';
+}
+
+function normD(d){if(d._n)return d;(d.n||[]).forEach(n=>{if(typeof n[5]==='number'||Array.isArray(n[5]))n.splice(5,0,null);if(typeof n[6]==='number'&&n[6]>=20)n.splice(6,0,null)});d._n=1;return d}
+function drawFree(d,cur){normD(d);
+  const id=++uid; const W=d.w||800,H=d.h||360;
+  let out=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${markers(id)}`;
+  (d.z||[]).forEach(z=>{const [x,y,w,h,l,c,step]=z; if(!vis(step,cur))return; const C=col(c);
+    out+=`<g class="${cls(step,cur)}"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${C}" fill-opacity=".04" stroke="${C}" stroke-opacity=".55" stroke-dasharray="5 4"/>${l?`<text class="ztxt" x="${x+10}" y="${y+15}" fill="${C}">${esc(l)}</text>`:''}</g>`});
+  const nodes={};
+  (d.n||[]).forEach(n=>{const [w,h]=nodeSize(n);nodes[n[0]]={x:n[1],y:n[2],w,h}});
+  (d.e||[]).forEach(e=>out+=drawEdge(e,nodes,cur,id));
+  (d.n||[]).forEach(n=>out+=drawNode(n,cur));
+  (d.t||[]).forEach(t=>{const [x,y,tx,c,step,size,anc,wt]=t; if(!vis(step,cur))return;
+    const a={s:'start',e:'end'}[anc]||'middle';
+    String(tx).split('\n').forEach((l,i)=>out+=`<text class="ftxt ${cls(step,cur)}" x="${x}" y="${y+i*(size||12)*1.3}" text-anchor="${a}" font-size="${size||12}" font-weight="${wt||500}" fill="${col(c||'x')}">${esc(l)}</text>`)});
+  return out+'</svg>';
+}
+
+function drawSeq(q,cur){
+  const id=++uid; const W=q.w||800; const A=q.a; const n=A.length; const m=Math.max(70,...A.map(a=>Math.max(84,a.split('|')[0].length*7.6+22)/2+6));
+  const xs=A.map((_,i)=>n===1?W/2:m+i*(W-2*m)/(n-1));
+  const ai=v=>typeof v==='number'?v:A.findIndex(a=>a.split('|')[0]===v);
+  const rh=q.rh||31; const rows=q.m.length; const H=72+rows*rh+14;
+  let out=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${markers(id)}`;
+  A.forEach((a,i)=>{const [nm,c]=a.split('|');const C=col(c||'b');const w=Math.max(84,nm.length*7.6+22);
+    out+=`<line x1="${xs[i]}" y1="44" x2="${xs[i]}" y2="${H-6}" stroke="${C}" stroke-opacity=".35" stroke-dasharray="4 4"/>`;
+    out+=`<rect x="${xs[i]-w/2}" y="12" width="${w}" height="32" rx="7" fill="${C}" fill-opacity=".14" stroke="${C}" stroke-width="1.5"/><text x="${xs[i]}" y="33" text-anchor="middle" font-size="13" font-weight="700" fill="#e6edf3" font-family="Inter,sans-serif">${esc(nm)}</text>`});
+  q.m.forEach((r,k)=>{const y=72+k*rh;
+    if(r[0]==='#'){const [,a,b,tx,c,step]=r; if(!vis(step,cur))return; const C=col(c||'a');
+      const i1=ai(a),i2=ai(b==null?a:b); const x1=Math.min(xs[i1],xs[i2])-62,x2=Math.max(xs[i1],xs[i2])+62;
+      const w=Math.min(W-8,Math.max(x2-x1,tx.length*6.5+16)); let cx=(x1+x2)/2; cx=Math.max(4+w/2,Math.min(W-4-w/2,cx));
+      out+=`<g class="${cls(step,cur)}"><rect x="${cx-w/2}" y="${y-13}" width="${w}" height="22" rx="5" fill="${C}" fill-opacity=".14" stroke="${C}" stroke-opacity=".7"/><text x="${cx}" y="${y+2}" text-anchor="middle" font-size="11.5" fill="${C}" font-family="Inter,sans-serif" font-weight="600">${esc(tx)}</text></g>`;return}
+    const [f,t,l,st,step]=r; if(!vis(step,cur))return; const s=st||'';
+    const ck=(s.match(/[rgabptk]/)||['x'])[0]; const C=COL[ck];
+    const i1=ai(f),i2=ai(t); const dash=s.includes('d')?' stroke-dasharray="6 4"':'';
+    let g=`<g class="${cls(step,cur)}">`;
+    if(i1===i2){const x=xs[i1];g+=`<path d="M${x},${y-6} h34 v14 h-30" fill="none" stroke="${C}" stroke-width="1.6"${dash} marker-end="url(#m${id}${ck})"/><text x="${x+42}" y="${y+5}" font-size="11.5" fill="${s.match(/[rgabptk]/)?C:'#adbac7'}" font-family="JetBrains Mono,monospace">${esc(l)}</text>`}
+    else{const x1=xs[i1]+(i2>i1?3:-3),x2=xs[i2]+(i2>i1?-5:5);
+      g+=`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${C}" stroke-width="1.7"${dash} marker-end="url(#m${id}${ck})"/>`;
+      if(s.includes('x'))g+=`<text x="${(x1+x2)/2}" y="${y+5}" text-anchor="middle" font-size="15" fill="${COL.r}" font-weight="800">✕</text>`;
+      g+=`<text x="${(x1+x2)/2}" y="${y-6}" text-anchor="middle" font-size="11.5" fill="${s.match(/[rgabptk]/)?C:'#adbac7'}" font-family="JetBrains Mono,monospace">${esc(l)}</text>`}
+    out+=g+'</g>';});
+  return out+'</svg>';
+}
+
+function drawFlow(f,cur){
+  // f.f: [[label,col,shape,edgeLabel,step],...]
+  const W=f.w||800; const items=f.f; const n=items.length; const gap=f.gap||34;
+  const bw=Math.min(170,(W-20-(n-1)*gap)/n); const H=f.h||120; const y=H/2;
+  const nodes=items.map((it,i)=>[ 'f'+i, 10+bw/2+i*(bw+gap), y, it[0], it[1]||'b', it[2], it[4], bw, f.bh]);
+  const edges=items.slice(0,-1).map((it,i)=>['f'+i,'f'+(i+1),it[3]||'',it[5]||'',items[i+1][4]]);
+  return drawFree({w:W,h:H,n:nodes,e:edges,t:f.t,z:f.z},cur);
+}
+
+function maxStep(s){
+  let m=0;
+  const scan=arr=>(arr||[]).forEach(x=>{const st=Array.isArray(x)?x:[];});
+  if(s.d){normD(s.d);['n','e','z','t'].forEach(k=>(s.d[k]||[]).forEach(x=>{const i={n:6,e:4,z:6,t:4}[k];m=Math.max(m,s0(x[i]))}))}
+  if(s.seq)s.seq.m.forEach(r=>m=Math.max(m,s0(r[0]==='#'?r[5]:r[4])));
+  if(s.flow)s.flow.f.forEach(r=>m=Math.max(m,s0(r[4])));
+  if(s.cap)m=Math.max(m,s.cap.length-1);
+  if(s.qa)m=Math.max(m,s.qa.length);
+  return m;
+}
+
+function cardHTML(c){
+  const [k,l,b]=c; const lab={say:'Say this in the interview',trap:'Trap',num:'Numbers',why:'Why it matters',q:'Interviewer asks'}[k];
+  return `<div class="card c-${k}"><div class="lab">${l||lab}</div><div class="body">${b}</div></div>`;
+}
+function tableHTML(t){return `<table class="t"><tr>${t.h.map(h=>`<th>${h}</th>`).join('')}</tr>${t.r.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table>`}
+
+function renderSlide(s,cur){
+  if(s.type==='title'){
+    return `<div class="slide title-slide"><div class="kick">${s.k||''}</div><h1>${s.t}</h1><div class="sub">${s.s||''}</div>${s.chips?`<div class="chips">${s.chips.map(c=>`<span class="chip">${c}</span>`).join('')}</div>`:''}${s.cards?`<div class="cards2" style="margin-top:18px">${s.cards.map(cardHTML).join('')}</div>`:''}${s.pts?`<ul class="pts" style="margin-top:16px">${s.pts.map(p=>`<li>${p}</li>`).join('')}</ul>`:''}</div>`;
+  }
+  let dg='';
+  if(s.d)dg=drawFree(s.d,cur); else if(s.seq)dg=drawSeq(s.seq,cur); else if(s.flow)dg=drawFlow(s.flow,cur);
+  const capTxt=s.cap?s.cap[Math.min(cur,s.cap.length-1)]:'';
+  const left=dg?`<div><div class="dbox">${dg}</div>${s.cap?`<div class="cap"><span class="sn">${cur+1}/${s.cap.length}</span>${capTxt}</div>`:''}</div>`:'';
+  let side='';
+  if(s.qa)side+=`<div class="qa">${s.qa.map((x,i)=>`<div class="qi${i<cur?' open':''}"><div class="qq"><span>Q${i+1}</span>${x[0]}</div><div class="qn">${i<cur?x[1]:'<i>Think it through and say your answer out loud, then press → to reveal.</i>'}</div></div>`).join('')}</div>`;
+  if(s.tbl)side+=tableHTML(s.tbl);
+  if(s.script)side+=`<div class="script">${s.script.map(r=>`<div><span class="tm">${r[0]}</span><span>${r[1]}</span></div>`).join('')}</div>`;
+  if(s.pts)side+=`<ul class="pts">${s.pts.map(p=>`<li>${p}</li>`).join('')}</ul>`;
+  if(s.c2)side+=`<div class="cards2">${s.c2.map(cardHTML).join('')}</div>`;
+  if(s.cards)side+=s.cards.map(cardHTML).join('');
+  const full=s.full||!dg||!side;
+  return `<div class="slide"><div class="kick">${s.k||s.sec||''}</div><h1>${s.t}</h1>${s.s?`<div class="sub">${s.s}</div>`:''}<div class="grid${full?' full':''}">${left}${side?`<div class="side">${side}</div>`:''}</div></div>`;
+}
+
+window.__maxStep=maxStep;
+window.Deck=function(meta,slides){
+  document.documentElement.style.setProperty('--accent',meta.accent||'#f0a429');
+  document.title=meta.title;
+  const secs=[];slides.forEach((s,i)=>{if(!secs.length||secs[secs.length-1].name!==s.sec)secs.push({name:s.sec,i})});
+  document.body.innerHTML=`
+  <div class="top"><div class="brand">${meta.brand}</div>
+   <select class="secsel" id="secsel">${secs.map(x=>`<option value="${x.i}">${esc(x.name)}</option>`).join('')}</select>
+   <span class="tbtn" id="ovb">☰ All slides</span>
+   <div class="links">${meta.links.map(l=>`<a href="${l[1]}" ${l[1]===meta.self?'class="cur"':''}>${l[0]}</a>`).join('')}</div></div>
+  <div class="prog"><div id="pg"></div></div>
+  <div class="stage" id="stage"></div>
+  <div class="bot"><button class="nbtn" id="pv">← Prev</button><button class="nbtn pri" id="nx">Next →</button>
+   <span class="ctr" id="ctr"></span><span class="dots" id="dots"></span>
+   <span class="hint">→ / Space: next step · ↓↑: skip slide · A: show all steps · O: overview</span></div>
+  <div class="ov" id="ov"></div>`;
+  const st=document.getElementById('stage');
+  let i=0,step=0;
+  try{const h=parseInt(location.hash.slice(1));if(h>0&&h<=slides.length)i=h-1;else{const v=parseInt(localStorage.getItem(meta.key)||'0');if(v>=0&&v<slides.length)i=v}}catch(e){}
+  function draw(){
+    const s=slides[i];const ms=maxStep(s);
+    st.innerHTML=renderSlide(s,step);st.scrollTop=0;
+    document.getElementById('pg').style.width=((i+1)/slides.length*100)+'%';
+    document.getElementById('ctr').textContent=`${i+1} / ${slides.length}`;
+    document.getElementById('dots').innerHTML=ms?Array.from({length:ms+1},(_,k)=>`<i class="${k<=step?'on':''}"></i>`).join(''):'';
+    let si=0;secs.forEach((x,k)=>{if(x.i<=i)si=k});document.getElementById('secsel').selectedIndex=si;
+    try{localStorage.setItem(meta.key,i);history.replaceState(null,'','#'+(i+1))}catch(e){}
+  }
+  function redrawKeepScroll(){const y=st.scrollTop;const s=slides[i];st.innerHTML=renderSlide(s,step);st.scrollTop=y;
+    const ms=maxStep(s);document.getElementById('dots').innerHTML=ms?Array.from({length:ms+1},(_,k)=>`<i class="${k<=step?'on':''}"></i>`).join(''):'';}
+  function go(n,full){if(n<0||n>=slides.length)return;i=n;step=full?maxStep(slides[i]):0;draw()}
+  function next(){if(step<maxStep(slides[i])){step++;redrawKeepScroll()}else go(i+1)}
+  function prev(){if(step>0){step--;redrawKeepScroll()}else go(i-1,true)}
+  document.getElementById('nx').onclick=next;document.getElementById('pv').onclick=prev;
+  document.getElementById('secsel').onchange=e=>go(+e.target.value);
+  const ov=document.getElementById('ov');
+  function openOv(){ov.innerHTML=`<h2>${esc(meta.title)} — all slides <span class="tbtn" onclick="document.getElementById('ov').classList.remove('show')">✕ close (Esc)</span></h2>`+secs.map((x,k)=>{const end=k+1<secs.length?secs[k+1].i:slides.length;
+      return `<div class="sec"><h3>${esc(x.name)}</h3><div class="its">${slides.slice(x.i,end).map((s,j)=>`<div class="it${x.i+j===i?' cur':''}" data-i="${x.i+j}"><span>${x.i+j+1}</span>${s.t.replace(/<[^>]+>/g,'')}</div>`).join('')}</div></div>`}).join('');
+    ov.classList.add('show');ov.querySelectorAll('.it').forEach(el=>el.onclick=()=>{ov.classList.remove('show');go(+el.dataset.i)})}
+  document.getElementById('ovb').onclick=openOv;
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='SELECT')return;
+    if(ov.classList.contains('show')){if(e.key==='Escape'||e.key==='o')ov.classList.remove('show');return}
+    if(['ArrowRight',' ','PageDown','j'].includes(e.key)){e.preventDefault();next()}
+    else if(['ArrowLeft','PageUp','k'].includes(e.key)){e.preventDefault();prev()}
+    else if(e.key==='ArrowDown'){e.preventDefault();go(i+1)}
+    else if(e.key==='ArrowUp'){e.preventDefault();go(i-1)}
+    else if(e.key==='a'||e.key==='A'){step=maxStep(slides[i]);redrawKeepScroll()}
+    else if(e.key==='o'||e.key==='Escape'){openOv()}
+    else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+  });
+  let tx=null,ty=null;st.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+  st.addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5){dx<0?next():prev()}tx=null},{passive:true});
+  st.addEventListener('click',e=>{if(e.target.closest('svg'))next()});
+  draw();
+};
+})();
+</script>
+<script>const PT=[{"id": "pb1", "num": "01", "title": "Bitly \u2014 URL Shortener", "diff": "Easy", "patterns": ["reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb2", "num": "02", "title": "Rate Limiter", "diff": "Medium", "patterns": ["reads", "contention"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb9", "num": "09", "title": "Yelp \u2014 Business Discovery", "diff": "Medium", "patterns": ["reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb11", "num": "11", "title": "FB News Feed", "diff": "Medium", "patterns": ["reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb19", "num": "19", "title": "News Aggregator", "diff": "Easy", "patterns": ["reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb28", "num": "28", "title": "Local Delivery (Gopuff)", "diff": "Easy", "patterns": ["reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb8", "num": "08", "title": "Tinder \u2014 Dating App", "diff": "Medium", "patterns": ["reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb15", "num": "15", "title": "YouTube Top K Videos", "diff": "Hard", "patterns": ["writes"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb20", "num": "20", "title": "Ad Click Aggregator", "diff": "Hard", "patterns": ["writes"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb18", "num": "18", "title": "Web Crawler", "diff": "Hard", "patterns": ["writes"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb25", "num": "25", "title": "Metrics Monitoring (Datadog)", "diff": "Hard", "patterns": ["writes"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb21", "num": "21", "title": "Strava \u2014 Fitness Tracking", "diff": "Medium", "patterns": ["writes"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb10", "num": "10", "title": "Uber \u2014 Ride Sharing", "diff": "Hard", "patterns": ["realtime"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb12", "num": "12", "title": "FB Live Comments", "diff": "Medium", "patterns": ["realtime"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb16", "num": "16", "title": "Google Docs \u2014 Collaborative Editing", "diff": "Hard", "patterns": ["realtime"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb22", "num": "22", "title": "Robinhood \u2014 Stock Trading", "diff": "Hard", "patterns": ["realtime"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb6", "num": "06", "title": "Online Auction", "diff": "Medium", "patterns": ["realtime", "contention"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb29", "num": "29", "title": "ChatGPT \u2014 Conversational AI", "diff": "Hard", "patterns": ["realtime"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb5", "num": "05", "title": "Ticketmaster", "diff": "Hard", "patterns": ["contention", "reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb26", "num": "26", "title": "Payment System (Stripe)", "diff": "Hard", "patterns": ["multistep"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb4", "num": "04", "title": "LeetCode \u2014 Online Judge", "diff": "Medium", "patterns": ["multistep", "longtask"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb24", "num": "24", "title": "Job Scheduler", "diff": "Hard", "patterns": ["multistep", "longtask"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb14", "num": "14", "title": "YouTube \u2014 Video Platform", "diff": "Hard", "patterns": ["blobs", "reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb17", "num": "17", "title": "Dropbox \u2014 Cloud File Storage", "diff": "Easy", "patterns": ["blobs"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb7", "num": "07", "title": "Instagram", "diff": "Medium", "patterns": ["blobs", "reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb3", "num": "03", "title": "Distributed Cache", "diff": "Medium", "patterns": ["reads", "longtask"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb13", "num": "13", "title": "FB Post Search", "diff": "Medium", "patterns": ["writes", "reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}, {"id": "pb27", "num": "27", "title": "Price Tracking (CamelCamelCamel)", "diff": "Medium", "patterns": ["writes", "reads"], "tags": [], "story": "", "naive": "", "insight": "", "line": "", "concepts": []}];
+
+/* Per-problem data. Layout grid: client x≈70, gateway x≈200, services x≈370, middle x≈550, stores x≈710; rows y≈60/150/240/320 */
+const P={};
+P.pb1={fr:['Create a short URL for a long URL (optional custom alias, expiry)','Redirect short URL → original URL'],
+ nfr:['Redirect p99 &lt; 100ms','99.99% available for redirects','Short codes globally unique','Read:write ≈ 100:1'],
+ num:'100M DAU × 10 clicks = 1B redirects/day ≈ <b>12k/s avg, ~100k/s peak</b>. Writes ~1M/day ≈ 12/s. 1B URLs × 500B = <b>500GB</b>, which fits one Postgres.',
+ api:['POST /urls {long_url, alias?, expires_at?} → short_url','GET /{code} → 302 Location: long_url'],
+ ent:'urls(code PK, long_url, user_id, created_at, expires_at)',
+ d:{w:800,h:340,n:[['cl',70,170,'Client','t','pill'],['gw',200,170,'API Gateway','x'],['ws',380,70,'Write service','b'],['rs',380,270,'Redirect service','b',1],
+   ['cnt',580,40,'Redis counter|INCR, batch of 1000','a','db',3,170],['ca',580,270,'Redis cache|code → long_url','a','db',2],['db',720,160,'Postgres|urls','g','db']],
+  e:[['cl','gw','',''],['gw','ws','POST',''],['ws','db','',''],['gw','rs','GET /abc','',1],['rs','db','every read ✗','r',[1,1]],['rs','ca','hit 80%+','a',2],['ca','db','miss','d',2],['ws','cnt','next id','a',3]]},
+ cap:['Start simple: a write service creates a code and stores it in Postgres. ~12 writes/sec is nothing.','Redirects are 100× more frequent. 100k reads/sec straight to Postgres is what breaks first.','Add a Redis cache (code → URL). Clicks follow Pareto, so 80%+ hit the cache in under 1ms. Postgres only sees misses; add replicas if needed.','Generate codes from a global counter: Redis INCR + base62. 7 chars = 3.5 trillion codes, no collisions. Servers grab IDs in batches of 1,000.'],
+ deep:[['How do you guarantee unique codes?','Counter + base62 is unique by construction. Hashing (MD5 prefix) needs a unique constraint plus retry on collision. Counters are guessable, so add a reversible shuffle if that matters.'],
+  ['301 or 302?','<b>302</b>: every click reaches you (analytics, expiry, editing). 301 lets browsers cache it, which cuts load but loses analytics.'],
+  ['What if the counter node dies?','Redis with AOF + replica, or servers lease ranges from a Postgres sequence. A crash wastes a range; gaps are harmless.'],
+  ['Custom aliases?','Same table with a unique constraint; the insert fails if taken. Keep namespaces apart (e.g., counter codes are 7 chars, aliases ≥ 8).']],
+ trap:'Sharding 500GB at 12 writes/sec. It fits one machine; scale reads with cache and replicas.',ddia:'Ch 5 replicas · Ch 6 hash sharding'};
+
+P.pb2={fr:['Limit requests per client (user, IP, API key) by configurable rules','Return 429 with Retry-After and rate-limit headers'],
+ nfr:['Adds &lt; 10ms latency','Accurate across many API servers','Highly available (choose fail-open vs fail-closed)','1M requests/sec total'],
+ num:'1M req/s = 1M Redis ops/s; one Redis node does ~100k ops/s, so a <b>~10–20 shard Redis Cluster</b> keyed by client. 10M active keys × 100B ≈ <b>1GB</b> of memory.',
+ api:['isAllowed(client_key, rule) → {allowed, remaining, reset_at}','Response headers: X-RateLimit-Limit / Remaining / Reset'],
+ ent:'rules(endpoint, limit, window) · bucket:{client}:{rule} → {tokens, last_refill}',
+ d:{w:800,h:340,n:[['cl',70,170,'Clients','t','pill'],['gw',260,170,'API Gateway|rate-limit middleware','b',null,180],['svc',540,170,'Backend services','g'],
+   ['loc',260,300,'Local counter per server ✗','r','n',[0,0],190],['rd',540,300,'Redis Cluster|token buckets','a','db',1],['lua',720,300,'Lua script|atomic refill+check+decr','p','n',2,170],['cfg',260,50,'Rules config|DB / config service','x','db',3]],
+  e:[['cl','gw','',''],['gw','svc','allowed','g'],['gw','cl','429','rc',0],['gw','loc','','rd',[0,0]],['gw','rd','1 round trip','a',1],['rd','lua','','pd',2],['cfg','gw','cached rules','d',3]]},
+ cap:['Naive: each API server counts in local memory. With 50 servers, a client gets 50× the limit.','Centralize counters in Redis. But GET then SET from two servers races: both see 99/100 and both allow.','A Lua script runs refill + check + decrement atomically inside single-threaded Redis, in one round trip, with no race.','Rules come from a config store cached in each gateway. Decide failure mode: fail-open for normal APIs, fail-closed for login and payments.'],
+ deep:[['Which algorithm?','<b>Token bucket</b> (capacity = burst, refill = sustained rate) is the industry default. Fixed window allows 2× bursts at boundaries; a sliding-window log is exact but stores every timestamp; a sliding-window counter is a good approximation.'],
+  ['Race between servers?','Read-modify-write is a lost update (DDIA Ch 7). Atomic Lua or INCR + EXPIRE inside Redis fixes it.'],
+  ['Redis is down?','Fall back to local limits (limit ÷ N servers). Fail-open vs fail-closed is a product decision per endpoint.'],
+  ['Very hot client?','One key lands on one shard. Give each server a local allowance and sync periodically, trading accuracy for load.']],
+ trap:'Counters in Postgres: 1M writes/sec of throwaway data.',ddia:'Ch 7 lost update · Ch 6 shard by key'};
+
+P.pb9={fr:['Search businesses by location + radius, category, text','View business details and reviews','Leave one review per user per business; see average rating'],
+ nfr:['Search p99 &lt; 500ms','100M DAU, read-heavy','Ratings can lag slightly (eventual)','Reviews durable'],
+ num:'10M businesses × 1KB = <b>10GB</b>, which fits in memory. Search: 100M × 5 / 86,400 ≈ <b>6k/s, ~20k/s peak</b>. Reviews ~12/s.',
+ api:['GET /businesses?lat&lng&radius&category&q&cursor','GET /businesses/{id}','POST /businesses/{id}/reviews {rating, text}'],
+ ent:'businesses(id, name, location, category, avg_rating, num_ratings) · reviews(id, business_id, user_id, rating, text, UNIQUE(user_id, business_id))',
+ d:{w:800,h:340,n:[['cl',70,170,'Client','t','pill'],['gw',200,170,'API Gateway','x'],['ss',380,80,'Search service','b'],['bs',380,170,'Business service','b'],['rv',380,260,'Review service','b',3],
+   ['pg',710,170,'Postgres primary|businesses + reviews','g','db',null,180],['geo',580,40,'PostGIS GiST + pg_trgm','a','n',1,180],['rep',580,300,'Read replicas\n+ Redis page cache','g','db',2,160]],
+  e:[['cl','gw',''],['gw','ss',''],['gw','bs',''],['bs','pg',''],['ss','pg','lat BETWEEN… ✗','r',[0,0]],['ss','geo','ST_DWithin','a',1],['geo','pg','','a',[1,1]],['geo','rep','','a',2],['bs','rep','','g',2],['pg','rep','replicate','d',2],['gw','rv','','',3],['rv','pg','1 tx: insert + avg','g',3]]},
+ cap:['Naive: WHERE lat BETWEEN … AND lng BETWEEN …. Two 1-D B-tree indexes can\'t do a 2-D range efficiently.','Add a geospatial index (PostGIS GiST, ST_DWithin) and pg_trgm for name search. <b>10GB fits one Postgres</b>, so no extra search cluster yet.','~20k searches/sec: serve reads from replicas and cache hot business pages in Redis. The primary only takes writes.','Reviews: a unique (user, business) constraint, and the average updated in the same transaction as the insert, with no lost updates.'],
+ deep:[['Which geo index?','<b>Geohash</b>: prefix = area, B-tree friendly; query the cell plus 8 neighbours to handle edges. <b>Quadtree</b>: adapts to density. <b>R-tree / PostGIS</b>: the production default.'],
+  ['Average rating with concurrent reviews?','Store sum and count; UPDATE … SET sum=sum+:r, count=count+1 in the review\'s transaction. That is an atomic operation, so no lost update.'],
+  ['One review per user?','A DB unique constraint, not an application check (check-then-insert races).'],
+  ['When would you add Elasticsearch?','Only if search needs relevance ranking, fuzzy matching, and facets beyond pg_trgm, or QPS outgrows replicas. Then feed it from Postgres via CDC; never dual-write.']],
+ trap:'A geo-sharded cluster for 10GB of data. One Postgres with PostGIS plus replicas is enough.',ddia:'Ch 3 geo indexes · Ch 7 atomic updates · Ch 5 read replicas'};
+
+P.pb11={fr:['Create posts','Follow users','View feed of followed users\' posts, newest first, paginated'],
+ nfr:['Feed p99 &lt; 500ms','2B users; eventual consistency (post appears within ~1 min)','Handle accounts with millions of followers','Highly available'],
+ num:'1B DAU × 10 feed loads = <b>~115k feed reads/s</b>. ~500M posts/day ≈ 6k/s. With ~200 followers each, fan-out on write ≈ <b>1.2M feed inserts/s</b>.',
+ api:['POST /posts {content}','PUT /users/{id}/followers','GET /feed?cursor=(ts,post_id)'],
+ ent:'posts(id, author_id, content, ts) partitioned by author · follows(follower_id, followee_id) + reverse index · feed:{user} = Redis ZSET(ts, post_id), capped at 500',
+ d:{w:800,h:340,n:[['cl',70,170,'Client','t','pill'],['gw',190,170,'Gateway','x'],['ps',350,70,'Post service','b'],['fs',350,270,'Feed service','b'],
+   ['pdb',710,70,'Posts DB|Cassandra / DynamoDB','g','db',null,170],['fdb',710,170,'Follows DB','g','db'],['k',530,70,'Kafka','p','q',1],['fw',530,170,'Fan-out workers','a',null,1],['rf',530,290,'Redis feeds|ZSET per user','a','db',1],['cel',710,290,'Celebrity posts|pulled at read','k','n',2,150]],
+  e:[['cl','gw','',''],['gw','ps','',''],['gw','fs','',''],['ps','pdb','',''],['fs','fdb','200 queries ✗','r',[0,0]],['fs','pdb','','rd',[0,0]],['ps','k','new post','p',1],['k','fw','','p',1],['fw','fdb','followers','',1],['fw','rf','ZADD','a',1],['fs','rf','ZREVRANGE','a',1],['fs','cel','merge','kd',2],['fs','pdb','hydrate','d',3]]},
+ cap:['Fan-out on <b>read</b>: look up 200 followees, then their posts, on every feed load. At 115k feeds/sec that is millions of queries/sec.','Fan-out on <b>write</b>: a new post goes to Kafka; workers push its ID into every follower\'s Redis sorted set. A feed load becomes one ZREVRANGE.','Celebrity problem: one post to 100M followers means 100M writes. Hybrid: skip fan-out above ~100k followers and merge their recent posts at read time.','Hydrate post IDs into content from the posts store, with a post cache. Cursor pagination on (ts, post_id).'],
+ deep:[['Celebrity with 100M followers?','Hybrid. Don\'t fan out; followers pull celebrity posts at read time and merge. Threshold ~100k–1M followers.'],
+  ['How much memory for feeds?','Only active users, only IDs, capped at 500: 300M × 500 × ~8B ≈ 1.2TB across a Redis cluster. Inactive users get rebuilt on demand.'],
+  ['Pagination?','Cursor = (ts, post_id) of the last item. Offsets shift as new posts arrive.'],
+  ['User follows someone new?','An async job backfills the followee\'s recent posts into the follower\'s feed.']],
+ trap:'Fan-out on write for everyone: one celebrity post means 100M writes and workers hours behind.',ddia:'Ch 1 Twitter load · Ch 11 materialized views · Ch 6 hot keys'};
+
+P.pb19={fr:['Feed of recent articles from thousands of publishers, by region and category','Click through to the publisher; infinite scroll'],
+ nfr:['Feed p99 &lt; 200ms','100M DAU with breaking-news spikes','New articles visible within ~30 min','Availability over consistency'],
+ num:'100M × 10 = 1B feed reads/day ≈ <b>12k/s, 50k+/s spikes</b>. Writes: ~100k articles/day ≈ 1/s.',
+ api:['GET /feed?region&category&cursor → [{title, summary, thumbnail, url, publisher}]'],
+ ent:'articles(id, canonical_url UNIQUE, title, summary, thumbnail_url, publisher_id, region, category, published_at)',
+ d:{w:800,h:340,n:[['pub',70,70,'Publishers|RSS / webhooks','x',null,null,130],['pl',250,70,'Poller / ingest workers','b',null,null,170],['pg',470,70,'Postgres|articles','g','db'],['s3',690,70,'S3 + CDN|thumbnails','g','db',3],
+   ['cl',70,270,'Client','t','pill'],['cdn',250,270,'CDN|cache 60s per region','a',2,150],['fs',470,270,'Feed service','b'],['rd',690,270,'Redis|feed:{region}:{cat}','a','db',1,170]],
+  e:[['pub','pl','',''],['pl','pg','dedupe by URL',''],['cl','fs','','',[0,1]],['fs','pg','ORDER BY ts ✗','rd',[0,0]],['pl','rd','LPUSH + trim','a',1],['fs','rd','','a',1],['cl','cdn','','a',2],['cdn','fs','miss only','ad',2],['pl','s3','','',3]]},
+ cap:['Pull articles from publishers on a schedule and query Postgres for each feed. Fine at low traffic.','Precompute one list per (region, category) in Redis at ingest time. Reads become a single list read.','The feed is <b>not personalized</b>, so a CDN can cache it for 60s per region. A 50k/s spike becomes a few origin requests.','Thumbnails are copied to S3 and served by CDN; publishers that support webhooks push instead of being polled.'],
+ deep:[['Why can a CDN cache the feed?','Everyone in a region gets the same response. 60s of staleness is fine for news (AP).'],
+  ['Polling cost vs freshness?','Adaptive polling: busy publishers every few minutes, quiet ones hourly. Use webhooks where offered.'],
+  ['Duplicate stories?','Unique canonical URL; near-duplicates clustered with SimHash/MinHash on title and body.'],
+  ['Pagination?','Cursor on (published_at, id). Offsets break when new articles arrive.']],
+ trap:'Per-user fan-out like a social feed when the feed is per region and category: build it once per region and let the CDN cache it.',ddia:'Ch 1 load parameters · Ch 10 ingest pipelines'};
+
+P.pb28={fr:['Check availability of items deliverable to a location (DCs within 1 hour)','Order multiple items; never sell stock you don\'t have'],
+ nfr:['Availability p99 &lt; 100ms','Orders strongly consistent (no overselling)','10k distribution centres (DCs), ~100k SKUs','Browse load ≫ order load'],
+ num:'Browse ~10M × 10 / 86,400 ≈ <b>1.2k/s, ~10k/s peak</b>. Orders ~1M/day ≈ 12/s. The DC list (10k rows) fits in memory.',
+ api:['GET /availability?lat&lng&item_ids','POST /orders {items:[{id, qty}], lat, lng}'],
+ ent:'dcs(id, lat, lng, region) · inventory(dc_id, item_id, qty) PK(dc_id, item_id) · orders, order_items',
+ d:{w:800,h:340,n:[['cl',70,170,'Client','t','pill'],['gw',190,170,'Gateway','x'],['av',360,80,'Availability service','b'],['nd',560,40,'Nearby-DC service|in-memory DC list','p',1,170],['tt',720,40,'Travel-time API','x',1],
+   ['ca',560,130,'Redis|avail cache 30–60s','a','db',2,160],['rep',720,130,'Read replicas','g','db',2],['os',360,270,'Order service','b',3],['pg',620,270,'Postgres primary|inventory (by region)','g','db',3,190]],
+  e:[['cl','gw','',''],['gw','av','',''],['av','tt','every DC ✗','r',[0,0]],['av','nd','','p',1],['nd','tt','~5 candidates','',1],['av','ca','','a',2],['ca','rep','miss','d',2],['gw','os','','',3],['os','pg','1 tx, conditional\ndecrement per item','g',3]]},
+ cap:['Naive: call a travel-time API for every DC. 10k calls per page view is far too slow.','Keep the small DC list in memory, prefilter by straight-line distance, then ask travel time for only a handful of candidates.','Browse reads come from a short-TTL cache and read replicas. Slightly stale is fine here (AP).','Ordering hits the primary: one transaction with UPDATE … SET qty = qty − n WHERE qty ≥ n per item. Any zero-row update means ROLLBACK, so there is no overselling (CP).'],
+ deep:[['How do you prevent overselling?','A conditional decrement per item inside one transaction; row locks serialize concurrent buyers. 0 rows updated means rollback and out of stock.'],
+  ['Stale availability vs orders?','Different consistency per path: browse is cached and eventually consistent; checkout reads and writes the primary.'],
+  ['Scale orders?','Partition inventory by region; an order only touches nearby DCs, so there are no cross-shard transactions.'],
+  ['Hot item (flash sale)?','Row contention on one inventory row: queue orders per item, or split stock into sub-buckets.']],
+ trap:'Redis as the inventory source of truth, with no multi-item transaction or durability.',ddia:'Ch 7 conditional updates · Ch 5 replica lag'};
+
+P.pb8={fr:['Profile with preferences (age, distance)','Get a stack of nearby candidates','Swipe left/right; get notified on a mutual match'],
+ nfr:['Stack load p99 &lt; 300ms','No missed matches (strong consistency on swipes)','Don\'t re-show swiped profiles','20M DAU × 100 swipes'],
+ num:'2B swipes/day ≈ <b>25k/s avg, ~100k/s peak</b>, which is write-heavy. Stacks precomputed: 20M × 200 IDs × 8B ≈ 32GB.',
+ api:['GET /feed?lat&lng → [profiles]','POST /swipes {target_id, decision}','push: match notification'],
+ ent:'profiles · swipes(swiper_id, swipee_id, decision) partitioned by swiper · matches(a, b, ts)',
+ d:{w:800,h:340,n:[['cl',70,170,'App','t','pill'],['gw',190,170,'Gateway','x'],['st',360,70,'Stack service','b'],['sw',360,270,'Swipe service','b',2],
+   ['es',560,40,'Elasticsearch|geo + filters','p','db',null,150],['sc',720,90,'Redis|precomputed stack\n+ Bloom of swiped','a','db',1,170],['cs',560,300,'Cassandra|swipes (LSM)','g','db',2],['lua',720,230,'Redis Lua|pair key (min,max)\natomic match check','k','db',3,170],['nt',720,320,'Push (APNs/FCM)','x',null,3]],
+  e:[['cl','gw',''],['gw','st',''],['st','es','geo query','p'],['st','sc','','a',1],['gw','sw','','',2],['sw','cs','write','g',2],['sw','lua','SET my bit,\nGET theirs','k',3],['lua','nt','match!','k',3]]},
+ cap:['Build each stack with a geo + preferences query in Elasticsearch. That works, but is slow on every open.','Precompute the next ~200 candidates per user in Redis and refresh in the background. A per-user <b>Bloom filter</b> hides profiles already swiped.','Swipes are write-heavy (100k/s) and append-only, so an LSM store like Cassandra fits.','Match race: A and B swipe right at the same moment, and each check misses the other. Fix: one key per pair (min, max) and a Lua script that sets my decision and reads theirs atomically.'],
+ deep:[['Both swipe at once: why can a match be missed?','Two writes followed by two reads: each read runs before the other\'s write lands. That is write skew (Ch 7). An atomic op on a single pair key makes exactly one side see "both".'],
+  ['Hide already-swiped profiles?','A Bloom filter per user. A false positive skips an unseen profile, which is acceptable; no false negatives.'],
+  ['Location changes?','Invalidate and recompute the stack when the user moves more than X km.']],
+ trap:'Separate "write swipe" and "check other swipe" calls without atomicity, so matches are lost.',ddia:'Ch 7 write skew · Ch 3 Bloom filters, LSM'};
+
+P.pb15={fr:['Top K most-viewed videos for the last hour, day, month, and all time'],
+ nfr:['Query latency &lt; 100ms','Freshness ~1 minute','Accurate counts (billing-grade not required, but no big drift)','Massive view volume'],
+ num:'70B views/day ≈ <b>~800k views/s</b>. 4B videos × 8B counters ≈ 32GB of state, spread over partitions.',
+ api:['GET /topk?window=hour|day|month|all&k=100'],
+ ent:'view events (video_id, ts) → per-minute counts per video → per-window top-K heap',
+ d:{w:800,h:340,n:[['v',70,170,'View events','t','q'],['db',260,60,'UPDATE videos\nSET views+1 ✗','r','x',[0,0],170],['k',260,170,'Kafka|partition by video_id','p','q',1,170],
+   ['c1',460,100,'Counter P0|minute buckets\n+ local top-K heap','a',2,170],['c2',460,240,'Counter P1 … Pn','a',2,170],['ag',640,170,'Aggregator|merge P × K','b',2],['rd',730,300,'Redis / cache|results per window','g','db',3,150],['s3',260,300,'S3 raw → batch\nrecount','x','db',3]],
+  e:[['v','db','','r',[0,0]],['v','k','','p',1],['k','c1','','p',2],['k','c2','','p',2],['c1','ag','local top K','a',2],['c2','ag','','a',2],['ag','rd','','g',3],['k','s3','','d',3]]},
+ cap:['Naive: increment a counter row per view and ORDER BY views. That is 800k UPDATEs/sec on hot rows, then a full sort.','Stream views into Kafka partitioned by <b>video_id</b>, so every view of a video lands on the same consumer.','Each consumer counts in memory in per-minute buckets and keeps a local top-K heap. The aggregator merges P×K candidates, which is exact because each video lives in exactly one partition.','Windows: hour = sum of the last 60 minute-buckets (subtract the expiring one). Results are cached; raw events go to S3 for batch correction.'],
+ deep:[['Why is the merge exact?','A video\'s full count lives in one partition, so its global rank can only come from its local rank. The global top K ⊆ union of local top Ks.'],
+  ['Sliding windows?','A ring buffer of minute counts per video; for months use hourly buckets. Rolling sums avoid rescanning.'],
+  ['Very hot video?','Pre-aggregate on producers (send counts per second, not individual views).'],
+  ['Approximate is OK?','Count-Min Sketch + heap uses fixed memory and is good for trending; exact needs partitioned counting.']],
+ trap:'A counter row per video in the DB: 800k writes/sec on hot rows.',ddia:'Ch 11 windows, partitioned streams · Ch 6 partition by key'};
+
+P.pb20={fr:['Click on an ad redirects the user to the advertiser','Advertisers query click metrics over time (minute granularity), with filters'],
+ nfr:['10k clicks/s peak, 100M/day','Never lose or double-count clicks (it is billing)','Metrics queries &lt; 1s','Freshness ~1 minute'],
+ num:'100M clicks × 100B ≈ <b>10GB/day raw</b>. Aggregated rows: ads × minutes, which is small. A 10k/s peak is easy for Kafka.',
+ api:['GET /click?ad_id&impression_id → 302 advertiser_url','GET /metrics?ad_id&from&to&granularity'],
+ ent:'click(impression_id, ad_id, ts, user) → agg(ad_id, minute, count)',
+ d:{w:800,h:340,n:[['u',70,80,'Browser','t','pill'],['cs',230,80,'Click service|302 redirect','b'],['pg',420,40,'Postgres raw\nGROUP BY ✗','r','x',[0,0],150],['k',420,160,'Kafka|by ad_id','p','q',1],
+   ['fl',600,160,'Flink|1-min tumbling\ndedupe impression_id','a',1,170],['ol',600,290,'OLAP|ClickHouse / Druid','g','db',1,170],['adv',360,290,'Advertiser\ndashboard','t','pill',1],['s3',740,60,'S3 raw','x','db',3],['sp',740,160,'Spark nightly\nreconcile','x',3,100]],
+  e:[['u','cs','',''],['cs','pg','','r',[0,0]],['cs','k','','p',1],['k','fl','','p',1],['fl','ol','upsert','g',1],['adv','ol','query','',1],['k','s3','','d',3],['s3','sp','','d',3],['sp','ol','correct','d',3]],
+  t:[[230,135,'impression_id signed at ad-serve time','a',2,11]]},
+ cap:['Naive: insert each click into Postgres and GROUP BY at query time. Slow queries, and writes compete with reads.','Click service redirects immediately and publishes to Kafka. Flink aggregates per (ad, minute) on event time and upserts into an OLAP column store.','Idempotency: every impression gets a <b>signed unique ID</b> when the ad is served; Flink dedupes on it, so double-clicks and retries count once and forged clicks are rejected.','Lambda-style safety net: raw clicks to S3; a nightly batch recount corrects aggregates, because billing must be exact.'],
+ deep:[['Flink crashes?','Checkpoints + Kafka offsets give replay; the sink upserts (ad_id, minute), so replays overwrite instead of double-counting.'],
+  ['Hot ad (Super Bowl)?','Key on ad_id:random(0..N) to spread across partitions, then aggregate twice.'],
+  ['Why also batch?','Streams give fast numbers; batch from immutable raw data gives exact billing numbers.'],
+  ['Why OLAP?','Column store and pre-aggregates make time-range queries over billions of rows sub-second.']],
+ trap:'Aggregating raw rows at query time in the OLTP database.',ddia:'Ch 11 windows, exactly-once · Ch 12 Lambda · Ch 3 column stores'};
+
+P.pb18={fr:['Crawl from seed URLs, fetch pages, extract text, follow links','Store text for LLM training: 10B pages in 5 days'],
+ nfr:['Politeness: robots.txt, per-domain rate limits','Fault tolerant: resume without losing progress','No duplicate URLs or content','Efficient (network-bound)'],
+ num:'10B ÷ 5 days ≈ <b>23k pages/s</b>. × ~2MB ≈ 46GB/s, so size the fleet by <b>network bandwidth</b>, not CPU. Raw storage ~20PB → S3.',
+ api:['internal: frontier queue messages {url, depth}','S3: raw/{url_hash}, text/{url_hash}'],
+ ent:'urls(url_hash PK, url, status, last_crawled) · domains(domain, robots, crawl_delay, next_allowed_at)',
+ d:{w:800,h:340,n:[['seed',70,170,'Seeds','t','pill'],['fq',200,170,'Frontier queue|SQS / Kafka','p','q',null,140],['fw',380,90,'Fetcher workers','b'],['raw',580,90,'S3 raw HTML','g','db',1],['pq',580,180,'Parse queue','p','q',1],['pw',380,270,'Parser workers','b',1],['txt',580,290,'S3 text','g','db',1],
+   ['dom',380,20,'Redis|per-domain rate limit + robots','a','db',2,230],['dd',200,300,'URL dedupe|DB / Bloom','a','db',3]],
+  e:[['seed','fq',''],['fq','fw',''],['fw','raw','','g',1],['raw','pq','','p',1],['pq','pw','','p',1],['pw','txt','','g',1],['fw','dom','allowed?','a',2],['pw','dd','new links','a',3],['dd','fq','unseen only','a',3]]},
+ cap:['Start with a frontier queue of URLs and fetcher workers pulling from it.','Split <b>fetch</b> (network-bound) from <b>parse</b> (CPU-bound) with S3 + a second queue. Each scales independently, and parsing can be re-run from stored HTML.','Politeness: per-domain token buckets and cached robots.txt in Redis. Not allowed yet? Re-queue with a delay (visibility timeout).','Extracted links pass a dedupe check (URL hash in DB or Bloom filter) before entering the frontier. Content hashes catch mirrored pages.'],
+ deep:[['Why separate stages?','Different bottlenecks, independent scaling and retries, and you can re-parse 20PB without re-crawling.'],
+  ['Crash mid-crawl?','A message is acked only after the raw page is in S3: at-least-once, idempotent by URL hash.'],
+  ['Crawler traps?','Max depth per domain, URL normalization, content-hash dedupe.'],
+  ['DNS bottleneck?','Cache DNS per worker; multiple resolvers.']],
+ trap:'One monolithic fetch→parse loop: a slow parser stalls fetching and a crash loses in-flight work.',ddia:'Ch 10 batch pipelines · Ch 3 Bloom filters · Ch 11 queues'};
+
+P.pb25={fr:['Ingest metrics from 500k servers','Query dashboards over time ranges','Alert rules with notifications'],
+ nfr:['5M datapoints/s ingest','Recent-data queries &lt; 1s','Alerts within ~1 minute','Late/out-of-order tolerant, durable'],
+ num:'500k hosts × 100 metrics ÷ 10s = <b>5M points/s</b>. Gorilla compression ≈ 1.4B/point → ~600GB/day; downsample after 7 days.',
+ api:['POST /ingest (batched points from agents)','GET /query?metric&tags&from&to&step','POST /alerts {rule, threshold, channel}'],
+ ent:'series(metric, tags) → (ts, value) blocks · rollups 1m / 1h · alert_rules',
+ d:{w:800,h:340,n:[['ag',70,170,'Agents|batch every 10s','t',null,null,120],['ig',220,170,'Ingest gateway','b'],['pg',400,60,'Postgres rows ✗','r','x',[0,0]],['k',400,170,'Kafka|by series','p','q',1],
+   ['tw',580,110,'TSDB writers','b',1],['ts',730,170,'TSDB|LSM + compression','g','db',1,140],['q',580,290,'Query service','b',2],['ds',730,290,'Rollups → S3','x','db',2],
+   ['fl',400,300,'Flink alert eval','a',3],['am',220,300,'Alert manager → PagerDuty','a',3,170]],
+  e:[['ag','ig',''],['ig','pg','','r',[0,0]],['ig','k','','p',1],['k','tw','','p',1],['tw','ts','','g',1],['q','ts','','',2],['ts','ds','downsample','d',2],['k','fl','','a',3],['fl','am','','a',3]]},
+ cap:['Naive: one Postgres row per datapoint with a B-tree index. It falls over around ~50k inserts/sec.','Buffer through Kafka into a <b>time-series DB</b>: append-only LSM writes, series-by-time blocks, delta-of-delta + XOR compression.','Queries hit recent blocks; older data is downsampled (1s → 1m → 1h) and tiered to S3. Dashboards use rollups.','Alerts are evaluated <b>on the stream</b> (Flink windows over Kafka), not by polling the TSDB with thousands of queries.'],
+ deep:[['Why a TSDB?','Time-ordered appends suit LSM; compression gives ~10×; queries are range scans per series.'],
+  ['High cardinality?','A user_id tag explodes series count. Cap or reject high-cardinality labels.'],
+  ['Late data?','Event-time windows with watermarks; allowed lateness for corrections.'],
+  ['Alert flapping?','Require N consecutive windows; dedupe and group in the alert manager.']],
+ trap:'Row-per-point in Postgres, and alerting by polling queries.',ddia:'Ch 3 LSM, compression · Ch 11 stream alerting'};
+
+P.pb21={fr:['Start/pause/stop recording an activity (GPS track)','View activity stats and maps','Share with friends; see friends\' activities; leaderboards'],
+ nfr:['Works offline; never lose an activity','10M DAU','Feed eventually consistent','Uploads resumable'],
+ num:'10M activities/day; 1hr at 1 point/5s = 720 points ≈ 15–100KB per track → <b>~1TB/day</b> of track blobs.',
+ api:['POST /activities (complete track, idempotency key)','GET /activities/{id}','GET /feed?cursor'],
+ ent:'activities(id, user_id, type, start, distance, duration, track_s3_key) · follows · leaderboard:{segment} ZSET',
+ d:{w:800,h:340,n:[['ph',70,170,'Phone|records locally','t',null,null,120],['gw',220,170,'API','x'],['as',380,100,'Activity service','b'],['pg',580,50,'Postgres|activity metadata','g','db',2,170],['s3',740,150,'S3|GPS tracks','g','db',2],
+   ['q',380,260,'Queue','p','q',3],['wk',580,260,'Stats / segment workers','a',3,170],['lb',740,260,'Redis|leaderboards','a','db',3],['live',380,30,'live points every 1s ✗','r','n',[0,0],170]],
+  e:[['ph','gw',''],['gw','as',''],['ph','live','','rd',[0,0]],['as','pg','','',2],['as','s3','','',2],['as','q','','p',3],['q','wk','','p',3],['wk','lb','ZADD best time','a',3],['wk','pg','stats','d',3]]},
+ cap:['Naive: stream every GPS point to the server in real time. 10M devices means millions of writes/sec, for no user value.','Record on the device (works in tunnels and mountains). Upload the whole activity when finished, with an idempotency key and resumable upload.','Track blob to S3, metadata to Postgres.','Heavy processing (stats, segment matching) runs asynchronously from a queue; leaderboards are Redis sorted sets per segment.'],
+ deep:[['Why device-first?','Signal is unreliable; users need it to work offline. Only optional live tracking sends periodic points (best effort).'],
+  ['Upload reliability?','Idempotency key = activity_id; resumable chunks; retry until acked.'],
+  ['Leaderboards?','ZADD segment:{id} with the time as score; ZRANGE for top N; snapshot to DB.'],
+  ['Time correctness?','Use device timestamps (event time), not upload time.']],
+ trap:'Server-side real-time ingestion of every GPS point.',ddia:'Ch 11 event time · Ch 12 idempotent upload'};
+
+P.pb10={fr:['Rider requests a ride (pickup, destination) and sees a fare estimate','Match to a nearby available driver; driver accepts or declines','Live location of driver during the trip'],
+ nfr:['Match within ~1 minute','A driver is never assigned two rides (consistency)','High availability for location updates','Handle surge peaks per city'],
+ num:'1M active drivers × 1 update/4s = <b>250k location writes/s</b>, ephemeral (only the latest matters). Ride requests ~100/s avg.',
+ api:['POST /rides/estimate','POST /rides {estimate_id}','POST /drivers/location {lat, lng}','PATCH /rides/{id} {accept|decline}'],
+ ent:'rides(id, rider, driver, status, pickup, dest, fare) · driver_location in Redis GEO (TTL)',
+ d:{w:800,h:340,n:[['ra',70,90,'Rider app','t','pill'],['da',70,260,'Driver app','t','pill'],['gw',200,170,'Gateway','x'],['rs',370,70,'Ride service','b'],['ls',370,270,'Location service','b'],
+   ['pg',580,40,'Postgres|rides','g','db'],['pgl',580,300,'Postgres locations ✗','r','x',[0,0],170],['geo',580,300,'Redis GEO|GEOADD / GEOSEARCH','a','db',1,170],
+   ['ms',580,170,'Matching service','p',2],['lk',740,170,'Redis lock|SET driver NX PX 10s','k','db',2,150],['q',740,60,'Request queue|by region','p','q',3]],
+  e:[['ra','gw',''],['da','gw',''],['gw','rs',''],['gw','ls',''],['rs','pg',''],['ls','pgl','250k/s','r',[0,0]],['ls','geo','','a',1],['rs','ms','','p',2],['ms','geo','nearby','a',2],['ms','lk','lock driver','k',2],['ms','da','offer (push)','pdc',2],['rs','q','','p',3],['q','ms','','pd',3]]},
+ cap:['Naive: drivers write locations to Postgres. 250k writes/sec of throwaway data breaks it.','Locations go to <b>Redis GEO</b>: in memory, latest point only, with TTL. GEOSEARCH finds drivers within radius.','Matching offers the ride to <b>one driver at a time</b> and takes a lock on that driver (SET NX with a 10s TTL), so they can\'t be offered two rides. Ride assignment is a conditional UPDATE WHERE driver IS NULL.','Requests go through a durable queue partitioned by region, so a crashed matcher doesn\'t lose rides and surges scale per city.'],
+ deep:[['Driver double-assigned?','Lock per driver with TTL = accept window, plus conditional assignment in Postgres. Lock expiry = automatic decline.'],
+  ['Reduce location load?','Adaptive update frequency (less when stationary), client batching.'],
+  ['Why not query Postgres + PostGIS?','Fine for reads, but 250k updates/sec of ephemeral data belongs in memory.'],
+  ['Matcher crash mid-match?','Durable workflow/queue; the request is re-processed and idempotent by ride_id.']],
+ trap:'Offering a ride to many drivers at once without locks, so two drivers accept the same ride.',ddia:'Ch 8 leases · Ch 3 geo index · Ch 6 partition by region'};
+
+P.pb12={fr:['Post a comment on a live video','Viewers see new comments in near real time','Late joiners can scroll back through earlier comments'],
+ nfr:['Delivery p99 &lt; 200ms','Millions of concurrent viewers; mega-streams with 1M+ viewers','Eventual consistency and ordering are acceptable'],
+ num:'Hot stream: 1M viewers × 1k comments/s = <b>1B deliveries/s</b> for one video. Polling every 2s = 500k req/s from that one stream.',
+ api:['POST /videos/{id}/comments','GET /videos/{id}/comments?cursor (history)','GET /videos/{id}/comments/stream (SSE)'],
+ ent:'comments(video_id, comment_id, user_id, text, ts) partitioned by video_id, clustered by ts',
+ d:{w:800,h:340,n:[['v',70,170,'Viewers','t','pill'],['lb',210,170,'L7 LB|route by video_id','x',3,130],['rt',390,170,'Realtime servers|SSE connections','b',1,170],['cs',390,40,'Comment service','b'],['cdb',600,40,'Cassandra|by video_id','g','db'],['ps',600,170,'Pub/sub|channel video:{id}','p','q',2,170],['poll',390,300,'poll every 2s ✗','r','n',[0,0]]],
+  e:[['v','cs','POST',''],['cs','cdb',''],['v','poll','','rd',[0,0]],['v','rt','SSE','b',[1,2]],['v','lb','SSE','b',3],['lb','rt','','b',3],['cs','ps','publish','p',2],['ps','rt','subscribed','p',2]]},
+ cap:['Naive: viewers poll for new comments. Latency = poll interval, and 1M viewers create a self-inflicted DDoS.','Server push over <b>SSE</b>: one long-lived HTTP connection per viewer. Posting a comment stays a normal POST.','A comment is written once to Cassandra and published once to a pub/sub channel for that video. Every realtime server subscribed to the channel pushes it to its local viewers.','An L7 load balancer routes viewers of the same video to the same servers (consistent hashing on video_id), so each server subscribes to few channels.'],
+ deep:[['SSE or WebSocket?','Traffic is server→client. SSE is plain HTTP with auto-reconnect; WebSocket is only needed for heavy bidirectional traffic.'],
+  ['How does one comment reach 1,000 servers?','Pub/sub fan-out: publish once; each server is subscribed to the channels of videos its viewers watch.'],
+  ['Mega-streams?','Sample or rate-limit the comment stream per viewer (nobody can read 1k/s); prioritize friends\' comments.'],
+  ['Late join?','Page the last N from Cassandra by cursor, then attach to the stream.']],
+ trap:'Polling, which gives high latency and huge wasted load.',ddia:'Ch 11 pub/sub · Ch 6 partition by video'};
+
+P.pb16={fr:['Create and open documents','Many users edit concurrently and see each other\'s changes live','See collaborators\' cursors and presence'],
+ nfr:['Remote edits visible &lt; 100ms','All replicas converge to the same document','No lost edits (durable)','~100 concurrent editors per doc; millions of docs'],
+ num:'Each keystroke is an op (~100B). 100 editors × 5 ops/s = 500 ops/s per hot doc, which one server handles easily. The challenge is correctness, not scale.',
+ api:['WS /docs/{id}: send op {type, pos, char, base_version}; receive transformed ops','GET /docs/{id} (snapshot + version)'],
+ ent:'doc_ops(doc_id, version, op) append-only · doc_snapshots(doc_id, version, content)',
+ d:{w:800,h:340,n:[['a',70,90,'Editor A','t','pill'],['b',70,250,'Editor B','t','pill'],['lb',220,170,'LB|route doc_id → owner','x',3,140],['ds',410,170,'Document server|single owner per doc\nOT: order + transform','b',1,190],
+   ['ol',640,90,'Op log|append each op','g','db',2],['sn',640,250,'Snapshots|every N ops','g','db',2],['zk',410,40,'ZooKeeper|doc → server map','p','db',3],['lww',410,300,'whole-doc save → last write wins ✗','r','n',[0,0],230]],
+  e:[['a','lww','','rd',[0,0]],['b','lww','','rd',[0,0]],['a','ds','op','b',[1,2]],['b','ds','op','b',[1,2]],['a','lb','WS','b',3],['b','lb','WS','b',3],['lb','ds','','b',3],['ds','ol','','g',2],['ds','sn','','gd',2],['zk','lb','','pd',3]]},
+ cap:['Naive: send the whole document on save. Last write wins, and someone\'s work disappears.','Send <b>operations</b> (insert "x" at 5). Concurrent ops shift positions, so a single server per doc orders them and <b>transforms</b> each against concurrent ones (Operational Transformation), then broadcasts.','Every op is appended to the op log before it is acknowledged; periodic snapshots make loading fast (snapshot + tail).','All editors of a doc must reach the same owner server: consistent hashing on doc_id, with ownership coordinated through ZooKeeper.'],
+ deep:[['OT or CRDT?','<b>OT</b>: a central server orders and transforms; compact; needs one coordinator per doc (Google Docs). <b>CRDT</b>: ops commute, no server needed, good for offline and P2P; bigger metadata (Figma, Yjs).'],
+  ['Why one server per doc?','OT needs a single total order of ops (DDIA Ch 9).'],
+  ['Offline edits?','Client buffers ops tagged with a base version; on reconnect the server transforms them against everything since that version.'],
+  ['Cursors?','Ephemeral presence over the same socket; not persisted.']],
+ trap:'Locking the document or paragraph, which defeats real-time collaboration.',ddia:'Ch 5 conflict resolution · Ch 9 total order · Ch 11 event log'};
+
+P.pb22={fr:['See live stock prices for watched symbols','Place market and limit orders; cancel orders','See order status and fills'],
+ nfr:['Price updates &lt; 200ms','Orders never lost or duplicated','Strong consistency on order state','20M users; market-open spikes'],
+ num:'Exchange feed ~ thousands of updates/s for ~10k symbols. 20M users polling = millions of req/s, so push instead. Orders ~ thousands/s at peak.',
+ api:['GET /prices/stream?symbols (SSE)','POST /orders {symbol, side, qty, type, limit?} + Idempotency-Key','DELETE /orders/{id}'],
+ ent:'orders(id, user_id, symbol, status PENDING|SUBMITTED|FILLED|CANCELLED, exchange_order_id) partitioned by user',
+ d:{w:800,h:340,n:[['ex',730,60,'Exchange|market data + FIX','x','db'],['pp',540,60,'Price processor','b',1],['ps',370,60,'Pub/sub|by symbol','p','q',1],['sse',200,60,'SSE servers','b',1],['cl',70,170,'Client','t','pill'],
+   ['os',300,270,'Order service','a',2],['pg',500,270,'Postgres|orders (PENDING first)','g','db',2,170],['eg',690,200,'Exchange gateway','b',2],['tp',690,300,'Fill processor','b',3]],
+  e:[['ex','pp','feed','',1],['pp','ps','','p',1],['ps','sse','','p',1],['sse','cl','push','b',1],['cl','os','POST /orders','',2],['os','pg','1. insert','g',2],['os','eg','2. send','a',2],['eg','ex','','',2],['ex','tp','fills / acks','d',3],['tp','pg','update status','g',3]]},
+ cap:['Order and price paths are separate problems: one is real-time fan-out, the other is correctness.','Prices: one consumer reads the exchange feed and publishes per symbol; SSE servers subscribe to the symbols their clients watch. Throttle to ~1 update/s per symbol for the app.','Orders: <b>persist PENDING first</b> with our own order ID, then send to the exchange using that ID as clientOrderId. If we crash in between, we can look it up and reconcile.','Fills and acks come back asynchronously and update order status; a reconciliation job compares against exchange reports daily.'],
+ deep:[['Write DB before or after the exchange call?','Before. Otherwise a crash after sending leaves a live order you don\'t know about. The exchange call has an unknown outcome on timeout (DDIA Ch 8).'],
+  ['Duplicate submits?','Client Idempotency-Key with a unique index; the exchange also dedupes on clientOrderId.'],
+  ['Cancel races with a fill?','Cancel is a request; status changes only on the exchange ack. Handle partial fills.'],
+  ['Market-open spike?','Autoscale SSE servers; per-user rate limits on orders.']],
+ trap:'Treating the exchange call as a local function call, so timeouts create ghost or duplicate orders.',ddia:'Ch 8 unknown outcomes · Ch 12 idempotency · Ch 11 pub/sub'};
+
+P.pb6={fr:['Create an auction (item, starting price, end time)','Place bids that must beat the current highest','Watch the highest bid update live; winner decided at the end'],
+ nfr:['Bids strongly consistent (never accept a stale "highest")','Live updates &lt; 1s','No lost bids','Hot auctions spike in the final seconds'],
+ num:'10M auctions, ~100 bids each over a week ≈ low average QPS, but a hot auction can see <b>~1k bids/s</b> on one row near the end.',
+ api:['POST /auctions','POST /auctions/{id}/bids {amount} + Idempotency-Key','GET /auctions/{id}/stream (SSE)'],
+ ent:'auctions(id, max_bid, max_bidder, end_time, status) · bids(auction_id, bid_id, user_id, amount, ts) append-only',
+ d:{w:800,h:340,n:[['cl',70,170,'Bidders','t','pill'],['gw',200,170,'Gateway','x'],['bs',370,170,'Bid service','b'],['pg',600,170,'Postgres|auctions + bids','g','db'],
+   ['k',370,50,'Kafka|partition by auction_id','p','q',3,180],['ps',600,300,'Pub/sub → SSE','a','q',2],['w',370,300,'Watchers','t','pill',2],['end',740,60,'Delayed job|close auction','x',3]],
+  e:[['cl','gw',''],['gw','bs',''],['bs','pg','read max, compare\nin app ✗','r',[0,0]],['bs','pg','UPDATE … WHERE\nmax_bid < :amt','g',[1,2]],['bs','ps','accepted bid','a',2],['ps','w','','a',2],['gw','k','','p',3],['k','bs','ordered per auction','p',3],['bs','pg','','g',3],['end','pg','','d',3]]},
+ cap:['Naive: read max_bid, compare in application code, insert. Two concurrent bids both "win", a lost update.','Make it atomic in the DB: UPDATE auctions SET max_bid=:amt, max_bidder=:u WHERE id=:a AND max_bid &lt; :amt AND end_time &gt; now(). 1 row = accepted, 0 = outbid. Bids are also appended for history.','Accepted bids are published to pub/sub and pushed over SSE to everyone watching.','For very hot auctions, a Kafka partition per auction_id serializes bids before the DB (durable and ordered). A delayed job closes the auction at end time.'],
+ deep:[['Two bids at the same instant?','Conditional update (or SELECT FOR UPDATE) on the auction row. That is the lost-update fix from DDIA Ch 7.'],
+  ['Clock fairness at the deadline?','Use the DB server time inside the same conditional update, never client time.'],
+  ['Durability?','Acknowledge only after commit (or Kafka acks=all).'],
+  ['Anti-sniping?','Extend end_time by N seconds on late bids, inside the same update.']],
+ trap:'Comparing bids in a Redis cache without atomicity.',ddia:'Ch 7 lost update · Ch 11 partitioned log · Ch 8 clocks'};
+
+P.pb29={fr:['Send a message in a conversation','Stream the model\'s answer token by token','View conversation history'],
+ nfr:['Time to first token &lt; 1s','GPU capacity is the scarce resource','Conversations durable','100M DAU; bursty'],
+ num:'100M DAU × 10 msgs = 1B/day ≈ <b>12k/s</b> generations. Each holds a GPU for seconds, so GPUs are the bottleneck and every queueing decision is about them.',
+ api:['POST /conversations/{id}/messages → message_id','GET /messages/{id}/stream (SSE, Last-Event-ID resume)','GET /conversations/{id}'],
+ ent:'conversations(id, user_id) · messages(conversation_id, id, role, content, status)',
+ d:{w:800,h:340,n:[['cl',70,170,'Client','t','pill'],['cs',230,170,'Chat service','b'],['db',230,300,'DB|conversations','g','db'],['sync',420,50,'sync HTTP 30s ✗','r','n',[0,0]],
+   ['q',420,170,'Request queue|priority by tier','p','q',2],['gpu',610,170,'Inference workers|GPU pool','a',2,150],['rs',610,300,'Redis Streams|tokens by message_id','k','db',3,170],['sse',420,300,'SSE servers','b',1]],
+  e:[['cl','cs','POST',''],['cs','db',''],['cs','sync','','rd',[0,0]],['cl','sse','stream','b',1],['cs','q','','p',2],['q','gpu','','p',2],['gpu','rs','tokens','k',3],['rs','sse','','k',3],['gpu','db','final text','d',3]]},
+ cap:['Naive: one synchronous request waits ~30s for the full answer. Timeouts, no progress shown, no backpressure.','Stream tokens to the client over <b>SSE</b> as they are generated, so time-to-first-token stays low.','Put a <b>queue</b> in front of the GPU pool: absorbs bursts, enables priority for paid tiers, batching, and admission control (429 when full).','Workers write tokens into a Redis Stream keyed by message_id; SSE servers read from it. A client that reconnects resumes from its last token; the final text is persisted.'],
+ deep:[['Why a queue before GPUs?','Scarce and expensive capacity: queueing gives backpressure, priority, fairness, and batching.'],
+  ['Client disconnects?','Generation continues; tokens are buffered in the stream; resume with Last-Event-ID.'],
+  ['Long context?','Load recent messages; summarize or truncate to fit the window; cache hot conversations.'],
+  ['Cost control?','Per-user rate limits and token quotas at the gateway.']],
+ trap:'Holding a synchronous connection through the load balancer straight to a GPU.',ddia:'Ch 11 logs and streams · Ch 1 tail latency'};
+
+P.pb23={fr:['1:1 and group chats (up to ~100 members)','Send and receive messages in real time','Offline users get messages when they reconnect','Delivery and read receipts; media'],
+ nfr:['Delivery &lt; 500ms when online','Messages never lost','Ordered within a chat','1B DAU'],
+ num:'50B messages/day ≈ <b>~600k msgs/s</b>. Hundreds of millions of concurrent connections, at ~1M connections per tuned server → hundreds of chat servers.',
+ api:['WS connect → send {chat_id, client_msg_id, body}; receive {msg, seq}; ack {msg_id}','POST /media → presigned upload URL'],
+ ent:'messages(chat_id, seq, msg_id, sender, body, ts) partitioned by chat_id · inbox(device_id, msg_id) until acked · chat_members',
+ d:{w:800,h:340,n:[['a',70,90,'Alice','t','pill'],['b',70,260,'Bob','t','pill'],['s1',250,90,'Chat server 1|WebSocket','b'],['s2',250,260,'Chat server 2|WebSocket','b',1],
+   ['reg',470,40,'Redis|user → server','a','db',2],['ps',470,170,'Pub/sub|channel per user','p','q',2],['db',680,90,'Cassandra|messages by chat_id','g','db',3,170],['ib',680,220,'Inbox|undelivered per device','g','db',3,170],['push',680,310,'APNs / FCM','x',null,3]],
+  e:[['a','s1','WS','b'],['b','s2','WS','b',1],['s1','reg','','a',2],['s1','ps','publish to bob','p',2],['ps','s2','','p',2],['s1','db','persist','g',3],['s1','ib','','g',3],['ib','push','offline','d',3]]},
+ cap:['Persistent <b>WebSocket</b> connections for both directions, so there is no polling.','Alice and Bob are usually connected to <b>different</b> servers, so you need routing between them.','A registry (user → server) and a pub/sub channel per user: server 1 publishes to Bob\'s channel; server 2, which holds Bob\'s connection, delivers.','Durability first: persist to the messages table and the recipient\'s inbox <b>before</b> acknowledging Alice. Bob\'s device acks on receipt and the inbox entry is deleted; offline devices get a push and sync on reconnect.'],
+ deep:[['Never lose a message?','Persist before ack; at-least-once delivery from the inbox; client dedupes by msg_id.'],
+  ['Ordering?','Per-chat sequence numbers, with chat_id as the partition key so one writer orders them (DDIA Ch 5 consistent prefix).'],
+  ['Groups?','Fan-out per member at send time (≤ ~100 members) into inboxes and channels.'],
+  ['Media?','Upload to S3 via presigned URL; the message carries only the object key.']],
+ trap:'Assuming both users share a server or are always online.',ddia:'Ch 5 consistent prefix · Ch 11 at-least-once + idempotency'};
+
+P.pb5={fr:['View events and seat maps','Search events','Book tickets: pick seats, hold, pay, confirm'],
+ nfr:['Never double-book a seat (strong consistency)','Browse and search highly available, low latency','Extreme spikes: ~10M users for one on-sale','Seat hold ~10 minutes during checkout'],
+ num:'Hot event: 10M users, 100k seats. Reads are massive; successful bookings are capped by seat count (100k). Protect the booking path from the read storm.',
+ api:['GET /events/{id} · GET /search?q&date&location','POST /bookings/hold {event_id, seat_ids}','POST /bookings/{id}/confirm (after payment)'],
+ ent:'events · tickets(id, event_id, seat, status AVAILABLE|HELD|BOOKED, hold_expires_at, user_id) · bookings',
+ d:{w:800,h:340,n:[['cl',70,170,'Users','t','pill'],['cdn',200,60,'CDN|event pages','a',3],['wq',200,280,'Waiting room|Redis queue + SSE','k',3,150],['gw',200,170,'Gateway','x'],['es',380,60,'Event + search svc','b'],['bs',380,250,'Booking service','b'],
+   ['pg',600,250,'Postgres|tickets','g','db'],['el',600,60,'Elasticsearch','p','db',3],['lk',740,170,'Hold = conditional\nUPDATE or Redis\nSET NX EX 600','a','n',1,140],['pay',740,310,'Stripe|webhook','x',null,2]],
+  e:[['cl','gw',''],['gw','es',''],['gw','bs',''],['bs','pg','SELECT then INSERT ✗','r',[0,0]],['bs','pg','hold','g',1],['pg','lk','','ad',1],['bs','pay','','',2],['pay','bs','confirm','gd',2],['cl','cdn','','a',3],['cl','wq','hot event','k',3],['es','el','','p',3]]},
+ cap:['Naive: check the seat is free, then insert a booking. Two users read "free" at the same time and both book: write skew.','Hold atomically: UPDATE tickets SET status=HELD, user=?, hold_expires=now()+10m WHERE id=? AND (status=AVAILABLE OR hold_expires &lt; now()). One row = yours. Or a Redis SET NX with a 10-minute TTL.','The user pays with Stripe; the idempotent webhook flips HELD → BOOKED. An expired hold frees itself, with no cron job.','For hot on-sales, a <b>virtual waiting room</b> admits users in batches; the CDN serves pages and Elasticsearch handles search, keeping the booking DB small and safe.'],
+ deep:[['Two users click the same seat?','A conditional update on the ticket row (the seat row materializes the conflict, DDIA Ch 7). Exactly one gets 1 row updated.'],
+  ['Release abandoned holds?','The expiry is part of the condition, or a Redis TTL. No background job is needed for correctness.'],
+  ['Taylor Swift spike?','Waiting room queue (Redis sorted set by arrival), push "your turn" via SSE, admit at the rate booking can handle.'],
+  ['Stale seat map?','Cache for a few seconds; the booking path is the source of truth.']],
+ trap:'Holding a DB transaction or row lock open while the user pays for 10 minutes.',ddia:'Ch 7 write skew · Ch 8 leases / TTL'};
+
+P.pb26={fr:['Merchants create payment intents; customers pay by card','Merchants receive status via webhooks','Refunds'],
+ nfr:['Never double-charge (exactly-once effect)','Durable and auditable; strongly consistent ledger','~10k TPS','PCI: raw card data isolated'],
+ num:'10k TPS is moderate for a well-indexed Postgres cluster. The hard part is <b>correctness under unknown outcomes</b>, not throughput.',
+ api:['POST /payment_intents {amount, currency} + Idempotency-Key','POST /payment_intents/{id}/confirm {payment_method_token}','webhook → merchant: payment.succeeded / failed'],
+ ent:'payment_intents(id, merchant, amount, status state machine) · ledger_entries(id, txn_id, account, debit, credit) append-only · outbox',
+ d:{w:800,h:340,n:[['m',70,170,'Merchant','t','pill'],['api',220,170,'Payments API|idempotency keys','b',null,null,150],['pg',430,170,'Postgres|intents + ledger + outbox','g','db',1,190],
+   ['pr',650,70,'Card processor|/ network','x'],['vault',430,40,'Card vault|tokenized, PCI','k','db',2],['k',650,250,'Kafka (outbox relay)','p','q',3,150],['wh',430,310,'Webhook service|retry + sign','a',3],['rec',650,320,'Daily reconcile','x',null,3]],
+  e:[['m','api',''],['api','pr','charge, then\nwrite DB ✗','r',[0,0]],['api','pg','1. PENDING','g',1],['api','pr','2. charge (our id)','',1],['pr','api','3. result','dC',1],['api','vault','token','k',2],['pg','k','outbox','p',3],['k','wh','','p',3],['wh','m','','a',3],['rec','pr','','d',3]]},
+ cap:['Naive: call the processor, then write the DB. A crash in between charges the card with no record of it.','Write the intent as <b>PENDING</b> first, call the processor with our intent ID as the idempotency key, then record the result. On timeout, query by our ID; never create a new charge.','Merchants send an Idempotency-Key on every mutating call (stored with a unique index). Card numbers are tokenized into an isolated vault; the rest of the system sees tokens.','Status changes write an <b>outbox</b> row in the same transaction; a relay publishes and webhooks are delivered with retries and signatures. Money moves as append-only double-entry ledger rows, reconciled daily against processor settlement files.'],
+ deep:[['Processor times out?','Unknown outcome (DDIA Ch 8): keep PENDING, retry with the same idempotency key or query status by reference.'],
+  ['Webhook delivery?','Outbox in the same transaction; exponential backoff; merchants dedupe by event_id.'],
+  ['Why double-entry?','Every movement is a debit + credit summing to zero, so balances are derivable and auditable; never UPDATE amounts.'],
+  ['Distributed transaction with the bank?','Impossible. Design a state machine with compensation (refund) and reconciliation.']],
+ trap:'Using 2PC or assuming the processor call succeeds or fails cleanly.',ddia:'Ch 8 unknown outcomes · Ch 12 end-to-end idempotency, integrity · Ch 11 outbox'};
+
+P.pb4={fr:['Browse problems','Submit code in several languages; get pass/fail per test','Contest leaderboard'],
+ nfr:['Untrusted code fully isolated','Result within ~5s','Contest spikes (100k users submitting)','Scalable'],
+ num:'Contest: 100k users × ~5 submissions in 90 min ≈ <b>~100 submissions/s</b> peak; each run takes 1–5s of sandbox CPU, so ~500 concurrent sandboxes.',
+ api:['POST /problems/{id}/submissions {lang, code} → submission_id','GET /submissions/{id} (poll status)','GET /contests/{id}/leaderboard'],
+ ent:'problems · test_cases (S3) · submissions(id, user, problem, status, results) · leaderboard:{contest} ZSET',
+ d:{w:800,h:340,n:[['cl',70,170,'Client','t','pill'],['api',230,170,'Submission API','b'],['run',230,40,'run on API server ✗','r','n',[0,0]],['pg',230,300,'Postgres|submissions','g','db',2],
+   ['q',430,170,'Queue (SQS)','p','q',2],['wk',620,170,'Workers|autoscale on depth','b',2],['sb',620,50,'Sandbox|microVM · no network\nCPU/mem/time limits','k',1,190],['lb',620,300,'Redis ZSET|leaderboard','a','db',3]],
+  e:[['cl','api',''],['api','run','','rd',[0,0]],['api','sb','','k',[1,1]],['api','pg','status=QUEUED','',2],['api','q','','p',2],['q','wk','','p',2],['wk','sb','','k',2],['wk','pg','results','g',2],['cl','api','poll status','dC',2],['wk','lb','ZADD','a',3]]},
+ cap:['Naive: run user code on the API servers. It is a security hole, and slow code blocks everything.','Run every submission in an isolated sandbox (Firecracker/gVisor): read-only filesystem, no network, seccomp, strict CPU/memory/time limits.','Decouple with a queue: the API records QUEUED and returns immediately; autoscaled workers run tests and write results; the client polls status every second (the long-running-task pattern).','Contest leaderboard in a Redis sorted set; the score encodes points and time penalty.'],
+ deep:[['Security layers?','MicroVM or gVisor, no network, read-only FS, seccomp filters, resource limits, kill on timeout.'],
+  ['Contest spike?','The queue absorbs it; scale workers on queue depth; pre-warm containers per language.'],
+  ['Polling vs push?','Polling every 1s is simple and fine at this scale; SSE is optional.'],
+  ['Leaderboard ties?','score = points × 1e6 − penalty_seconds.']],
+ trap:'Executing user code with network access or on shared API hosts.',ddia:'Ch 11 queues · Ch 1 bursty load'};
+
+P.pb24={fr:['Schedule jobs: one-off at time T, or cron','Execute jobs with a retry policy','View job status and history'],
+ nfr:['10k job executions/s','Start within 2s of scheduled time','At-least-once; jobs idempotent','Never lose a job; billions of jobs stored'],
+ num:'10k executions/s = 864M/day. A DB poll every second for "due now" across billions of rows will not hold, so use a two-layer design.',
+ api:['POST /jobs {schedule (cron | at), payload, retry_policy}','GET /jobs/{id}/executions'],
+ ent:'jobs(id, user, schedule, payload) · executions(time_bucket, execution_id, job_id, scheduled_at, status, attempt) partitioned by time bucket',
+ d:{w:800,h:340,n:[['cl',70,170,'Client','t','pill'],['api',220,170,'Scheduler API','b'],['db',420,170,'DB|jobs + executions\nby time bucket','g','db',null,170],['cron',220,40,'cron on 1 box ✗','r','n',[0,0]],
+   ['pl',420,40,'Poller|every 5 min: due soon','p',1,170],['dq',640,40,'Delay queue|SQS delay / Redis ZSET','a','q',2,190],['wk',640,170,'Workers|visibility timeout','b',3],['zk',420,300,'etcd / ZK|poller leader','x','db',3]],
+  e:[['cl','api',''],['api','db','',''],['api','cron','','rd',[0,0]],['pl','db','next 5 min','p',1],['pl','dq','','a',2],['dq','wk','released on time','a',3],['wk','db','status + retry','g',3],['zk','pl','','d',3]]},
+ cap:['Naive: cron on one server. A single point of failure that can\'t scale.','Store executions in a DB partitioned by time bucket; a poller fetches executions due in the next few minutes.','Two layers: the poller hands near-due jobs to a <b>delay queue</b> that releases each one at its exact time, giving second-level precision without hammering the DB.','Workers take jobs with a visibility timeout (lease). A crash means the job reappears and is retried, so jobs must be idempotent. Pollers are partitioned or leader-elected via etcd/ZooKeeper.'],
+ deep:[['How do you hit 2s precision?','DB scan every few minutes → delay queue (SQS DelaySeconds ≤ 15 min, or a Redis ZSET by timestamp) releases on time.'],
+  ['Worker dies mid-job?','Lease expires and the job is retried. Heartbeats extend leases for long jobs; fencing token on completion writes.'],
+  ['Duplicate enqueues?','Dedupe by execution_id at the queue or worker.'],
+  ['User history queries?','Secondary index on (user_id, scheduled_at).']],
+ trap:'Polling the entire jobs table every second.',ddia:'Ch 9 leader election · Ch 8 leases / fencing · Ch 6 time partitioning'};
+
+P.pb14={fr:['Upload videos (up to many GB)','Watch videos with smooth playback on any network'],
+ nfr:['Resumable uploads','Fast start, adaptive quality','~1M uploads/day; billions of views','Metadata availability over consistency'],
+ num:'1M uploads/day × 1GB raw ≈ <b>1PB/day</b> raw, plus several renditions. Views are mostly served from the <b>CDN</b>, not origin.',
+ api:['POST /videos → {video_id, presigned multipart URLs}','GET /videos/{id} → manifest URL','PUT parts directly to S3'],
+ ent:'videos(id, uploader, title, status UPLOADING|PROCESSING|READY, manifest_url) · S3 raw/ + processed/{rendition}/{segment}',
+ d:{w:800,h:340,n:[['up',70,170,'Uploader','t','pill'],['api',240,60,'Video API','b'],['md',240,300,'Metadata DB','g','db'],['s3r',450,170,'S3 raw','g','db',1],
+   ['tq',450,300,'Transcode DAG|split → parallel → merge','p',2,180],['s3p',670,300,'S3 processed|HLS/DASH segments','g','db',2,160],['cdn',670,170,'CDN','a',3],['v',740,60,'Viewer','t','pill',3]],
+  e:[['up','api','',''],['api','md',''],['api','s3r','bytes via API ✗','r',[0,0]],['up','s3r','presigned multipart','g',1],['s3r','tq','S3 event','p',2],['tq','s3p','','p',2],['tq','md','READY','d',2],['s3p','cdn','','a',3],['cdn','v','segments','a',3]]},
+ cap:['Naive: upload gigabytes through your API servers. Slow, fragile, and expensive.','The API returns <b>presigned multipart URLs</b>; the client uploads parts directly to S3 in parallel and resumes failed parts.','An S3 event starts a transcoding DAG: split into short segments, transcode each to several resolutions in parallel, write HLS/DASH manifests, and mark the video READY.','Viewers fetch the manifest and segments from the CDN; the player picks the quality per segment from measured bandwidth (adaptive bitrate).'],
+ deep:[['Why presigned URLs?','Bytes never touch your servers; S3 handles scale; multipart gives parallel, resumable parts.'],
+  ['Fast transcoding?','Segment-level parallelism across many workers; the DAG orchestrator tracks completion.'],
+  ['Adaptive bitrate?','The manifest lists renditions; the player switches per segment.'],
+  ['Cost?','Transcode popular formats eagerly; long-tail renditions lazily.']],
+ trap:'Serving or uploading whole files through app servers.',ddia:'Ch 10 batch DAGs · Ch 1 bandwidth math'};
+
+P.pb17={fr:['Upload and download files (up to 50GB)','Automatic sync across a user\'s devices','Share files and folders'],
+ nfr:['Resumable uploads','Changes visible on other devices within seconds','Durable (S3 11 nines)','Bandwidth-efficient sync'],
+ num:'Large files chunked at ~5MB: a 50GB file = 10k chunks. Only changed chunks are re-uploaded, so a 1-byte edit sends 5MB, not 50GB.',
+ api:['POST /files {name, size, chunk_hashes[]} → missing chunks + presigned URLs','GET /changes?cursor → file metadata diffs','GET /files/{id} → chunk list + presigned download URLs'],
+ ent:'files(id, owner, path, version) · file_chunks(file_id, idx, sha256) · chunks(sha256, s3_key) · shares(file_id, user, perm)',
+ d:{w:800,h:340,n:[['c1',70,90,'Device A|watcher + chunker','t',null,null,130],['c2',70,300,'Device B','t','pill'],['ms',300,90,'Metadata service','b'],['db',540,90,'Postgres|files, chunks, versions','g','db',null,170],
+   ['s3',300,210,'S3|chunks by hash','g','db',1],['ch',470,300,'Change log|per user cursor','p','q',3],['cdn',690,230,'CDN / presigned','a',3]],
+  e:[['c1','ms','metadata',''],['ms','db',''],['c1','s3','missing chunks only','g',1],['ms','ch','','p',3],['c2','ch','long-poll / WS','pd',3],['c2','cdn','download changed chunks','ac',3],['cdn','s3','','ad',3]],
+  t:[[300,30,'fingerprint chunks (SHA-256) → upload only what S3 lacks','a',2,11.5]]},
+ cap:['Naive: upload the whole file through the API. A 50GB upload dies at 99% and starts over.','Split into ~5MB chunks; upload directly to S3 via presigned URLs, which is resumable and parallel.','Fingerprint each chunk, using <b>content-defined chunking</b> so an insert near the start doesn\'t shift every boundary. The server returns only missing chunks. Edits re-upload changed chunks, and identical chunks are stored once (dedupe).','Other devices follow a per-user change log with a cursor (long-poll or WebSocket), fetch the metadata diff, and download only the changed chunks.'],
+ deep:[['Resume after failure?','The server knows which chunk hashes exist; the client re-sends only missing ones.'],
+  ['How do devices learn about changes?','Change log + cursor per device; long-poll or WebSocket notifications.'],
+  ['Edits on two offline devices?','Upload carries a base version; if stale, save a "conflicted copy" (DDIA Ch 5 multi-leader conflict).'],
+  ['Trust the client said "done"?','Verify via S3 event or ETags before marking the file version committed.']],
+ trap:'Proxying file bytes through API servers, and re-uploading whole files on small edits.',ddia:'Ch 5 conflicts · Ch 11 change log / cursor'};
+
+P.pb7={fr:['Post photos and videos with captions','Follow users','View a feed of followed users\' posts'],
+ nfr:['Feed p99 &lt; 500ms','Media upload and delivery fast globally','500M DAU','Eventual consistency for the feed'],
+ num:'500M DAU × 20 feed loads ≈ <b>~115k feed reads/s</b>. 100M posts/day; media ~2MB avg → 200TB/day to S3, served by CDN.',
+ api:['POST /posts {caption} → {post_id, presigned upload URL}','GET /feed?cursor','POST /users/{id}/follow'],
+ ent:'posts(id, author, caption, media_keys, status) · follows · feed:{user} ZSET',
+ d:{w:800,h:340,n:[['cl',70,170,'App','t','pill'],['ps',250,70,'Post service','b'],['s3',450,40,'S3 media','g','db',1],['mp',640,40,'Media processing|thumbs, renditions','p',1,170],['cdn',640,130,'CDN','a',1],
+   ['k',450,170,'Kafka','p','q',2],['fw',640,220,'Fan-out workers','a',2],['rf',450,300,'Redis feeds','a','db',2],['fs',250,270,'Feed service','b'],['pdb',250,170,'Posts DB','g','db']],
+  e:[['cl','ps',''],['cl','fs',''],['ps','pdb',''],['fs','pdb','fan-out on read ✗','r',[0,1]],['cl','s3','presigned','g',1],['s3','mp','event','p',1],['mp','cdn','','a',1],['ps','k','','p',2],['k','fw','','p',2],['fw','rf','','a',2],['fs','rf','','a',2]]},
+ cap:['Naive: media through the API and a fan-out-on-read feed. Both break at this scale.','Media: the client uploads directly to S3 with a presigned URL; an S3 event triggers thumbnails and renditions; the CDN serves them.','Feed: same as News Feed. New posts go to Kafka, workers push post IDs into followers\' Redis feeds, and celebrities are pulled at read time (hybrid).'],
+ deep:[['Post visible before media is processed?','Keep status PROCESSING; show it once renditions are ready (or show to the author only).'],
+  ['Celebrities?','Hybrid fan-out as in News Feed.'],
+  ['Like counts?','Redis INCR or sharded counters, flushed asynchronously to the DB.'],
+  ['Global latency?','CDN for media; regional read replicas or caches for the feed.']],
+ trap:'Serving images from app servers or storing blobs in the database.',ddia:'Ch 1 fan-out · Ch 11 async pipelines'};
+
+P.pb3={fr:['get(key), set(key, value, ttl), delete(key)','LRU eviction when full'],
+ nfr:['p99 ~1ms','~1TB data, 100k+ ops/s','Survive node failure','Eventual consistency acceptable'],
+ num:'1TB ÷ ~32GB usable per node ≈ <b>32+ nodes</b> (+ replicas). Each node handles ≫ 100k ops/s, so memory, not CPU, sets the node count.',
+ api:['GET /cache/{key}','PUT /cache/{key} {value, ttl}','DELETE /cache/{key}'],
+ ent:'per node: HashMap key → node in a doubly linked list (LRU order) + expiry',
+ d:{w:800,h:340,n:[['cl',70,170,'App servers|smart client','t',null,null,130],['one',300,170,'Single node|HashMap + LRU list','b',[0,0],170],
+   ['n1',360,60,'Cache node A','b',1],['n2',360,170,'Cache node B','b',1],['n3',360,280,'Cache node C','b',1],['r1',570,60,'Replica A′','x','db',2],['r2',570,170,'Replica B′','x','db',2],['r3',570,280,'Replica C′','x','db',2],
+   ['zk',150,300,'Config / ZK|ring membership','p','db',3,140]],
+  e:[['cl','one','','',[0,0]],['cl','n1','hash ring','b',1],['cl','n2','','b',1],['cl','n3','','b',1],['n1','r1','async','d',2],['n2','r2','','d',2],['n3','r3','','d',2],['zk','cl','ring updates','pd',3]]},
+ cap:['One node: a HashMap for O(1) lookup plus a doubly linked list for LRU order (move to head on access, evict the tail). TTL by lazy check plus a background sweep.','Shard across nodes with <b>consistent hashing</b> (with virtual nodes). The client computes the owner directly, so there is no extra hop.','Each primary replicates asynchronously to a replica; on failure the replica is promoted. Some recent writes may be lost, which is acceptable for a cache.','Ring membership lives in a config service; clients watch it. Hot keys get replicated across several nodes or a short-TTL local cache.'],
+ deep:[['LRU in O(1)?','HashMap → linked-list node; get = move to head; evict = remove tail.'],
+  ['Add a node?','Consistent hashing moves ~1/N of keys; vnodes keep load even; warm gradually.'],
+  ['Hot key?','Copies key#0..k on several nodes with random reads, or a client-side L1 cache.'],
+  ['Why not hash % N?','Every scale event remaps ~all keys, and the cold cache stampedes the database.']],
+ trap:'hash(key) % N sharding.',ddia:'Ch 6 consistent hashing · Ch 5 async replication'};
+
+P.pb13={fr:['Search posts by keyword','Sort results by recency or by likes','(Inputs: create posts, like posts)'],
+ nfr:['Search &lt; 500ms','New posts searchable within ~1 minute','Huge write volume (posts and likes)','Read volume ~10k searches/s'],
+ num:'~1B posts/day ≈ 12k/s and ~10× that in likes. Indexing every like individually is far too much write load, so batch it.',
+ api:['GET /search?q&sort=recency|likes&cursor'],
+ ent:'inverted index: term → post IDs (recency list) and term → ZSET(post_id, like_bucket)',
+ d:{w:800,h:340,n:[['ev',70,170,'Post + like\nevents','t','q'],['k',230,170,'Kafka','p','q',1],['iw',400,90,'Indexing workers','b',1],['lk',400,250,'Like batcher|update only at\nthresholds','a',2,150],
+   ['ix',600,170,'Inverted index|sharded by term\nrecency list + likes ZSET','g','db',1,190],['qs',600,40,'Query service','b',1],['cold',600,300,'Cold postings → S3','x','db',3],['qc',760,40,'Query cache','a','db',3],['pg',230,40,'LIKE \'%term%\' ✗','r','n',[0,0]]],
+  e:[['ev','pg','','r',[0,0]],['ev','k','','p',1],['k','iw','','p',1],['iw','ix','','g',1],['qs','ix','','',1],['k','lk','','a',2],['lk','ix','','a',2],['ix','cold','','d',3],['qs','qc','','a',3]]},
+ cap:['Naive: LIKE \'%term%\' on the posts table, a full scan at any real scale.','Build an <b>inverted index</b> (term → post IDs) from the event stream, sharded by term. New posts are searchable within seconds.','Two orderings: a recency list and a likes-sorted set. Don\'t reindex on every like; update the score only when the count crosses thresholds (powers of 2) or in per-minute batches.','Keep hot postings in memory and move older ones to blob storage; cache popular queries; intersect posting lists for multi-word queries.'],
+ deep:[['Why not just Elasticsearch?','In a real design it is a fine answer; know its sharding (document-partitioned, scatter-gather) and refresh interval. This problem tests whether you understand the inverted index underneath.'],
+  ['Likes change constantly?','Threshold or batched updates to the ranking score; exact counts live elsewhere.'],
+  ['Multi-keyword?','Intersect posting lists, smallest first; consider bigram indexes.'],
+  ['Hot term?','Term-partitioned index means one shard per term, so replicate hot terms.']],
+ trap:'A Postgres LIKE scan, or re-indexing on every like.',ddia:'Ch 3 inverted index · Ch 6 term-partitioned index · Ch 11 stream indexing'};
+
+P.pb27={fr:['Track price history for products','Users subscribe to alerts at a target price','View price charts'],
+ nfr:['500M products','Alert within ~1 hour of a drop','Respect site rate limits (crawl budget)','Charts load fast'],
+ num:'500M products crawled daily = <b>~6k pages/s</b>, which runs into rate limits. Subscriptions are concentrated on a small fraction of products, so prioritize those.',
+ api:['POST /subscriptions {product_id, target_price}','GET /products/{id}/history?range'],
+ ent:'price_history(product_id, ts, price) time-series · subscriptions(product_id, user_id, target_price) indexed (product_id, target_price)',
+ d:{w:800,h:340,n:[['sch',90,70,'Crawl scheduler|priority by subscribers','p',null,null,170],['cr',300,70,'Crawlers','b'],['ext',90,250,'Browser extension|crowd-sourced prices','t',1,170],['k',300,170,'Kafka|price events','p','q',2],
+   ['ts',520,70,'Time-series DB|price history','g','db',2,150],['am',520,250,'Alert matcher','a',3],['sub',720,170,'Subscriptions DB','g','db',3],['nt',720,300,'Email / push','x',3]],
+  e:[['sch','cr',''],['cr','k','','p',2],['ext','k','validate','p',2],['k','ts','','g',2],['k','am','price changed','a',3],['am','sub','target ≥ price','a',3],['am','nt','','a',3]]},
+ cap:['A scheduler decides what to crawl: products with many subscribers or volatile prices are checked more often; the long tail rarely.','A browser extension reports prices users actually see, which adds coverage for free. Validate it (N agreeing reports or a crawler re-check) before trusting it.','Every price change becomes an event; history goes to a time-series table (downsampled for charts).','Alerts are <b>event-driven</b>: on a drop, query subscriptions WHERE product_id=? AND target_price ≥ new_price and notify, deduped per user and product.'],
+ deep:[['Crawl budget?','Prioritize by subscribers and volatility; adaptive frequency; respect robots and rate limits.'],
+  ['Bad extension data?','Require agreement or confirm with a crawl before alerting.'],
+  ['Matching efficiently?','Index on (product_id, target_price); react to events, never scan all subscriptions.'],
+  ['Charts?','Daily aggregates, cached.']],
+ trap:'Re-scanning all subscriptions on a schedule instead of reacting to price changes.',ddia:'Ch 11 event-driven · Ch 3 time-series storage'};
+
+/* WhatsApp is new (not in problems-tutorial) */
+const PT_EXTRA={id:'pb23',num:'23',title:'WhatsApp — Messaging',diff:'Medium',patterns:['realtime'],tags:['Real-time','WebSockets','Pub/Sub'],
+ story:'Chat looks like a CRUD app until you notice the two users are connected to different servers, one of them is offline, and messages must never be lost or reordered.',
+ naive:'Most candidates poll an HTTP endpoint for new messages, or assume both users are on one server. Neither survives 1B users.',
+ insight:'<strong>WebSockets + a routing layer</strong> (user → server registry + per-user pub/sub). <strong>Persist before ack</strong> and keep an inbox per device until delivered. <strong>Partition by chat_id</strong> with per-chat sequence numbers for ordering.',
+ concepts:['WebSockets','Pub/sub routing','Inbox per device','Per-chat sequence','Push notifications'],
+ line:'"Persistent WebSockets; a registry plus pub/sub routes between chat servers; messages persist to the chat partition and the recipient inbox before ack, so nothing is lost even if Bob is offline."'};
+
+
+var TL={"pb1":{"slug":"url-shortener","name":"URL shortener (Bitly)","hook":"It sounds like a toy, but it is the cleanest example of a read-heavy system: almost every request is a redirect.","tldr":["Redirects outnumber new links about 100 to 1, so the design is mostly about serving reads fast.","Generate short codes from a counter encoded in base62: unique by construction, no collision checks.","Put a cache in front of the database; a small share of links gets most clicks, so the hit rate is high."]},"pb2":{"slug":"rate-limiter","name":"Rate limiter","hook":"Every public API needs one, and the obvious implementation has a race condition.","tldr":["Counting per server gives each client N times its limit; the counter must be shared, usually in Redis.","Read-then-write on a shared counter races. Do the refill, check and decrement atomically in one Lua script.","Decide what happens when Redis is down: allow traffic (fail-open) or block it (fail-closed), per endpoint."]},"pb9":{"slug":"business-discovery","name":"Business discovery (Yelp)","hook":"The trap is over-engineering: the whole dataset fits on one database server.","tldr":["Ten million businesses at ~1 KB each is about 10 GB, small enough for one Postgres instance.","Two-dimensional \"near me\" queries need a geospatial index (PostGIS, geohash), not two B-tree indexes.","Keep the average rating correct under concurrent reviews by updating it atomically in the same transaction."]},"pb11":{"slug":"news-feed","name":"News feed (Facebook)","hook":"The canonical fan-out problem: build a personalised feed for billions of users in a few hundred milliseconds.","tldr":["Computing the feed on every read means hundreds of queries per page view, so precompute it when people post.","Push new post IDs into each follower's feed list in Redis (fan-out on write); a feed read becomes one lookup.","Accounts with millions of followers break fan-out on write, so pull their posts at read time instead (hybrid)."]},"pb19":{"slug":"news-aggregator","name":"News aggregator (Google News)","hook":"A feed problem where the feed is the same for everyone in a region, which changes everything.","tldr":["Writes are tiny (new articles); reads spike hard when big news breaks.","Precompute one list per region and category at ingest time instead of querying on every request.","Because the feed is not per-user, a CDN can cache it for a minute and absorb almost all traffic."]},"pb28":{"slug":"local-delivery","name":"Local delivery (Gopuff)","hook":"It looks like an ordering system, but most of the load is people checking what is available near them.","tldr":["Browsing availability is far more frequent than ordering, so cache it and serve it from replicas.","Find nearby warehouses with an in-memory list and a cheap distance filter before calling any travel-time API.","Prevent overselling with conditional stock decrements for every item in one transaction."]},"pb8":{"slug":"dating-app","name":"Dating app (Tinder)","hook":"Swipes are a firehose of writes, and two people swiping right at the same moment must never miss their match.","tldr":["Precompute each user's stack of nearby candidates and hide already-swiped profiles with a Bloom filter.","Swipes are write-heavy and append-only, a good fit for an LSM store like Cassandra.","Detect matches atomically on one key per pair of users, so simultaneous swipes can't both miss each other."]},"pb15":{"slug":"top-k-videos","name":"Top-K videos (YouTube)","hook":"The design falls straight out of one number: hundreds of thousands of views per second.","tldr":["A counter row per video in a database can't take ~800k updates per second.","Stream views through Kafka partitioned by video ID; each consumer counts its videos in memory and keeps a local top-K.","Merge the per-partition top-K lists; the result is exact because each video lives in exactly one partition."]},"pb20":{"slug":"ad-click-aggregator","name":"Ad click aggregator","hook":"Clicks are money, so the numbers must be fast for dashboards and exact for billing.","tldr":["Redirect immediately and publish the click to Kafka; never aggregate raw rows at query time.","A stream processor counts clicks per ad per minute and writes them to a column store for fast queries.","Deduplicate by a signed impression ID, and recount from raw logs in a nightly batch job for billing accuracy."]},"pb18":{"slug":"web-crawler","name":"Web crawler","hook":"Ten billion pages in five days is a pipeline problem, constrained by politeness and network bandwidth.","tldr":["About 23k pages per second; size the fleet by network bandwidth, not CPU.","Split fetching and parsing into separate stages with queues and stored raw pages, so each scales and retries on its own.","Respect per-domain rate limits and robots.txt, and skip already-seen URLs and duplicate content."]},"pb25":{"slug":"metrics-monitoring","name":"Metrics monitoring (Datadog)","hook":"Millions of data points per second arrive, and alerts must fire within a minute.","tldr":["Buffer the write firehose through Kafka into a time-series database built for appends and compression.","Downsample old data and move it to cheap storage; dashboards read rollups.","Evaluate alert rules on the stream itself instead of polling the database."]},"pb21":{"slug":"fitness-tracking","name":"Fitness tracking (Strava)","hook":"The key insight is where the work happens: on the phone, not the server.","tldr":["Record GPS on the device and upload the whole activity when it ends; no need to stream every point.","Store the track in object storage and the metadata in a database, with an idempotent, resumable upload.","Compute stats and leaderboards asynchronously from a queue; leaderboards are Redis sorted sets."]},"pb10":{"slug":"ride-sharing","name":"Ride sharing (Uber)","hook":"Four problems in one: a flood of location updates, matching, locking drivers, and a multi-step trip lifecycle.","tldr":["Driver locations are ephemeral and frequent, so keep them in Redis's geospatial index, not a database.","Offer a ride to one driver at a time and lock that driver with a short TTL so they can't get two offers.","Run ride requests through a durable, per-region queue so a crashed matcher loses nothing."]},"pb12":{"slug":"live-comments","name":"Live comments (Facebook Live)","hook":"One popular stream can mean a million viewers each expecting new comments within a fraction of a second.","tldr":["Polling at this scale is a self-inflicted denial of service; push with Server-Sent Events.","Write each comment once and publish it once; pub/sub fans it out to every server holding viewers of that video.","Route viewers of the same video to the same servers so each server subscribes to few channels."]},"pb16":{"slug":"collaborative-editor","name":"Collaborative editor (Google Docs)","hook":"The challenge is correctness, not scale: everyone must end up with the same document.","tldr":["Send small operations, not whole documents; last-write-wins on documents loses people's work.","One server per document orders operations and transforms concurrent ones (OT); CRDTs are the serverless alternative.","Append every operation to a log before acknowledging it, and snapshot periodically for fast loading."]},"pb22":{"slug":"stock-trading","name":"Stock trading (Robinhood)","hook":"Two separate problems: pushing live prices to millions, and never losing or duplicating an order.","tldr":["Prices: one consumer of the exchange feed publishes per symbol; push servers subscribe and stream to clients.","Orders: persist the order as pending with your own ID before sending it to the exchange.","Treat exchange calls as having unknown outcomes; reconcile by your order ID instead of resubmitting."]},"pb6":{"slug":"online-auction","name":"Online auction","hook":"Many people bid on one row at the same time, and exactly one of them must win each race.","tldr":["Comparing bids in application code loses updates under concurrency.","Accept a bid with one conditional update: set the new maximum only if it beats the current one and the auction is open.","Push accepted bids to watchers in real time; for very hot auctions, serialize bids through a partitioned log."]},"pb29":{"slug":"llm-chat","name":"LLM chat (ChatGPT)","hook":"GPUs are the scarce resource, so every queueing decision is really a cost decision.","tldr":["Stream tokens to the client as they are generated so the first words appear in under a second.","Put a queue with priorities in front of the GPU pool for backpressure, fairness and batching.","Buffer tokens per message so a client that reconnects can resume where it left off."]},"pb23":{"slug":"chat-app","name":"Chat app (WhatsApp)","hook":"Chat looks like CRUD until you notice the two users are on different servers and one of them is offline.","tldr":["Keep a persistent WebSocket per device; route messages between chat servers with a registry and per-user pub/sub.","Persist each message and add it to the recipient's inbox before acknowledging the sender, so nothing is lost.","Partition by conversation and number messages within it so every device shows the same order."]},"pb26":{"slug":"payment-system","name":"Payment system (Stripe)","hook":"Throughput is moderate. The hard part is staying correct when a call to the bank has an unknown outcome.","tldr":["Record the payment as pending before calling the processor, and pass your ID as the idempotency key.","On a timeout, query by that key or retry it; never create a second charge.","Publish status changes through an outbox, keep an append-only double-entry ledger, and reconcile daily."]},"pb4":{"slug":"online-judge","name":"Online judge (LeetCode)","hook":"You are running strangers' code on your servers, so isolation comes first.","tldr":["Run every submission in a locked-down sandbox: no network, read-only filesystem, strict CPU, memory and time limits.","Queue submissions and return immediately; workers autoscale on queue depth and the client polls for results.","Keep contest leaderboards in a Redis sorted set."]},"pb24":{"slug":"job-scheduler","name":"Job scheduler","hook":"Ten thousand jobs per second, each within two seconds of its scheduled time.","tldr":["Cron on one machine is a single point of failure that can't scale.","Store executions partitioned by time; a poller moves soon-due jobs into a delay queue that releases each on time.","Workers lease jobs with a visibility timeout, so crashed jobs are retried; jobs must be idempotent."]},"pb14":{"slug":"video-platform","name":"Video platform (YouTube)","hook":"Two hard problems: getting gigabyte uploads in reliably, and streaming smoothly on any connection.","tldr":["Upload directly to object storage with presigned, multipart, resumable URLs; bytes never touch your servers.","Split videos into segments and transcode them in parallel into several resolutions.","Serve segments from a CDN and let the player switch quality per segment (adaptive bitrate)."]},"pb17":{"slug":"file-sync","name":"File storage and sync (Dropbox)","hook":"Syncing a 50 GB file after a one-byte edit should not mean uploading 50 GB again.","tldr":["Split files into chunks fingerprinted by hash, and upload only the chunks the server doesn't already have.","Upload and download directly to object storage with presigned URLs.","Other devices follow a per-user change log with a cursor and fetch only what changed."]},"pb7":{"slug":"photo-sharing","name":"Photo sharing (Instagram)","hook":"A news feed plus a media pipeline: two well-known problems combined.","tldr":["Upload media straight to object storage; process thumbnails and sizes asynchronously; serve them from a CDN.","Build feeds with fan-out on write into Redis, and pull celebrity posts at read time.","Show a post only once its media has finished processing."]},"pb3":{"slug":"distributed-cache","name":"Distributed cache","hook":"Design Redis itself: data structures inside one node, then distribution across many.","tldr":["One node is a hash map plus a doubly linked list for O(1) least-recently-used eviction.","Spread keys with consistent hashing and virtual nodes, so adding a node moves only a small share of keys.","Replicate asynchronously for failover, and spread hot keys over several nodes."]},"pb13":{"slug":"post-search","name":"Post search (Facebook)","hook":"Search over billions of posts, where like counts change constantly.","tldr":["Build an inverted index (term → post IDs) from the stream of new posts, sharded by term.","Keep two orderings per term, recency and likes, and update like-based ranking only at thresholds or in batches.","Keep hot postings in memory, move old ones to cheaper storage, and cache popular queries."]},"pb27":{"slug":"price-tracker","name":"Price tracker (CamelCamelCamel)","hook":"Five hundred million products can't all be crawled often, so decide what is worth checking.","tldr":["Prioritise crawling by how many people track a product and how often its price changes.","Add crowd-sourced prices from a browser extension, validated before they trigger alerts.","Make alerts event-driven: when a price drops, look up subscriptions for that product only."]},"pb5":{"slug":"ticketmaster","name":"Ticketmaster","handwritten":true,"hook":"Millions of people arrive for one on-sale, and no seat may ever be sold twice.","tldr":["Browsing is huge, read-only traffic that can be slightly stale: cache it hard.","Hold a seat with one atomic conditional update so two buyers can never both win.","For huge on-sales, a virtual waiting room admits users at the rate the system can handle."]}};
+var PATN={reads:'Scaling reads',writes:'Scaling writes',realtime:'Real-time updates',contention:'Contention',multistep:'Multi-step processes',blobs:'Large blobs',longtask:'Long-running tasks'};
+function pub(p){var t=TL[p.id];if(!t)return;var d=P[p.id];p.title=t.name;p.story=t.hook;p.naive=d.cap[0];p.insight=t.tldr.join(' ');p.line='"'+t.tldr[1]+'"';p.tags=p.patterns.map(function(k){return PATN[k]});p.concepts=p.tags;}
+PT.forEach(pub);pub(PT_EXTRA);
+
+const PAT={reads:'Scaling Reads',writes:'Scaling Writes',realtime:'Real-time Updates',contention:'Dealing with Contention',multistep:'Multi-step Processes',blobs:'Handling Large Blobs',longtask:'Long-running Tasks'};
+const PORDER=['reads','writes','realtime','contention','multistep','blobs','longtask'];
+const PROBS=(function(){
+  const all=PT.concat([PT_EXTRA]).map(p=>Object.assign({},p,P[p.id]));
+  all.forEach(p=>{if(!P[p.id])console.error('missing data',p.id)});
+  return PORDER.flatMap(o=>all.filter(p=>p.patterns[0]===o));
+})();
+const ul=a=>`<ul class="lst">${a.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+const probsFor=k=>PROBS.filter(p=>p.patterns.includes(k)).map(p=>p.title.split(' —')[0]).join(', ');
+
+const SLIDES=[
+{sec:'Start',type:'title',k:'System Design · Learn mode',t:'Learn Deck: patterns, concepts, 29 problems',
+ s:'Understanding first. Every diagram <b>builds up one step at a time</b>: the naive design, the moment it breaks, and the fix. Press → to advance and try to predict each step before it appears.',
+ chips:['7 patterns','9 core concepts','9 key technologies','29 problems built step by step'],
+ cards:[['why','How this deck differs from the Interview deck','<b>Learn</b> explains why each piece exists. <b>Interview</b> drills you: requirements, numbers, architecture, and deep-dive questions with hidden answers.'],
+  ['say',null,'Every design in this deck follows the same loop: <b>simplest thing that works → calculate where it breaks → fix only that → repeat.</b>']]},
+{sec:'Start',t:'The design loop',k:'How every problem is solved',
+ flow:{w:900,h:150,gap:26,f:[['Requirements|FR + NFR','b'],['Estimate|QPS · storage','a',null,'',1],['Simple design|1 server + DB','g',null,'',2],['Find the break|which number fails?','r',null,'',3],['Fix only that|cache · queue · shard','p',null,'',4],['Repeat','x','pill','',5]]},
+ cap:['Pin down what the system must do (functional) and how well (non-functional: latency, availability, consistency, scale).','Turn NFRs into numbers: DAU × actions ÷ 86,400 = QPS; × payload = bandwidth; × retention = storage.','Draw the simplest design that meets the functional requirements: client → service → database.','Compare your numbers to component limits (Postgres ~10–50k TPS, Redis ~100k ops/s). The first limit exceeded is your bottleneck.','Apply the pattern that fixes that specific bottleneck, and nothing more.','Go around again until all NFRs are met. Each loop gives you something to say in the interview.']},
+
+/* ───── PATTERNS ───── */
+{sec:'7 Patterns',type:'title',k:'Part 1',t:'The 7 patterns',s:'Almost every system design problem combines a few of these. Learn each as a picture: what breaks, and what fixes it.',chips:Object.values(PAT)},
+{sec:'7 Patterns',t:'Pattern 1: Scaling Reads',k:'Read-heavy systems (100:1 or more)',
+ d:{w:800,h:330,n:[['cl',70,170,'Clients','t','pill'],['cdn',210,60,'CDN|static + cacheable','a',3],['app',300,170,'App servers|stateless','b'],['ca',500,80,'Redis cache|cache-aside','a','db',1],['pr',690,170,'Postgres primary','g','db'],['r1',500,270,'Read replicas','g','db',2]],
+  e:[['cl','app',''],['app','pr','every read','r',[0,0]],['app','ca','1. check','a',1],['ca','pr','2. miss → load','ad',1],['app','r1','reads','g',2],['pr','r1','replicate','d',2],['cl','cdn','','a',3]]},
+ cap:['One database serves every read. At ~10k+ reads/sec it becomes the bottleneck.','<b>Cache-aside</b>: check Redis; on a miss, read the DB and populate the cache with a TTL. A hit takes &lt;1ms vs ~5–50ms from the DB.','<b>Read replicas</b> spread the remaining reads (expect replication lag, DDIA Ch 5).','<b>CDN</b> serves static and shared responses from the edge, so origin never sees them.'],
+ cards:[['trap','Cache problems to name','<b>Stampede</b>: a hot key expires and 10k requests hit the DB (fix: lock/single-flight, jittered TTL). <b>Invalidation</b>: delete on write, short TTL. <b>Hot key</b>: replicate or use a local L1 cache.'],['why','Used in',probsFor('reads')]]},
+{sec:'7 Patterns',t:'Pattern 2: Scaling Writes',k:'Write-heavy systems',
+ d:{w:800,h:330,n:[['cl',70,170,'Producers','t','pill'],['app',230,170,'Ingest service','b'],['db',700,170,'Single DB\nmelting ✗','r','x',[0,0]],['k',420,170,'Kafka|buffer + batch','p','q',1],
+   ['w',600,90,'Consumers|batch inserts','b',2],['s1',730,40,'Shard 1','g','db',2],['s2',730,140,'Shard 2','g','db',2],['ag',600,270,'Pre-aggregate|count per minute','a',3],['lsm',730,270,'LSM store|Cassandra','g','db',3]],
+  e:[['cl','app',''],['app','db','50k writes/s','r',[0,0]],['app','k','','p',1],['k','w','','p',2],['w','s1','hash(key)','g',2],['w','s2','','g',2],['k','ag','','a',3],['ag','lsm','','g',3]]},
+ cap:['Every event is an individual synchronous DB write. Spikes overwhelm the database.','A <b>queue/log</b> (Kafka) absorbs spikes and decouples producers from the DB. Consumers write in <b>batches</b>.','<b>Shard</b> by a key that spreads load evenly (hash of id); each shard takes a fraction of the writes.','<b>Reduce the writes</b>: pre-aggregate (10k clicks → 1 row per minute), and use write-optimized LSM storage.'],
+ cards:[['trap','Hot partition','One key (celebrity, viral ad) can still overload one shard: split the key with a suffix, or aggregate before writing.'],['why','Used in',probsFor('writes')]]},
+{sec:'7 Patterns',t:'Pattern 3: Real-time Updates',k:'Push changes to clients',
+ d:{w:800,h:330,n:[['c1',70,90,'Client A','t','pill'],['c2',70,250,'Client B','t','pill'],['s1',300,90,'Server 1','b'],['s2',300,250,'Server 2','b',2],['ps',530,170,'Pub/sub|Redis / Kafka','p','q',3],['src',730,170,'Event source|new comment','a',3]],
+  e:[['c1','s1','poll every 2s','rd',[0,0]],['s1','c1','SSE / WebSocket','b',[1,9]],['s2','c2','SSE','b',2],['src','ps','publish','a',3],['ps','s1','','p',3],['ps','s2','','p',3]]},
+ cap:['<b>Polling</b>: simple, but latency = interval and most requests return nothing. Fine for slow updates (every ~30s).','<b>Server push</b>: SSE (server→client, plain HTTP, auto-reconnect) or WebSocket (bidirectional). Long-polling is the fallback.','With many servers, the receiver\'s connection lives on <b>another server</b> than the one that got the event.','<b>Pub/sub</b> routes events to whichever servers hold the interested connections: channel per video, per user, or per symbol.'],
+ cards:[['why','Choosing','Updates rare → poll. Server→client stream → SSE. Chat, games, collaboration → WebSocket. Between servers → pub/sub.'],['why','Used in',probsFor('realtime')]]},
+{sec:'7 Patterns',t:'Pattern 4: Dealing with Contention',k:'Many users, one resource',
+ seq:{a:['User A|t','Seat 12A row|b','User B|p'],m:[
+  ['User A','Seat 12A row','read: AVAILABLE','',0],['User B','Seat 12A row','read: AVAILABLE','',0],['User A','Seat 12A row','book','',0],['User B','Seat 12A row','book ✗ double-booked','r',0],
+  ['#','User A','User B','Fix: UPDATE … SET HELD WHERE id=12A AND status=AVAILABLE','g',1],
+  ['User A','Seat 12A row','1 row updated → won','g',1],['User B','Seat 12A row','0 rows → "taken"','a',1],
+  ['#','User A','User B','Or: SELECT FOR UPDATE · version CAS · Redis SET NX TTL · queue per item','p',2]]},
+ cap:['Check-then-act from two users: both see AVAILABLE, both book. A race condition (DDIA Ch 7 write skew).','Make the check and the write <b>one atomic statement</b>. The database guarantees only one succeeds.','Other tools: pessimistic lock (high contention), optimistic version check (low contention), distributed lock with TTL (holds across services), or a per-item queue (extreme contention).'],
+ tbl:{h:['Tool','Use when'],r:[['Atomic conditional UPDATE','Single row, single DB: the default'],['SELECT … FOR UPDATE','Multi-step logic on few rows, high contention'],['Optimistic (version column)','Low contention; retry on conflict'],['Redis lock SET NX PX','Temporary holds across services (seat hold, driver lock)'],['Queue per resource','Extreme hot spots (auction last seconds)']]},
+ cards:[['why','Used in',probsFor('contention')+', Gopuff, Tinder, Uber']]},
+{sec:'7 Patterns',t:'Pattern 5: Multi-step Processes',k:'Sagas and durable workflows',
+ d:{w:800,h:330,n:[['o',400,50,'Orchestrator|durable workflow (Temporal) or saga','p',null,null,290],['s1',150,170,'1. Reserve room','b'],['s2',400,170,'2. Charge card','b'],['s3',650,170,'3. Confirm booking','b'],
+   ['c2',400,290,'charge FAILED ✗','r','pill',1],['cmp',150,290,'compensate:\nrelease room','a',2],['st',650,290,'state persisted\nafter each step','g','n',3]],
+  e:[['o','s1','','p'],['o','s2','','p'],['o','s3','','p'],['s1','s2','','d'],['s2','s3','','d'],['s2','c2','','r',1],['c2','cmp','','a',2]]},
+ cap:['A business action spans several services, and no distributed ACID transaction is available.','Any step can fail after earlier steps succeeded.','A <b>saga</b> runs a <b>compensating action</b> for each completed step (refund, release, cancel), in reverse order.','A durable orchestrator records progress after each step, so a crash resumes where it stopped instead of starting over or forgetting.'],
+ cards:[['why','Building blocks','Outbox pattern for reliable events · idempotent steps (retries are safe) · timeouts with unknown-outcome handling.'],['why','Used in',probsFor('multistep')+', Uber, Ticketmaster']]},
+{sec:'7 Patterns',t:'Pattern 6: Handling Large Blobs',k:'Files, images, videos',
+ d:{w:800,h:330,n:[['cl',70,170,'Client','t','pill'],['api',280,60,'API','b'],['s3',530,170,'S3|object storage','g','db'],['md',530,40,'Metadata DB','g','db',1],['cdn',280,290,'CDN','a',3],['ev',740,170,'S3 event →\nprocessing','p',2]],
+  e:[['cl','api','bytes ✗','r',[0,0]],['api','s3','','r',[0,0]],['cl','api','1. request upload','',1],['api','md','PENDING','',1],['api','cl','2. presigned URL','dC',1],['cl','s3','3. PUT parts directly','g',1],['s3','ev','4. notify','p',2],['ev','md','READY','pd',2],['cdn','s3','','a',3],['cl','cdn','download','a',3]]},
+ cap:['Pushing gigabytes through your API servers wastes their bandwidth and memory and fails on long uploads.','The API hands out a <b>presigned URL</b>; the client uploads directly to S3 (<b>multipart</b>: parallel, resumable chunks). Metadata is recorded separately.','S3 <b>event notifications</b> trigger processing (thumbnails, transcoding) and flip status to READY. Don\'t trust the client to say it finished.','Downloads come from a <b>CDN</b> (or presigned GET URLs), never through the app servers.'],
+ cards:[['why','Used in',probsFor('blobs')+', WhatsApp media, Strava tracks']]},
+{sec:'7 Patterns',t:'Pattern 7: Long-running Tasks',k:'Work that takes seconds to hours',
+ d:{w:800,h:330,n:[['cl',70,170,'Client','t','pill'],['api',250,170,'API','b'],['db',250,300,'Jobs DB|status','g','db',1],['q',450,170,'Queue','p','q',1],['w',640,170,'Worker pool|autoscale on depth','b',1,170],['dlq',640,300,'DLQ|after N retries','r','q',3]],
+  e:[['cl','api','request (waits 60s ✗)','r',[0,0]],['api','db','QUEUED','',1],['api','q','job','p',1],['q','w','','p',1],['w','db','RUNNING → DONE','g',2],['cl','api','poll / SSE status','dC',2],['q','dlq','','r',3]]},
+ cap:['Doing heavy work inside the request: timeouts, retried requests duplicate work, and no backpressure.','Return a job ID immediately; enqueue the work. Workers scale independently of the API.','Workers update the job status; the client polls or subscribes (SSE/WebSocket) for progress.','Failures retry with backoff (visibility timeout); poison jobs go to a dead-letter queue. Jobs must be idempotent.'],
+ cards:[['why','Used in',probsFor('longtask')+', YouTube transcoding, ChatGPT, Web Crawler']]},
+
+/* ───── CORE CONCEPTS ───── */
+{sec:'9 Core Concepts',type:'title',k:'Part 2',t:'9 core concepts',s:'The vocabulary every design uses. Each slide is the picture plus the sentence you would say.',chips:['Networking','API design','Data modeling','Indexing','Caching','Sharding','Consistent hashing','CAP','Numbers']},
+{sec:'9 Core Concepts',t:'Concept 1: Networking essentials',k:'How requests travel',
+ d:{w:800,h:300,n:[['cl',70,150,'Client','t','pill'],['dns',220,50,'DNS|→ LB IP','x'],['l4',300,150,'L4 LB|TCP, fast, no content','b',null,null,150],['l7',520,150,'L7 LB|HTTP: path, header,\nsticky routing','p',1,170],['s1',720,70,'Service A','g'],['s2',720,230,'Service B','g']],
+  e:[['cl','dns',''],['cl','l4',''],['l4','l7','','',1],['l7','s1','/api/*','p',1],['l7','s2','/ws/*','p',1]]},
+ cap:['DNS resolves the name; an <b>L4</b> load balancer forwards TCP connections without reading them. Very fast, good for WebSockets and raw TCP.','An <b>L7</b> load balancer reads HTTP and routes by path, header, or cookie; it terminates TLS and can do sticky sessions.'],
+ tbl:{h:['Protocol','Use'],r:[['REST over HTTP','Default public API'],['gRPC (HTTP/2 + Protobuf)','Internal service-to-service, high QPS'],['SSE','Server→client stream (feeds, tokens, comments)'],['WebSocket','Bidirectional real-time (chat, docs, games)'],['Long polling','Fallback push when nothing else works']]}},
+{sec:'9 Core Concepts',t:'Concept 2: API design',k:'5 minutes, then move on',
+ tbl:{h:['Rule','Example'],r:[['Resources = core entities','GET /events/{id}, POST /bookings'],['Cursor pagination, not offset','GET /feed?cursor=(ts,id)&limit=20: stable when new items arrive'],['Idempotency on mutations','Idempotency-Key header + unique index → retries are safe'],['Auth from token, not body','user_id comes from the JWT; never trust {user_id} in the request'],['Async for long work','POST returns 202 + job_id; GET /jobs/{id}'],['Version','/v1/… or header; add optional fields only']]},
+ cards:[['say',null,'"REST with resources from our entities: POST /bookings with an idempotency key, cursor-paginated GET /bookings. User identity comes from the auth token."'],['trap','Don\'t over-invest','Spending 15 minutes on endpoint shapes is a classic way to run out of time for the deep dives.']]},
+{sec:'9 Core Concepts',t:'Concept 3: Data modeling',k:'Access patterns first',
+ d:{w:800,h:300,n:[['q1',140,60,'Hot query 1|feed by user, newest first','t',null,null,230],['q2',140,150,'Hot query 2|post by id','t',null,null,230],['q3',140,240,'Write path|insert post','t',null,null,230],
+   ['m',470,150,'posts(id PK, author_id, ts, …)\nINDEX (author_id, ts DESC)','b',1,280,70],['db',710,150,'Postgres\n(default)','g','db',2,110]],
+  e:[['q1','m','','',1],['q2','m','','',1],['q3','m','','',1],['m','db','','g',2]]},
+ cap:['Start from the queries the product actually runs, not from the nouns.','Choose keys and indexes that make each hot query a single index lookup or range scan.','Default to Postgres; deviate only with a reason (write volume → Cassandra, flexible docs → DynamoDB/Mongo, search → Elasticsearch).'],
+ cards:[['why','Normalize vs denormalize','Normalize by default (one place to update). Denormalize deliberately for a hot read path, and say how the copy stays in sync (CDC, async job).']]},
+{sec:'9 Core Concepts',t:'Concept 4: Database indexing',k:'Make lookups O(log n)',
+ tbl:{h:['Index','Use for','Example'],r:[['B-tree','Equality + range + ORDER BY','created_at &gt; X; composite (user_id, ts)'],['Hash','Equality only','session lookup'],['Geospatial (R-tree, geohash)','Nearby queries','Yelp, Uber, Gopuff'],['Inverted','Full-text search','Post search, Elasticsearch'],['Composite','Multi-column filters (leftmost prefix rule)','WHERE user_id=? ORDER BY ts'],['Covering','Index-only scans','INCLUDE (title)']]},
+ cards:[['say',null,'"A composite index on (user_id, created_at DESC) makes the feed query a single range scan."'],['trap','Cost','Every index slows writes; index only the hot queries.']]},
+{sec:'9 Core Concepts',t:'Concept 5: Caching',k:'50ms → 1ms',
+ seq:{a:['App|b','Redis|a','Database|g'],m:[['App','Redis','GET key','',0],['Redis','App','miss','r',0],['App','Database','SELECT','',1],['Database','App','row','g',1],['App','Redis','SET key TTL 5m','a',2],['App','Redis','GET key (next request)','',3],['Redis','App','hit < 1ms','g',3],['#','App','Database','On write: UPDATE DB, then DELETE key','p',4]]},
+ cap:['Cache-aside: check the cache first.','On a miss, read the database.','Populate the cache with a TTL.','The next request is served from memory.','On writes, update the DB and delete (not update) the cached key, so the next read refreshes it.'],
+ tbl:{h:['Strategy','Trade-off'],r:[['Cache-aside','Default; app controls; possible brief staleness'],['Write-through','Write cache + DB together; fresher, slower writes'],['Write-behind','Write cache, flush later; fast, risk of loss'],['CDN','Edge cache for static or shared responses']]}},
+{sec:'9 Core Concepts',t:'Concept 6: Sharding',k:'Split data across machines',
+ d:{w:800,h:300,n:[['r',110,150,'Router|shard = f(key)','b'],['s1',420,60,'Shard A|users 0–⅓','g','db'],['s2',420,150,'Shard B','g','db'],['s3',420,240,'Shard C','g','db'],['x',680,150,'cross-shard query\n= scatter-gather','r','n',1,170]],
+  e:[['r','s1','hash(user_id)','g'],['r','s2','','g'],['r','s3','','g'],['x','s1','','rd',1],['x','s2','','rd',1],['x','s3','','rd',1]]},
+ cap:['Pick a <b>shard key</b> from the hottest access pattern so most queries hit one shard. Hash for even spread; range for range scans.','Queries that don\'t include the shard key hit every shard. That is the cost you accept.'],
+ cards:[['trap','Biggest mistake: sharding too early','One Postgres handles ~10–50k TPS and multiple TB. Shard when the calculation says so.'],['why','Hot spots','Even with hashing, one hot key overloads one shard: key splitting, caching, or buffering.']]},
+{sec:'9 Core Concepts',t:'Concept 7: Consistent hashing',k:'Add nodes without moving everything',
+ d:{w:800,h:320,n:[['ring',400,160,'','x','o',0,260,260],['A',400,30,'Node A','b','pill'],['B',530,160,'Node B','b','pill'],['C',400,290,'Node C','b','pill'],['D',270,160,'Node D','b','pill'],['k',500,70,'key','a','pill',1],['E',500,255,'Node E (new)','g','pill',2]],
+  e:[['k','B','clockwise','a',1],['E','C','only B→E range moves','gd',2]]},
+ cap:['Nodes and keys hash onto a ring.','A key belongs to the next node clockwise.','Adding a node moves only the keys in one arc (~1/N), unlike hash % N which moves almost everything. Virtual nodes even out the load.'],
+ cards:[['why','Used by','Distributed caches, Cassandra, DynamoDB, L7 routing of video/doc IDs to servers.']]},
+{sec:'9 Core Concepts',t:'Concept 8: CAP theorem',k:'During a partition, pick C or A',
+ d:{w:800,h:300,n:[['n1',180,130,'Node 1|x = 2 (new)','g','db'],['n2',620,130,'Node 2|x = 1 (stale)','r','db'],['u',620,260,'User reads x','t','pill',1],['cp',400,40,'CP: refuse → error','b','pill',2],['ap',400,250,'AP: return x = 1','a','pill',2]],
+  e:[['n1','n2','network partition ✗','rd'],['u','n2','','',1]]},
+ cap:['The network between two replicas breaks. Partitions <b>will</b> happen, so P is not optional.','A user asks the node that can\'t see the latest write.','Either refuse (consistent, unavailable) or answer with stale data (available, inconsistent).'],
+ tbl:{h:['Feature','Choice'],r:[['Booking, payments, inventory','CP: never oversell or double-charge'],['Search, feeds, reviews, likes','AP: stale for seconds is fine'],['Usernames / unique constraints','CP (linearizable)']]},
+ cards:[['say',null,'"CAP is a per-feature choice: the booking path is CP, browsing is AP."']]},
+{sec:'9 Core Concepts',t:'Concept 9: Numbers to know',k:'Back-of-envelope',
+ tbl:{h:['Thing','Number'],r:[['Seconds per day','~86,400 ≈ 10⁵ → 1M/day ≈ 12/s'],['Redis (one node)','~100k+ ops/s, sub-ms, up to ~hundreds of GB RAM'],['Postgres (one primary)','~10–50k TPS simple queries; multiple TB'],['Kafka','~5–10k msg/s per partition planned; ~1M msg/s per broker; 7-day default retention'],['Cassandra node','~10k+ writes/s'],['Elasticsearch','~1–10k queries/s per cluster tier; near-real-time (~1s refresh)'],['Memory / SSD / network','RAM ~100ns · SSD ~100µs · same-DC RTT ~0.5ms · cross-continent ~150ms'],['Server','~64–128 cores, 256GB–1TB RAM, 10–25 Gbps NIC'],['WebSocket connections','~100k–1M per tuned server']]},
+ cards:[['say',null,'"1B requests/day is ~12k/s average, ~3–5× at peak. A single Redis handles that; Postgres needs a cache in front."']]},
+
+/* ───── TECHNOLOGIES ───── */
+{sec:'9 Technologies',t:'Key technologies: when to reach for which',k:'Part 3',
+ tbl:{h:['Tech','What it is','Reach for it when','Watch out'],r:[
+  ['PostgreSQL','ACID relational DB','Default for anything with transactions or relations','Single primary for writes; shard late'],
+  ['Redis','In-memory data structures, single-threaded','Cache, counters, rate limits, locks (SET NX), leaderboards (ZSET), geo, pub/sub','Memory-bound; persistence is optional; locks need fencing'],
+  ['Kafka','Partitioned, replicated log','Event streams, buffering writes, CDC, replay, multiple consumers','Order only within a partition; partition count caps parallelism'],
+  ['Cassandra','Leaderless wide-column, LSM','Massive writes, simple key access (chat, metrics, swipes)','No joins; model per query; LWW conflicts'],
+  ['DynamoDB','Managed KV/document','AWS-native, predictable single-digit ms, auto-scale','Hot partitions; GSIs eventually consistent'],
+  ['Elasticsearch','Inverted-index search engine','Full-text, faceting, geo + text','Not the source of truth; feed via CDC'],
+  ['Flink','Stateful stream processor','Windows, aggregations, CEP, exactly-once','Operational complexity; state size'],
+  ['API Gateway','Single entry point','Auth, rate limiting, routing, TLS','Don\'t put business logic in it'],
+  ['ZooKeeper / etcd','Consensus-backed coordination','Leader election, locks + fencing, config, membership','Metadata only; small data']]}},
+
+/* ───── PROBLEMS INTRO ───── */
+{sec:'29 Problems',type:'title',k:'Part 4',t:'29 problems, built step by step',s:'Each problem has two slides: <b>(1)</b> the story and the architecture evolving from naive to final, and <b>(2)</b> the deep dives explained, with the line to say in the interview and the DDIA chapter underneath.',
+ chips:PORDER.map(k=>PAT[k]+' · '+PROBS.filter(p=>p.patterns[0]===k).length)},
+];
+
+PROBS.forEach((p,i)=>{
+  const sec='Problems · '+PAT[p.patterns[0]];
+  const k=`Problem ${i+1}/29 · ${p.diff} · ${p.tags.join(' · ')}`;
+  SLIDES.push({sec,k,t:p.title,s:p.story,d:p.d,cap:p.cap,
+    cards:[['trap','Where most candidates start',p.naive],['why','Key insight',p.insight]]});
+  SLIDES.push({sec,k:k+' · deep dives',t:p.title.split(' —')[0]+': the hard parts explained',
+    c2:p.deep.map(([q,a])=>['q','Deep dive',`<b>${q}</b><br>${a}`]),
+    cards:[['say',null,p.line],['trap','Common mistake',p.trap],['why','DDIA underneath',p.ddia+' · concepts: '+p.concepts.join(', ')]]});
+});
+SLIDES.push({sec:'Done',type:'title',k:'Next',t:'Now drill it in the Interview deck',s:'You\'ve seen why every component exists. The Interview deck turns each problem into a timed, out-loud rehearsal: requirements, numbers, architecture, and deep-dive questions with hidden answers.',
+ cards:[['why','Spaced review','Revisit 3–4 problems per day in this deck and say each caption before pressing →.'],['say',null,'"Simplest thing that works → calculate where it breaks → fix only that."']]});
+
+Deck({"title":"System Design: Learn Deck","brand":"SD <b>Learn Deck</b>","accent":"#57ab5a","links":[["Handbook","../"],["DDIA","ddia.html"],["Learn","learn.html"],["Interview","interview.html"]],"self":"learn.html","key":"pub-deck-learn"}, SLIDES);</script>
+</body></html>
