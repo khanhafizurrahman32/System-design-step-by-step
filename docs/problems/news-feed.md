@@ -58,36 +58,59 @@ GET /feed?cursor=(ts,post_id)
 
 ![News feed (Facebook): v1 design](../diagrams/problem-news-feed-v1.svg)
 
-Fan-out on **read**: look up 200 followees, then their posts, on every feed load. At 115k feeds/sec that is millions of queries/sec.
+The simplest feed is computed **when the user opens it** (fan-out on read). Look up the ~200 people they follow, fetch each one's recent posts, merge them by time, and return the newest 20. Posting is just one insert into `posts`.
+
+**Where it breaks:** reads. There are about **115k feed loads a second**, and each needs the follow list plus recent posts from ~200 authors, spread across many database partitions. That's **tens of millions of lookups a second**, plus merging and sorting, on every page view. The p99 under 500 ms can't be met, and the database spends nearly all its time rebuilding the same feeds over and over.
 
 ## 5. Evolving to the final design
 
 ![News feed (Facebook): final design](../diagrams/problem-news-feed-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Fan-out on **read**: look up 200 followees, then their posts, on every feed load. At 115k feeds/sec that is millions of queries/sec.
-2. Fan-out on **write**: a new post goes to Kafka; workers push its ID into every follower's Redis sorted set. A feed load becomes one ZREVRANGE.
-3. Celebrity problem: one post to 100M followers means 100M writes. Hybrid: skip fan-out above ~100k followers and merge their recent posts at read time.
-4. Hydrate post IDs into content from the posts store, with a post cache. Cursor pagination on (ts, post_id).
+### Step 1: precompute feeds when people post (fan-out on write)
+
+**Why:** feeds are read far more often than posts are written (115k reads a second vs about 6k posts a second). It's cheaper to do the work **once per post** than **once per feed view**.
+
+**How:** when someone posts, save the post, then put a "new post" event on **Kafka**. Fan-out workers look up the author's followers and push the post ID into each follower's **feed list** in Redis: a sorted set ordered by timestamp, capped at about 500 entries. Opening the feed is now **one Redis read** (`ZREVRANGE feed:{user} 0 19`), which returns in a millisecond or two. The cost moved to write time: 6k posts a second × ~200 followers ≈ **1.2M feed inserts a second**, done asynchronously by workers. A post appearing in feeds a few seconds later is fine (eventual consistency).
+
+### Step 2: handle celebrities differently (hybrid)
+
+**Why:** fan-out on write assumes ~200 followers. An account with **100 million** followers would trigger 100M Redis writes for one post, taking minutes and swamping the workers, while everyone else's posts wait behind it.
+
+**How:** **don't fan out** for accounts above a threshold (say 100k–1M followers). Their posts are stored normally. When a user opens their feed, read their precomputed list, **plus** the recent posts of the few celebrities they follow, and merge the two by time. Most users follow only a handful of celebrities, so the extra work per read is small.
+
+### Step 3: turn IDs into posts, and paginate
+
+**Why:** the feed list holds only post IDs (to keep memory small), but the app needs text, images and author names. And scrolling must work while new posts keep arriving.
+
+**How:** **hydrate** the 20 IDs with one batch read from the posts store, with a post cache in front, because popular posts appear in millions of feeds. Paginate with a **cursor**, the `(timestamp, post_id)` of the last item shown, rather than page numbers.
 
 ## 6. Deep dives
 
 ### Celebrity with 100M followers?
 
-Hybrid. Don't fan out; followers pull celebrity posts at read time and merge. Threshold ~100k–1M followers.
+**Why it's hard:** fan-out on write costs one write per follower. For a celebrity that's 100M writes per post: a huge delay before followers see it, and a backlog that delays everyone else's posts.
+
+**How:** the **hybrid** model. Fan out on write for normal accounts; for accounts above a follower threshold, skip fan-out and **pull** their recent posts at read time, merging them into the precomputed feed. Tune the threshold (roughly 100k–1M followers) by measuring the cost of each path. Keep celebrities' recent posts heavily cached, since many readers fetch the same ones.
 
 ### How much memory for feeds?
 
-Only active users, only IDs, capped at 500: 300M × 500 × ~8B ≈ 1.2TB across a Redis cluster. Inactive users get rebuilt on demand.
+**Why it matters:** storing a feed for 2 billion users in Redis could be enormous.
+
+**How to keep it small:** store **only post IDs** (about 8 bytes each), **cap** each feed at about 500 entries, and keep feeds only for **active** users, say 300M. That's 300M × 500 × ~8 B ≈ **1.2 TB**, which spreads comfortably over a Redis cluster. When an inactive user returns, rebuild their feed on demand with fan-out on read, once, then keep it updated.
 
 ### Pagination?
 
-Cursor = (ts, post_id) of the last item. Offsets shift as new posts arrive.
+**Why offsets fail:** with `?page=2`, if 5 new posts arrive while you're reading page 1, page 2 now starts 5 items earlier, and you see duplicates.
+
+**How:** use a **cursor**: "give me 20 items older than `(ts, post_id)` of the last item I saw". The post ID breaks ties when two posts share a timestamp. New posts at the top don't affect it, and the sorted set supports it directly with a score range query.
 
 ### User follows someone new?
 
-An async job backfills the followee's recent posts into the follower's feed.
+**Why it matters:** fan-out on write only pushes **future** posts. Right after following someone, their existing posts aren't in your feed, and it looks broken.
+
+**How:** an **asynchronous backfill**: when a follow happens, a job fetches the new followee's recent posts (say the last 20) and inserts them into the follower's feed list. On unfollow, a similar job removes them, or the read path filters them out. It doesn't need to be instant, just within seconds.
 
 ## 7. Interview script (45 minutes)
 
@@ -121,6 +144,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Fan-out on write for everyone: one celebrity post means 100M writes and workers hours behind.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>What is fan-out on write?</summary>
+
+When someone posts, push the post ID into every follower's precomputed feed list, so reading a feed is one lookup.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why does fan-out on write break for celebrities?</summary>
+
+One post would mean millions of writes. Instead, their posts are pulled at read time and merged in (the hybrid approach).
+
+</details>
+
+<details class="question" markdown>
+<summary>Why store only post IDs in the feed lists?</summary>
+
+IDs are small, so feeds for many users fit in Redis memory; post bodies are fetched and cached separately.
+
+</details>
 
 ## Related
 

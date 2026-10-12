@@ -1,0 +1,23 @@
+name: Suggest a topic or problem
+description: A concept, 101 explainer or interview problem you'd like covered.
+labels: [content-request]
+body:
+  - type: input
+    id: topic
+    attributes:
+      label: Topic
+      placeholder: e.g. Hotel booking system, Bloom filters, CRDTs
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of page?
+      options: [System Design 101 explainer, Core concept or pattern, Interview problem, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help?
+      description: Where did you get stuck, or where was it asked?

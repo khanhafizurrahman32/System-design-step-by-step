@@ -57,36 +57,69 @@ GET /conversations/{id}
 
 ![LLM chat (ChatGPT): v1 design](../diagrams/problem-llm-chat-v1.svg)
 
-Naive: one synchronous request waits ~30s for the full answer. Timeouts, no progress shown, no backpressure.
+The client sends a message, the API server calls a GPU model server, waits for the **complete** answer, and returns it in the HTTP response.
+
+**Where it breaks:**
+
+- **Waiting:** a long answer takes 20–30 seconds to generate. The user stares at a spinner, and the time-to-first-token target of under 1 second is impossible.
+- **Timeouts:** load balancers and mobile networks often drop requests open that long. The answer is generated, but the user never sees it, so they retry, and the GPU does the work twice.
+- **No backpressure:** about **12k generations a second** on average, bursting much higher, sent straight to GPUs. GPUs are the scarce, expensive resource. When they're full, requests pile up or fail randomly, with no way to prioritize.
 
 ## 5. Evolving to the final design
 
 ![LLM chat (ChatGPT): final design](../diagrams/problem-llm-chat-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: one synchronous request waits ~30s for the full answer. Timeouts, no progress shown, no backpressure.
-2. Stream tokens to the client over **SSE** as they are generated, so time-to-first-token stays low.
-3. Put a **queue** in front of the GPU pool: absorbs bursts, enables priority for paid tiers, batching, and admission control (429 when full).
-4. Workers write tokens into a Redis Stream keyed by message_id; SSE servers read from it. A client that reconnects resumes from its last token; the final text is persisted.
+### Step 1: stream tokens as they're generated
+
+**Why:** the model produces text one token at a time. Making the user wait for the last token before showing the first wastes 20+ seconds of perceived latency.
+
+**How:** the client opens an **SSE** stream for the message, and each token is sent the moment it's generated. The first words appear in well under a second, and the rest flows in as the model writes. SSE fits because the data flows server to client, it works over plain HTTP, and it supports resuming with `Last-Event-ID`.
+
+### Step 2: put a queue in front of the GPUs
+
+**Why:** GPU capacity is fixed in the short term and very expensive. Demand is bursty. Without a buffer, bursts overload GPUs, and there's no way to say "paid users first" or to group requests efficiently.
+
+**How:** `POST /messages` saves the user's message, puts a generation job on a **priority queue**, and returns a `message_id` immediately. GPU workers pull jobs when they have capacity. The queue gives:
+
+- **backpressure:** jobs wait instead of overloading GPUs;
+- **priority:** paid tiers first;
+- **fairness:** limits per user;
+- **batching:** a worker can run several requests together, which uses a GPU far more efficiently;
+- **admission control:** when the queue is too long, new requests get a clear `429`.
+
+### Step 3: buffer tokens per message so clients can resume
+
+**Why:** phones switch networks and tabs get closed. If tokens go straight from the GPU to one connection, a dropped connection loses the rest of the answer, even though the GPU keeps generating it.
+
+**How:** workers write each token to a **Redis Stream** keyed by `message_id`. SSE servers **read from that stream** and forward to the client. If the client reconnects (to any server) with `Last-Event-ID`, the SSE server continues from that position. When generation finishes, the full text is saved to the `messages` table, and the Redis stream expires.
 
 ## 6. Deep dives
 
 ### Why a queue before GPUs?
 
-Scarce and expensive capacity: queueing gives backpressure, priority, fairness, and batching.
+**Why it's needed:** a GPU can serve only a limited number of generations at once, and each one holds it for seconds. Unlike stateless web servers, you can't spin up thousands more in a minute.
+
+**How it helps:** the queue turns overload into **waiting** instead of **failure**, and gives you control over who waits: paid before free, short before long, a fair share per user. Workers can pull several jobs at once and **batch** them on the GPU. Generating for 8 users together costs much less than 8 separate runs. When the wait gets too long, return `429` with a retry hint rather than letting requests time out.
 
 ### Client disconnects?
 
-Generation continues; tokens are buffered in the stream; resume with Last-Event-ID.
+**Why it matters:** generation is expensive. Throwing away a half-finished answer because the user's Wi-Fi blinked wastes GPU time and frustrates the user.
+
+**How:** **decouple generation from the connection**. The worker keeps generating and appending tokens to the message's Redis Stream whether or not anyone is connected. The client reconnects with `Last-Event-ID` (the last token it received) and receives everything after it. If the user really leaves and nobody reads the stream for a while, the job can be cancelled to save GPU time.
 
 ### Long context?
 
-Load recent messages; summarize or truncate to fit the window; cache hot conversations.
+**Why it's a problem:** the model can read only a limited amount of text (its **context window**), and the cost grows with the length of input. A conversation with hundreds of messages may not fit, and resending all of it on every turn is expensive.
+
+**How:** load the **most recent** messages that fit, and replace older parts with a **summary** that is generated once and stored with the conversation. Keep hot conversations' recent messages **cached** so each turn doesn't hit the database. Some model servers can also cache the processed prefix of a conversation (KV or prompt caching), making repeat turns cheaper.
 
 ### Cost control?
 
-Per-user rate limits and token quotas at the gateway.
+**Why it's needed:** every generated token costs GPU time. One user or script sending thousands of long requests could consume a large share of capacity.
+
+**How:** enforce **per-user rate limits** (requests per minute) and **token quotas** (tokens per day, by plan) at the API gateway, before anything reaches the queue. Cap the maximum output length per request. Track usage per user for billing and abuse detection.
 
 ## 7. Interview script (45 minutes)
 
@@ -120,6 +153,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Holding a synchronous connection through the load balancer straight to a GPU.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why stream tokens rather than wait for the full answer?</summary>
+
+The first words appear in under a second, which matters more to users than total time.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why put a queue in front of the GPUs?</summary>
+
+Backpressure, fairness across users with priorities, and batching requests for GPU efficiency.
+
+</details>
+
+<details class="question" markdown>
+<summary>A client disconnects mid-answer. What happens?</summary>
+
+Tokens are buffered per message, so the reconnecting client resumes from where it left off.
+
+</details>
 
 ## Related
 

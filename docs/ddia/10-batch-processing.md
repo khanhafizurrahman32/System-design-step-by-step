@@ -1,6 +1,6 @@
 ---
 title: "DDIA Ch 10: Batch Processing"
-description: "Take a big, bounded, immutable input, run a pure function over it, and produce a derived output."
+description: "Batch processing from Unix pipes to MapReduce and Spark: map, shuffle, reduce, batch joins, skew, and why immutable inputs make jobs safe to re-run."
 tags: [ddia]
 ---
 
@@ -23,55 +23,74 @@ Take a big, bounded, **immutable** input, run a pure function over it, and produ
 
 *Where batch comes from*
 
+Part III of the book is about **derived data**: indexes, caches, reports and recommendations computed from a source of truth. The simplest way to compute derived data is a **batch job**. Take a large, fixed input (yesterday's logs, say), run it through a program, and write a new output. The ideas behind modern batch systems were already in Unix decades ago.
+
+Say you want the five most-visited pages from a web server log. In a Unix shell, this is one line:
+
+```bash
+cat access.log | awk '{print $7}' | sort | uniq -c | sort -rn | head -5
+```
+
 ![The Unix philosophy: small tools, one interface](../diagrams/ddia-10-1.svg)
 
-1. Read the log and extract the URL field from each line.
-2. Sort so identical URLs are adjacent, then count each run. When the data is bigger than memory, sort spills to disk, so this scales past RAM.
-3. Sort by count and take the top 5. Six tiny programs, composed through one uniform interface: a stream of lines.
+1. `awk` reads each line of the log and prints only the 7th field, the URL.
+2. `sort` puts identical URLs next to each other, and `uniq -c` collapses each run into a count. If the log is bigger than memory, `sort` spills to disk and merges, so this works on files far larger than RAM.
+3. `sort -rn` orders by count, highest first, and `head -5` keeps the top five. That's six tiny programs, none of which knows about the others, combined into a useful analysis.
 
-- **Immutable input**: run it as many times as you like and nothing breaks.
-- **Uniform interface**: every tool reads and writes files, so you can wire anything to anything.
-- **Separation of logic and wiring**: the program doesn't know where its input came from.
-- MapReduce is this same idea spread across thousands of machines, with HDFS as the "file".
+Why does this work so well? Three properties, which carry straight over to big-data systems:
+
+- **The input is never modified.** You can run the command a hundred times while experimenting, and the log is untouched. A mistake costs nothing.
+- **One uniform interface:** every tool reads lines of text and writes lines of text, so any tool can feed any other.
+- **Logic is separate from wiring:** `sort` doesn't know or care where its input comes from or where its output goes.
+
+**MapReduce** is this same idea spread over thousands of machines, with a distributed filesystem (HDFS) playing the role of the file.
 
 ## MapReduce: map, shuffle, reduce
 
 *Distributed batch*
 
+Now the log is 10 TB, spread over hundreds of machines. MapReduce runs the same "extract, group, count" logic in parallel:
+
 ![MapReduce: map, shuffle, reduce](../diagrams/ddia-10-2.svg)
 
-1. Input is split into blocks, replicated across machines (HDFS).
-2. The scheduler runs a **mapper** next to each block (move the compute to the data). Mappers emit key-value pairs.
-3. The **shuffle** sends every pair with the same key to the same reducer and sorts them. This is the expensive network step.
-4. Each **reducer** sees all values for its keys together, aggregates them, and writes output files. If a task fails, just rerun that task, because inputs are immutable.
+1. The input is stored in **HDFS**, split into blocks of about 128 MB, with each block copied to three machines.
+2. The scheduler starts a **mapper** on a machine that already holds each block. Moving the code to the data is far cheaper than moving terabytes over the network. Each mapper reads its records and emits **key-value pairs**, for example `(url, 1)` for every log line. This is the `awk` step.
+3. The **shuffle** then routes every pair to a **reducer** chosen by hashing its key, so all pairs for the same URL end up at the same reducer, sorted by key. This is the `sort` step. It is the expensive part, because most of the data crosses the network here.
+4. Each **reducer** receives, for each key, all its values together (`url → 1, 1, 1, …`), combines them (adds them up), and writes its output files back to HDFS. This is the `uniq -c` step.
+
+Fault tolerance comes almost for free. Because inputs are immutable and tasks have no side effects, if a machine dies mid-task the scheduler simply **re-runs that one task** somewhere else.
 
 > [!NOTE]
-> **Scale:** Mapper output goes to local disk; reducers pull over the network. Jobs at Google and Yahoo processed petabytes daily, and the same pattern now runs in Spark, BigQuery, and Snowflake.
+> **Scale:** mapper output is written to local disk, and reducers pull it over the network. Google and Yahoo ran MapReduce over petabytes a day, and the same map-shuffle-reduce shape still runs inside Spark, BigQuery and Snowflake today.
 
 ## Joins in batch: bring related records together
 
 *Sort-merge · broadcast · partitioned*
 
+Batch jobs often need to **combine** two datasets. Question: "which URLs are popular with which age group?" Clicks come from the event log (`user_id, url`). Ages come from the user database (`user_id, birth_year`).
+
 ![Joins in batch: bring related records together](../diagrams/ddia-10-3.svg)
 
-1. Goal: "which URLs are popular with which age group?" Don't query the user DB per event (millions of random lookups). Take a **snapshot** of it.
-2. **Sort-merge join**: both mappers emit user_id as the key. The shuffle delivers one user's profile and clicks to the same reducer, adjacent. One linear pass joins them.
-3. **Broadcast hash join**: if one side is small (a hotel dimension table), load it into each mapper's memory. No shuffle is needed. **Partitioned hash join**: both sides partitioned the same way, so join partition by partition.
+1. The naive way is to look up each user in the live database for each click. With billions of clicks, that's billions of random network requests: far too slow, and it would hammer the production database. Instead, take a **snapshot** (a dump) of the user table into HDFS, so both datasets are plain files.
+2. **Sort-merge join:** one mapper reads clicks and another reads users, and **both emit `user_id` as the key**. The shuffle delivers everything for user 104, the profile and all of their clicks, to the **same reducer**, next to each other, with the profile first. The reducer reads the birth year, then streams through the clicks emitting `(url, age)` pairs. It is one linear pass, with no random lookups.
+3. **Broadcast hash join:** if one side is **small**, such as a table of 5,000 hotels, skip the shuffle entirely. Load the small table into memory in **every** mapper, and each mapper joins its share of the big dataset by looking up the in-memory table. **Partitioned hash join:** if both datasets are already partitioned the same way (by the same key, into the same number of parts), each partition of one can be joined with the matching partition of the other independently.
 
 > [!WARNING]
-> **Skew:** One hot key (a celebrity user) sends millions of records to one reducer. Fixes: skewed-join handling (sample hot keys, spread them across reducers), the same idea as Ch 6.
+> **Skew:** if one key is extremely common, such as a celebrity with millions of clicks, all of its records go to **one** reducer, and the whole job waits for it. The fix is the same as hot keys in Chapter 6: detect the hot keys (for example by sampling) and spread their records across several reducers.
 
 ## Beyond MapReduce: dataflow engines and batch outputs
 
 *Spark · Flink · outputs*
 
+Real pipelines aren't one MapReduce job; they're chains of ten or twenty. MapReduce handles chains badly:
+
 ![Beyond MapReduce: dataflow engines and batch outputs](../diagrams/ddia-10-4.svg)
 
-1. Chaining MapReduce jobs **materializes** every intermediate result to replicated HDFS: slow, and each job waits for the whole previous one.
-2. Dataflow engines run the whole workflow as one **DAG** and pipeline data between operators. On failure they recompute lost partitions from **lineage**, so typically 10–100× faster.
+1. In MapReduce, every job writes its full output to HDFS, **replicated three times**, before the next job can start reading it. Most of those intermediate files are thrown away straight after. Each job also waits for the **entire** previous job to finish, even if the first results were ready long before.
+2. **Dataflow engines** like Spark and Flink treat the whole pipeline as one graph of operators (a **DAG**). Data streams from one stage to the next in memory or on local disk, without the replicated writes. If a machine fails, lost pieces are **recomputed** from the steps that produced them (the **lineage**) instead of being stored three times just in case. The result is often 10–100× faster.
 
 > [!NOTE]
-> **What batch jobs produce:** Search indexes (build offline, swap atomically), pre-computed recommendations, ML features, read-only KV stores bulk-loaded into serving. A bad output is rolled back by pointing at yesterday's files.
+> **What batch jobs produce:** search indexes (built offline, then swapped in atomically), precomputed recommendations, machine-learning features, and read-only key-value stores bulk-loaded into serving systems. Because outputs are new files rather than in-place changes, **rolling back a bad run** just means pointing back at yesterday's output.
 
 ## In the interview
 

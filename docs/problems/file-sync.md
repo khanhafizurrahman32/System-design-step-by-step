@@ -57,36 +57,65 @@ GET /files/{id} → chunk list + presigned download URLs
 
 ## 4. v1: the simplest design, and where it breaks
 
-Naive: upload the whole file through the API. A 50GB upload dies at 99% and starts over.
+The client uploads each changed file **whole** through the API, which stores it. Other devices periodically ask "what changed?" and download changed files whole.
+
+**Where it breaks:**
+
+- **Large files:** a 50 GB file uploading through your API takes hours. If the connection drops at 99%, it **starts over**.
+- **Small edits:** change one byte in a 50 GB file and the whole 50 GB is uploaded again, then downloaded again by every other device. Wasteful for users with limited bandwidth.
+- **Slow sync:** devices find out about changes only at their next check, not "within seconds".
 
 ## 5. Evolving to the final design
 
 ![File storage and sync (Dropbox): final design](../diagrams/problem-file-sync-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: upload the whole file through the API. A 50GB upload dies at 99% and starts over.
-2. Split into ~5MB chunks; upload directly to S3 via presigned URLs, which is resumable and parallel.
-3. Fingerprint each chunk, using **content-defined chunking** so an insert near the start doesn't shift every boundary. The server returns only missing chunks. Edits re-upload changed chunks, and identical chunks are stored once (dedupe).
-4. Other devices follow a per-user change log with a cursor (long-poll or WebSocket), fetch the metadata diff, and download only the changed chunks.
+### Step 1: split files into chunks, upload them directly to S3
+
+**Why:** large uploads must be resumable and must not pass through the API servers.
+
+**How:** the client splits each file into **chunks** of about 5 MB, so a 50 GB file is about 10,000 chunks. The API returns **presigned URLs**, and the client uploads chunks **directly to S3**, several in parallel. If the connection drops, only the unfinished chunks are retried. Metadata (file, version, list of chunks) lives in the database.
+
+### Step 2: fingerprint chunks, and upload only what's missing
+
+**Why:** after a small edit, most of the file is unchanged. Re-sending it wastes bandwidth. And many users store identical files.
+
+**How:** the client computes a **hash** (SHA-256) of each chunk and sends the **list of hashes** first. The server replies with the hashes it **doesn't already have**, and only those chunks are uploaded. A small edit uploads just the one or two changed chunks. Identical chunks across files and users are stored **once** (deduplication).
+
+One subtlety: with fixed 5 MB boundaries, inserting one byte near the start shifts **every** boundary after it, so every chunk looks new. **Content-defined chunking** places boundaries where the data matches a pattern (using a rolling hash), so an insert changes only the chunk around it and boundaries further on stay put.
+
+### Step 3: sync other devices from a change log
+
+**Why:** other devices must learn about changes within seconds, and download only what changed.
+
+**How:** every change to a user's files appends an entry to a **per-user change log**. Each device keeps a **cursor**, its position in that log. A device holds a long-poll or WebSocket connection open so it's **notified** as soon as something new arrives, then calls `GET /changes?cursor=…` to get the metadata changes since its cursor. For each changed file, it compares chunk hashes with what it already has and downloads only the **new chunks**.
 
 ## 6. Deep dives
 
 ### Resume after failure?
 
-The server knows which chunk hashes exist; the client re-sends only missing ones.
+**Why it matters:** uploads of big files over home or mobile connections fail regularly. Restarting from zero makes large files nearly impossible to sync.
+
+**How:** chunking makes progress **durable**: every uploaded chunk is stored in S3 under its hash. When the client reconnects, it sends the file's chunk-hash list again. The server says which hashes it already has, and the client sends **only the missing ones**. A 50 GB upload interrupted at 99% resumes by sending the last 1%.
 
 ### How do devices learn about changes?
 
-Change log + cursor per device; long-poll or WebSocket notifications.
+**Why polling isn't great:** frequent polling from millions of devices is wasteful; infrequent polling makes sync slow.
+
+**How:** a **change log with a cursor per device**, plus a **notification** channel. The device keeps a long-poll request or WebSocket open to a notification service. When the user's log gets a new entry, the service wakes the device, which then fetches the changes since its cursor and advances it. If the device was offline for a week, it simply reads everything since its cursor when it returns, so nothing is missed.
 
 ### Edits on two offline devices?
 
-Upload carries a base version; if stale, save a "conflicted copy" (DDIA Ch 5 multi-leader conflict).
+**Why it's hard:** you edit `report.docx` on your laptop on a plane, and a colleague edits it on their computer. Both later sync, and both changes are based on the same old version. Neither can simply win without destroying the other's work. This is the multi-leader conflict from [DDIA Ch 5](../ddia/05-replication.md).
+
+**How:** each upload states the **base version** it was edited from. If the server's current version is newer than that base, there's a conflict. Instead of overwriting, save the second upload as a separate **"conflicted copy"** (`report (Asha's conflicted copy).docx`) and let the people involved merge them. It's simple, nothing is lost, and the user decides.
 
 ### Trust the client said "done"?
 
-Verify via S3 event or ETags before marking the file version committed.
+**Why not:** the client could crash after saying "upload complete", or be buggy, or be malicious, claiming chunks it never uploaded. Marking the file as committed would point other devices at data that doesn't exist.
+
+**How:** **verify** with storage before committing the new version. Either react to **S3 event notifications** for each chunk, or check that every listed chunk exists and its **ETag**/checksum matches the expected hash. Only then mark the file version as committed and add it to the change log for other devices.
 
 ## 7. Interview script (45 minutes)
 
@@ -120,6 +149,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Proxying file bytes through API servers, and re-uploading whole files on small edits.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why split files into hashed chunks?</summary>
+
+Only changed chunks are uploaded, and chunks the server already has (same hash) are skipped.
+
+</details>
+
+<details class="question" markdown>
+<summary>How does another device learn about changes?</summary>
+
+It follows a per-user change log with a cursor and fetches only what changed since.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why not trust the client saying an upload is done?</summary>
+
+Verify with object storage that the chunks exist (and match their hashes) before marking the file complete.
+
+</details>
 
 ## Related
 

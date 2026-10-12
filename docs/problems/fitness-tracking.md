@@ -58,36 +58,62 @@ GET /feed?cursor
 
 ![Fitness tracking (Strava): v1 design](../diagrams/problem-fitness-tracking-v1.svg)
 
-Naive: stream every GPS point to the server in real time. 10M devices means millions of writes/sec, for no user value.
+While a user runs or rides, the app **streams every GPS point** to the server as it's recorded, and the server stores each point in a database. When the activity ends, the server computes distance, pace and the map from the stored points.
+
+**Where it breaks:**
+
+- **Load for nothing:** with many users recording at once, every point is a write. Millions of devices sending a point every few seconds is **hundreds of thousands to millions of writes a second**, yet nobody looks at the activity until it's finished.
+- **Lost activities:** runners go through tunnels, hikers through valleys with no signal, and phones switch networks. Every gap in connectivity is a gap in the recorded route, and losing someone's marathon is the worst possible failure for this product.
 
 ## 5. Evolving to the final design
 
 ![Fitness tracking (Strava): final design](../diagrams/problem-fitness-tracking-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: stream every GPS point to the server in real time. 10M devices means millions of writes/sec, for no user value.
-2. Record on the device (works in tunnels and mountains). Upload the whole activity when finished, with an idempotency key and resumable upload.
-3. Track blob to S3, metadata to Postgres.
-4. Heavy processing (stats, segment matching) runs asynchronously from a queue; leaderboards are Redis sorted sets per segment.
+### Step 1: record on the device, upload when finished
+
+**Why:** the activity is only needed **after** it ends, and the phone is the one thing guaranteed to be there for the whole activity, with or without a signal.
+
+**How:** the app records GPS points **locally**: they're written to the phone's storage, so even a crash or a dead battery keeps what was recorded. When the user taps "finish", the app uploads the **whole activity** in one go. If there's no signal, it waits and retries later. The upload uses a client-generated **activity ID** as an **idempotency key**, so a retry after a lost response never creates a duplicate. Large tracks upload in **resumable chunks**, so a dropped connection resumes rather than restarting.
+
+### Step 2: store the track as a file, the summary in a database
+
+**Why:** a track is a blob, around 15–100 KB of points, adding up to **about 1 TB a day**, and it's read whole, when someone opens the activity. The summary fields (distance, duration, type) are what feeds and searches use.
+
+**How:** store the track file in **S3** (cheap, durable, served via CDN for map rendering), and a small row in **Postgres**: `activities(id, user_id, type, start, distance, duration, track_s3_key)`.
+
+### Step 3: process asynchronously, build leaderboards in Redis
+
+**Why:** after upload there's real work to do: compute statistics, match the route against popular **segments** (a famous climb, a park loop), update leaderboards and feeds. Doing it inside the upload request would make the user wait and could fail the upload.
+
+**How:** the upload returns as soon as the data is safely stored, then puts a job on a **queue**. Workers compute stats and segment matches. Segment leaderboards are **Redis sorted sets**, one per segment, with the effort time as the score, so "top 10" or "my rank" are single fast commands. Feeds of friends' activities update asynchronously; eventual consistency is fine.
 
 ## 6. Deep dives
 
 ### Why device-first?
 
-Signal is unreliable; users need it to work offline. Only optional live tracking sends periodic points (best effort).
+**Why not live streaming:** signal is unreliable exactly where people exercise, so a server-first design loses data whenever coverage drops. It also generates enormous write load for data nobody reads until later.
+
+**How it works:** the device is the **source of truth during recording**, and the server becomes the source of truth after upload. Live tracking, letting a family member follow your run, is an **optional, best-effort** extra: the app sends a point every 30 seconds or so when it can, and gaps are fine. The final recorded track always comes from the device upload.
 
 ### Upload reliability?
 
-Idempotency key = activity_id; resumable chunks; retry until acked.
+**Why it's hard:** mobile uploads fail mid-way, and responses get lost. The app doesn't know whether the server received the activity, so it must retry without creating duplicates.
+
+**How:** the app creates the **activity ID** when recording starts and sends it as the **idempotency key**. The server's insert uses that ID, so a repeated upload finds the existing activity and returns success instead of creating a second one. The track uploads in **chunks** that can resume. The app keeps the local copy and keeps retrying **until the server confirms**, and only then may it delete local data.
 
 ### Leaderboards?
 
-ZADD segment:{id} with the time as score; ZRANGE for top N; snapshot to DB.
+**Why Redis:** a leaderboard needs "insert a time", "top N" and "my rank" to be fast, for millions of segments.
+
+**How:** one Redis **sorted set** per segment: `ZADD segment:{id} <time_seconds> <user_id>` (keeping only each user's best time). `ZRANGE segment:{id} 0 9` gives the 10 fastest, and `ZRANK` gives a user's position, both in O(log n). Periodically **snapshot** the sets to the database, so they can be rebuilt if Redis is lost.
 
 ### Time correctness?
 
-Use device timestamps (event time), not upload time.
+**Why it matters:** an activity recorded Saturday morning but uploaded Monday (no signal on the mountain) must show as Saturday's run, in the right order in feeds and weekly totals.
+
+**How:** use the **device's timestamps** from recording (event time) for the activity's start and each point, not the server's upload time. Sanity-check them (the phone clock might be wrong; compare with GPS time if available), but never replace them with arrival time.
 
 ## 7. Interview script (45 minutes)
 
@@ -121,6 +147,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Server-side real-time ingestion of every GPS point.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why record GPS on the device and upload at the end?</summary>
+
+Streaming every point is costly and fragile on poor connections; one upload per activity is simpler and works offline.
+
+</details>
+
+<details class="question" markdown>
+<summary>How do you make uploads reliable?</summary>
+
+Idempotent, resumable uploads to object storage, keyed by an activity ID created on the device.
+
+</details>
+
+<details class="question" markdown>
+<summary>How are leaderboards built?</summary>
+
+Asynchronously from a queue after upload, stored in Redis sorted sets.
+
+</details>
 
 ## Related
 

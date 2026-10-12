@@ -18,14 +18,29 @@ tags: [pattern]
 - Users upload or download files larger than a few megabytes.
 - Media needs processing after upload (thumbnails, transcoding).
 
-## The idea in one diagram
+## The problem
+
+Some data is **big**: videos, photos, PDFs, backups, from megabytes to many gigabytes per file. Your app servers are built for small, quick requests. If a 2 GB upload flows through them:
+
+- it ties up a server's connection, memory and bandwidth for minutes;
+- a dropped connection at 95% means starting again from zero;
+- a few hundred simultaneous uploads can starve every other request.
+
+Databases are the wrong place for the bytes too: big rows bloat backups and replication.
+
+The idea is that the bytes and the **information about** the bytes take **different paths**. The bytes go straight between the client and **object storage** (S3, Google Cloud Storage), which is built for exactly this. Your servers only handle the small metadata.
+
+## The idea, step by step
 
 ![Pattern 6: Handling Large Blobs](../diagrams/pattern-large-blobs.svg)
 
-1. Pushing gigabytes through your API servers wastes their bandwidth and memory and fails on long uploads.
-2. The API hands out a **presigned URL**; the client uploads directly to S3 (**multipart**: parallel, resumable chunks). Metadata is recorded separately.
-3. S3 **event notifications** trigger processing (thumbnails, transcoding) and flip status to READY. Don't trust the client to say it finished.
-4. Downloads come from a **CDN** (or presigned GET URLs), never through the app servers.
+1. **The client asks your API for permission to upload** ("I want to upload `video.mp4`, 2 GB"). The API checks the user is allowed, creates a metadata row in the database (owner, size, `status = PENDING`, the storage key), and…
+2. **…returns a presigned URL.** This is a URL to the storage bucket with a **signature** built in, granting permission to upload **that one object**, for a short time (say 15 minutes), without giving the client any storage credentials.
+3. **The client uploads directly to object storage** using that URL. For big files it uses **multipart upload**: the file is split into parts (say 10 MB each) that upload in parallel, and if one fails, only that part is retried. If the connection drops, the upload **resumes** where it left off. Your servers handle none of these bytes.
+4. **Object storage tells you when it's done.** When the upload completes, the storage service emits an **event notification**, which triggers your processing: thumbnails, virus scanning, video transcoding. When processing finishes, the metadata row is set to `READY`. Don't rely on the client saying "I'm done", because clients crash or lie. Trust the storage event, or check the object exists.
+5. **Downloads come from a CDN** in front of the storage (or via presigned download URLs for private files). Users get the bytes from a server near them, and again your app servers never touch them.
+
+**What to mention:** set an expiry on unfinished multipart uploads so abandoned parts don't cost money forever, store a checksum to detect corruption, and keep the bucket private, with access only through presigned URLs or the CDN.
 
 ## Decision checklist
 

@@ -56,36 +56,64 @@ GET /docs/{id} (snapshot + version)
 
 ![Collaborative editor (Google Docs): v1 design](../diagrams/problem-collaborative-editor-v1.svg)
 
-Naive: send the whole document on save. Last write wins, and someone's work disappears.
+Each user edits a local copy of the document, and the app **saves the whole document** to the server every few seconds. Other users periodically reload it.
+
+**Where it breaks:** Alice and Bob both open the doc. Alice fixes a typo in paragraph 1; Bob adds a sentence to paragraph 5. Both save. The server keeps whichever save arrives **last**, so the other person's work **disappears** without warning (last write wins). With 100 people editing, almost everyone's changes get overwritten. And edits only appear after the next save and reload, nowhere near the 100 ms target for seeing others type.
 
 ## 5. Evolving to the final design
 
 ![Collaborative editor (Google Docs): final design](../diagrams/problem-collaborative-editor-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: send the whole document on save. Last write wins, and someone's work disappears.
-2. Send **operations** (insert "x" at 5). Concurrent ops shift positions, so a single server per doc orders them and **transforms** each against concurrent ones (Operational Transformation), then broadcasts.
-3. Every op is appended to the op log before it is acknowledged; periodic snapshots make loading fast (snapshot + tail).
-4. All editors of a doc must reach the same owner server: consistent hashing on doc_id, with ownership coordinated through ZooKeeper.
+### Step 1: send operations, ordered and transformed by one server
+
+**Why:** whole-document saves can't be merged. Small **operations** can, but concurrent operations interfere. If Alice inserts 3 characters at position 2 while Bob deletes the character at position 10, by the time Bob's delete arrives, the character he meant is now at position 13. Applying "delete at 10" blindly deletes the wrong character.
+
+**How:** each keystroke becomes an operation like `insert("x", pos 5)`, tagged with the **document version** it was based on, sent over a WebSocket. One server per document receives all operations, puts them in a **single order**, and **transforms** each one against any operations it hadn't seen. Bob's "delete at 10, based on version 41" is adjusted to "delete at 13", because Alice's insert (version 42) shifted the text. This is **Operational Transformation (OT)**. The server broadcasts the transformed operation to everyone, and all copies end up identical.
+
+### Step 2: make every operation durable before acknowledging it
+
+**Why:** an acknowledged edit must never be lost, even if the server crashes. And loading a document by replaying millions of operations from the start would be slow.
+
+**How:** append each operation to an **op log** (`doc_ops(doc_id, version, op)`) **before** acknowledging and broadcasting it. Periodically save a **snapshot** of the full document at a version. To open a document, load the latest snapshot and apply only the operations after it.
+
+### Step 3: route every editor of a document to the same server
+
+**Why:** OT needs **one** place deciding the order for each document. If two servers both accepted operations for the same doc, they'd order them differently and the copies would diverge.
+
+**How:** route WebSocket connections by `doc_id` using **consistent hashing**, so all editors of a document reach the same server. Record which server **owns** which document in a coordination service (ZooKeeper or etcd), so after a server failure ownership moves cleanly to exactly one new server, which reloads the snapshot and op log.
 
 ## 6. Deep dives
 
 ### OT or CRDT?
 
-**OT**: a central server orders and transforms; compact; needs one coordinator per doc (Google Docs). **CRDT**: ops commute, no server needed, good for offline and P2P; bigger metadata (Figma, Yjs).
+**Why there are two approaches:** both solve "concurrent edits must converge", in different ways.
+
+**How they differ:**
+
+- **OT (Operational Transformation):** a central server orders operations and transforms them against each other. Operations stay small and simple, but you need that coordinator per document. Google Docs works this way.
+- **CRDTs (Conflict-free Replicated Data Types):** each character gets a unique, ordered identifier, so operations **commute**: they can be applied in any order and still converge. No central server is needed, which suits offline editing and peer-to-peer. The cost is extra metadata per character, and more complex data structures. Figma's multiplayer and libraries like Yjs and Automerge take this approach.
+
+In an interview, OT with a server per document is the simpler story when there's always a server. Mention CRDTs for offline-first.
 
 ### Why one server per doc?
 
-OT needs a single total order of ops (DDIA Ch 9).
+**Why it's needed:** OT's correctness depends on every operation being transformed against a **single, agreed order** of the operations before it. That's a **total order**, which requires one place making the decision ([DDIA Ch 9](../ddia/09-consistency-and-consensus.md)).
+
+**Why it's fine:** a hot document has ~100 editors doing a few operations a second each, about **500 operations a second**, which one server handles easily. The many millions of documents are spread across many servers, so the system scales by documents, not by splitting one document.
 
 ### Offline edits?
 
-Client buffers ops tagged with a base version; on reconnect the server transforms them against everything since that version.
+**Why it's tricky:** a user edits on a plane for an hour. Meanwhile, others changed the same document hundreds of times.
+
+**How:** the client **buffers** its operations locally, each tagged with the **base version** it last saw. On reconnect, it sends them. The server transforms them against **every** operation since that version, in order, then applies and broadcasts the results. The client also receives the missed operations and transforms its view similarly. Very long divergences may be shown as suggestions instead.
 
 ### Cursors?
 
-Ephemeral presence over the same socket; not persisted.
+**Why they're different:** showing where collaborators' cursors are, and who's present, is important for the experience but has no long-term value. Old cursor positions are worthless.
+
+**How:** send cursor and presence updates over the **same WebSocket**, but treat them as **ephemeral**: broadcast to other editors, throttled to a few updates a second, and **never** written to the op log or database. If one is lost, the next update replaces it.
 
 ## 7. Interview script (45 minutes)
 
@@ -119,6 +147,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Locking the document or paragraph, which defeats real-time collaboration.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why send operations instead of whole documents?</summary>
+
+Last-write-wins on whole documents loses concurrent edits; small operations can be merged.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why one server per document?</summary>
+
+It gives a single place to order and transform concurrent operations (OT).
+
+</details>
+
+<details class="question" markdown>
+<summary>When would you choose CRDTs over OT?</summary>
+
+When you need offline or peer-to-peer editing without a central server ordering operations.
+
+</details>
 
 ## Related
 

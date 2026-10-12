@@ -9,6 +9,8 @@ description: Nine technologies that cover most designs, with when to use each, w
 
 You need fewer technologies than you think. Start with **Postgres**, add **Redis** for speed and **Kafka** for streams, and reach for the others only when a requirement asks for them.
 
+Why these systems behave the way they do (Redis's single thread, Postgres's commit limits, Kafka's use of the page cache) is explained in [Operating Systems for system design](os/index.md).
+
 | Need | Default choice |
 |---|---|
 | Source of truth with transactions | Postgres |

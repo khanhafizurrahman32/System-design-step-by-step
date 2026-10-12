@@ -58,36 +58,69 @@ webhook → merchant: payment.succeeded / failed
 
 ![Payment system (Stripe): v1 design](../diagrams/problem-payment-system-v1.svg)
 
-Naive: call the processor, then write the DB. A crash in between charges the card with no record of it.
+When a customer pays, the API calls the card processor ("charge this card $50"), waits for the result, and then writes a `payments` row with the outcome.
+
+**Where it breaks:** look at what happens if anything fails **between** the processor call and the database write.
+
+- The server **crashes** after the processor charged the card but before the row was written. The customer has been charged, and **we have no record of it**.
+- The processor call **times out**. Did it charge or not? We don't know (see [DDIA Ch 8](../ddia/08-trouble-with-distributed-systems.md)). If we retry, we may **charge twice**. If we don't, we may lose a real payment.
+- The merchant's own server retries its request after a network blip, and we create a **second payment**.
+
+Throughput (about 10k transactions a second) isn't the hard part. **Correctness when outcomes are unknown** is.
 
 ## 5. Evolving to the final design
 
 ![Payment system (Stripe): final design](../diagrams/problem-payment-system-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: call the processor, then write the DB. A crash in between charges the card with no record of it.
-2. Write the intent as **PENDING** first, call the processor with our intent ID as the idempotency key, then record the result. On timeout, query by our ID; never create a new charge.
-3. Merchants send an Idempotency-Key on every mutating call (stored with a unique index). Card numbers are tokenized into an isolated vault; the rest of the system sees tokens.
-4. Status changes write an **outbox** row in the same transaction; a relay publishes and webhooks are delivered with retries and signatures. Money moves as append-only double-entry ledger rows, reconciled daily against processor settlement files.
+### Step 1: record intent first, call the processor with our ID
+
+**Why:** we need a record that exists **before** money can move, so after any crash or timeout we can find out what happened instead of guessing.
+
+**How:** create the payment intent in our database with status **PENDING** first. Then call the processor, passing **our intent ID as the processor's idempotency key**. Then record the result (SUCCEEDED or FAILED). If we crash or time out, the PENDING row remains. A recovery job retries the call with the **same** idempotency key, which the processor treats as the same request and never charges twice, or **queries the processor** for that ID's status. We never create a fresh charge for an existing intent.
+
+### Step 2: protect against client retries, and isolate card data
+
+**Why:** merchants' servers retry too, and each retry mustn't become a new payment. And raw card numbers are dangerous to store: any system that touches them falls under strict PCI rules.
+
+**How:** every mutating API call requires an **Idempotency-Key** from the merchant, stored with a **unique index**. A repeated key returns the original response instead of doing the work again. Card numbers go straight into an isolated, tightly controlled **vault** that returns a **token**. The rest of the system only ever sees tokens, which keeps most of it out of PCI scope.
+
+### Step 3: reliable events, a ledger, and reconciliation
+
+**Why:** merchants must be told reliably when a payment's status changes. The record of money must be correct and auditable forever. And bugs or processor errors must be caught.
+
+**How:**
+
+- Every status change writes an **outbox** row **in the same transaction**. A relay publishes it, and **webhooks** go to the merchant, signed and retried with backoff (see [Transactional outbox](../101/outbox.md)).
+- Money movements are recorded as append-only **double-entry ledger** rows (see deep dive).
+- A daily **reconciliation** job compares our ledger with the processor's **settlement files** and flags every difference.
 
 ## 6. Deep dives
 
 ### Processor times out?
 
-Unknown outcome (DDIA Ch 8): keep PENDING, retry with the same idempotency key or query status by reference.
+**Why it's hard:** a timeout doesn't mean failure. The charge may have succeeded and only the reply was lost. Assuming failure and retrying with a new request double-charges. Assuming success loses money if it actually failed.
+
+**How:** treat it as **unknown**. Keep the intent **PENDING**, and resolve it by either **retrying with the same idempotency key** (the processor returns the original result if it already charged) or **querying the processor's status** for our reference. The user sees "processing" until it's resolved. Reconciliation is the final safety net.
 
 ### Webhook delivery?
 
-Outbox in the same transaction; exponential backoff; merchants dedupe by event_id.
+**Why it's hard:** we must notify the merchant of every status change, but their server may be down, slow or failing. And sending the webhook separately from the database update risks one without the other (the dual-write problem).
+
+**How:** write the event to an **outbox** table in the **same transaction** as the status change, so the event exists if and only if the change does. A relay delivers webhooks with **exponential backoff** for hours or days, **signs** each one (HMAC) so merchants can verify it came from us, and includes an `event_id` so merchants can **deduplicate** the inevitable repeats.
 
 ### Why double-entry?
 
-Every movement is a debit + credit summing to zero, so balances are derivable and auditable; never UPDATE amounts.
+**Why not just a balance column:** updating `balance = balance - 50` overwrites history. If a bug or race corrupts it, you can't tell what happened or fix it reliably.
+
+**How:** record every movement of money as **entries that sum to zero**: debit the customer $50, credit the merchant $48.50, credit fees $1.50. Entries are **appended, never updated or deleted**. A mistake is fixed by adding correcting entries. Any account's balance is the sum of its entries, and the books must always balance across all accounts. Any imbalance immediately reveals a bug, and you have a complete audit trail.
 
 ### Distributed transaction with the bank?
 
-Impossible. Design a state machine with compensation (refund) and reconciliation.
+**Why you can't have one:** the processor and the banks are separate companies. They won't hold locks or take part in a two-phase commit with your database, and their operations can't be rolled back like a database transaction.
+
+**How:** design the payment as a **state machine** (created → pending → succeeded / failed → refunded), where every transition is recorded durably and every external call is idempotent. When something must be undone, use a **compensating action**, a refund, rather than a rollback. Use **reconciliation** against the processor's records to catch anything that slipped through.
 
 ## 7. Interview script (45 minutes)
 
@@ -121,6 +154,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Using 2PC or assuming the processor call succeeds or fails cleanly.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why record the payment as pending before calling the processor?</summary>
+
+If you crash or time out you still have a record and an ID to reconcile with; nothing exists only at the processor.
+
+</details>
+
+<details class="question" markdown>
+<summary>The processor call times out. What do you do?</summary>
+
+Query by your idempotency key, or retry with the same key. Never create a second charge.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why a double-entry ledger?</summary>
+
+Every movement is two balancing entries, so money is never created or lost and errors show up when sums don't match.
+
+</details>
 
 ## Related
 

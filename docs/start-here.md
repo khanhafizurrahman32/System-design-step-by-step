@@ -26,6 +26,8 @@ You've built applications, but you haven't designed large systems or done many s
 3. [Non-functional requirements](foundations/nfrs.md): just the first two sections for now.
 4. [Numbers and estimation](foundations/numbers-and-estimation.md): read the conversions and the method; skim the big table.
 
+Then skim [System Design 101](101/index.md): 25 one-screen explainers of the protocols, security, reliability, database and messaging pieces that the rest of the handbook takes for granted. Each ends with three self-check questions.
+
 > [!NOTE]
 > **Checkpoint:** you can explain why app servers should be stateless, what a cache saves you, and turn "10 million users, 5 actions a day" into requests per second.
 
@@ -72,11 +74,11 @@ Do these in order. For each one, **cover the page and try the design yourself fi
 - [What's expected at each level](playbook/levels.md), so you know how deep a mid-level interview goes.
 - [The 45-minute delivery framework](playbook/delivery-framework.md), then practise out loud with the [interview deck](slides/interview.html).
 
-You can skip the DDIA pages and the staff-level material for now. Come back to them later.
+You can skip the DDIA pages, the Computer Networking chapters and the staff-level material for now. Come back to them later. If networking feels shaky, read [Computer Networking chapters 1–3](cn/index.md) first; for what happens inside one server, read [Operating Systems pages 1, 5 and 6](os/index.md).
 
 ## Path 2: Senior engineer preparing for interviews (about 2 weeks)
 
-1. Skim [Foundations](foundations/index.md) and read [Numbers and estimation](foundations/numbers-and-estimation.md) carefully.
+1. Skim [Foundations](foundations/index.md) and [System Design 101](101/index.md), and read [Numbers and estimation](foundations/numbers-and-estimation.md) carefully.
 2. Read all [7 patterns](patterns/index.md) and [Choosing technologies](technologies.md).
 3. Do two [problems](problems/index.md) a day, medium and hard. Try each yourself first.
 4. Read the DDIA pages behind your weakest patterns, especially [Ch 5](ddia/05-replication.md), [Ch 7](ddia/07-transactions.md) and [Ch 11](ddia/11-stream-processing.md).
@@ -85,7 +87,7 @@ You can skip the DDIA pages and the staff-level material for now. Come back to t
 ## Path 3: Staff and above
 
 1. [What's expected at each level](playbook/levels.md) and [Staff-level answers](playbook/staff-level.md).
-2. All 12 [DDIA chapters](ddia/index.md).
+2. All 12 [DDIA chapters](ddia/index.md), plus [Operating Systems](os/index.md) for the single-machine behaviour behind them (threads, fsync, GC pauses, container limits).
 3. Every problem's **Staff-level lens** section, or all 29 at once in the [staff atlas](slides/staff-atlas.html).
 4. The night before: the [staff cheat sheet](sketchnotes/staff-cheat-sheet.svg) and the [interview cheat sheet](sketchnotes/interview-cheat-sheet.svg).
 

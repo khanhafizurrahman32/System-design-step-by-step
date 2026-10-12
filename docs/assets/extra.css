@@ -12,3 +12,10 @@
 [data-md-color-scheme="slate"] .md-typeset .lvl-a { color:#f4a29b; background:#3d1d1a; }
 /* Glossary terms with hover definitions */
 .md-typeset abbr { text-decoration: underline dotted; text-underline-offset: .2em; cursor: help; }
+
+/* "Report a mistake" line at the end of every page */
+.page-feedback { margin-top: 2.5rem; padding-top: .8rem; border-top: 1px solid var(--md-default-fg-color--lightest); font-size: .72rem; color: var(--md-default-fg-color--light); }
+.page-feedback a { font-weight: 600; }
+
+/* No hover-definition underline inside headings */
+.md-typeset :is(h1, h2, h3) abbr { text-decoration: none; border-bottom: none; cursor: inherit; }

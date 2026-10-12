@@ -7,6 +7,7 @@ exclude_docs: |
   diagrams/README.md
 theme:
   name: material
+  custom_dir: overrides
   features:
     - navigation.tabs
     - navigation.sections
@@ -29,12 +30,16 @@ theme:
       primary: indigo
       accent: amber
       toggle: {icon: material/weather-sunny, name: Light mode}
+extra:
+  # Paste the code from Google Search Console here (HTML tag method), e.g. google_site_verification: abc123
+  google_site_verification: ""
 extra_css:
   - assets/extra.css
 markdown_extensions:
   - tables
   - toc: {permalink: true}
   - admonition
+  - pymdownx.details
   - github-callouts
   - md_in_html
   - abbr
@@ -53,6 +58,38 @@ nav:
   - How to approach any design: foundations/how-to-approach-a-design.md
   - Non-functional requirements: foundations/nfrs.md
   - Numbers and estimation: foundations/numbers-and-estimation.md
+- System Design 101:
+  - Overview: 101/index.md
+  - APIs & protocols:
+    - "What happens when you type a URL": 101/type-a-url.md
+    - "TCP vs UDP": 101/tcp-vs-udp.md
+    - "HTTP/1.1 vs HTTP/2 vs HTTP/3": 101/http-versions.md
+    - "REST vs GraphQL vs gRPC": 101/rest-graphql-grpc.md
+    - "Webhooks vs polling": 101/webhooks-vs-polling.md
+    - "API gateway": 101/api-gateway.md
+  - Security & auth:
+    - "How HTTPS works": 101/https-tls.md
+    - "Storing passwords": 101/storing-passwords.md
+    - "Sessions vs tokens": 101/sessions-vs-tokens.md
+    - "JWT": 101/jwt.md
+    - "OAuth 2.0": 101/oauth.md
+    - "Single sign-on (SSO)": 101/sso.md
+  - Reliability:
+    - "Timeouts, retries and backoff": 101/timeouts-and-retries.md
+    - "Circuit breaker": 101/circuit-breaker.md
+    - "Rate limiting and load shedding": 101/load-shedding.md
+    - "Metrics, logs and traces": 101/observability.md
+    - "Deploying safely": 101/safe-deploys.md
+  - Databases & storage:
+    - "SQL vs NoSQL": 101/sql-vs-nosql.md
+    - "ACID and isolation levels": 101/acid-and-isolation.md
+    - "Database replication": 101/replication.md
+    - "Block, file and object storage": 101/storage-types.md
+  - Messaging:
+    - "Message queue vs event stream": 101/queue-vs-stream.md
+    - "Delivery guarantees": 101/delivery-guarantees.md
+    - "Transactional outbox": 101/outbox.md
+    - "Dead-letter queues": 101/dead-letter-queues.md
 - Core concepts:
   - Overview: core-concepts/index.md
   - Networking essentials: core-concepts/networking.md
@@ -125,6 +162,26 @@ nav:
   - 'Ch 10: Batch Processing': ddia/10-batch-processing.md
   - 'Ch 11: Stream Processing': ddia/11-stream-processing.md
   - 'Ch 12: The Future of Data Systems': ddia/12-future-of-data-systems.md
+- Computer Networking:
+  - Overview: cn/index.md
+  - 'Ch 1: Networks and the Internet': cn/01-computer-networks-and-the-internet.md
+  - 'Ch 2: Application layer': cn/02-application-layer.md
+  - 'Ch 3: Transport layer': cn/03-transport-layer.md
+  - 'Ch 4: Network layer, data plane': cn/04-network-layer-data-plane.md
+  - 'Ch 5: Network layer, control plane': cn/05-network-layer-control-plane.md
+  - 'Ch 6: Link layer and LANs': cn/06-link-layer-and-lans.md
+  - 'Ch 7: Wireless and mobile': cn/07-wireless-and-mobile-networks.md
+  - 'Ch 8: Security': cn/08-security.md
+- Operating Systems:
+  - Overview: os/index.md
+  - '1: Processes and threads': os/01-processes-and-threads.md
+  - '2: CPU scheduling': os/02-cpu-scheduling.md
+  - '3: Memory and GC pauses': os/03-memory.md
+  - '4: Concurrency': os/04-concurrency.md
+  - '5: I/O models': os/05-io-models.md
+  - '6: Files and durability': os/06-files-and-durability.md
+  - '7: Storage devices': os/07-storage-devices.md
+  - '8: Containers': os/08-containers.md
 - Low-level design:
   - Overview: lld/index.md
   - 'LLD: In-memory file system': lld/file-system.md

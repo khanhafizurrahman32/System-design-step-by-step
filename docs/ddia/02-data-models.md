@@ -1,6 +1,6 @@
 ---
 title: "DDIA Ch 2: Data Models & Query Languages"
-description: "The shape of your data decides which database fits."
+description: "Relational, document and graph models explained with one profile: when each fits, why references bring joins back, and what schemaless really means."
 tags: [ddia]
 ---
 
@@ -23,31 +23,46 @@ The shape of your data decides which database fits. Trees of data that are read 
 
 *Relational vs document*
 
+Take one LinkedIn-style profile: a name, a headline, several past jobs, a few schools and some contact details. How should it be stored?
+
 ![One LinkedIn profile, two models](../diagrams/ddia-02-1.svg)
 
-1. Relational: a profile is split across tables and reassembled with joins. Mapping objects to tables like this is called **impedance mismatch**.
-2. Document: a profile is a self-contained tree. One read fetches it all because the data has **locality**. This works when the data is one-to-many and read as a whole.
+1. **Relational:** split the profile into tables, with `users` holding one row per person, `positions` one row per job, `education` one row per school, each pointing back with `user_id`. To show the page, you **join** them back together. In your code, though, a profile is one object with nested lists. Translating between that object and the tables is boilerplate (it's why ORMs exist), and the book calls the mismatch **impedance mismatch**.
+2. **Document:** store the whole profile as one JSON document, with the jobs and schools nested inside it. One read returns everything the page needs, because all of it is stored together on disk. This is called **locality**. The structure in the database matches the object in your code.
+
+The document model fits well here because of the data's **shape**: a profile is a **tree**. One person has many jobs (one-to-many), each job belongs to exactly one profile, and you usually load the whole profile at once.
 
 > [!NOTE]
-> **When document wins:** Data forms a tree, you always load the whole tree, and there are few cross-references. Examples: a resume, a product page, an order with its line items.
+> **When the document model wins:** the data forms a tree, you nearly always load the whole tree together, and there are few references from one document to another. Examples: a resume, a product page, an order with its line items.
 
 ## Where documents break: many-to-one and many-to-many
 
 *Normalization*
 
+Look at the profile again. "Worked at **Acme Corp**". Is the company name just text in the profile, or a link to a company that exists on its own?
+
 ![Where documents break: many-to-one and many-to-many](../diagrams/ddia-02-2.svg)
 
-1. Storing the org name as text in every profile duplicates it.
-2. Duplicates drift: a typo, a rename, or a logo change means updating thousands of documents.
-3. Normalize: store an **ID** and keep the org in one place. That is a many-to-one relationship.
-4. Document databases have weak join support, so the join moves into application code. As data gains references, the relational model wins again.
+1. If you store `"company": "Acme Corp"` as text in every profile, the same company is copied into thousands of documents.
+2. Copies drift apart. One says "Acme Corp", another "ACME Corporation", a third has a typo. If Acme renames itself or changes its logo, you must find and update every document that mentions it, and you'll miss some.
+3. The fix is to **normalize**: store the company once, with an ID, and put only `company_id: 42` in each profile. Many profiles now point to one company. That is a **many-to-one** relationship. Add "people can endorse each other's skills" and you have **many-to-many**.
+4. Now, to display a profile, you need the company names, which means a **join**. Document databases traditionally have weak join support, so your application code ends up doing it: fetch the profile, collect the company IDs, fetch the companies, stitch them together.
+
+That is the real trade-off. Documents are great while the data is a self-contained tree. As soon as the data is full of **references** between records, you are doing joins anyway, and the relational model, which was built for joins, wins again. Most real applications start as trees and grow references over time.
 
 > [!TIP]
-> **Say this in the interview:** "Bookings reference hotels, users, and rooms, which is many-to-many, so I'll use Postgres. Each hotel's static content is one tree read as a whole, so it can live in a document store or as cached JSON."
+> **Say this in the interview:** "Bookings reference hotels, users and rooms, which is many-to-many, so I'll use Postgres. Each hotel's static content is one tree read as a whole, so it can live in a document store or as cached JSON."
 
 ## Schema-on-write vs schema-on-read
 
 *Schema flexibility*
+
+Document databases are often called "schemaless", but that isn't quite true. The real question is **when** the structure of your data is checked.
+
+- **Schema-on-write** (relational): the database enforces the structure when you write. Every row in `users` has the same columns, and inserting a row that doesn't fit fails immediately.
+- **Schema-on-read** (document): the database accepts any shape, and your **reading code** interprets it. If old documents have `name` and new ones have `first_name` and `last_name`, the code that reads them must handle both.
+
+It is like static versus dynamic typing in programming languages: neither is always better, and the table shows where each fits.
 
 |  | Schema-on-write (relational) | Schema-on-read (document) |
 |---|---|---|
@@ -58,21 +73,23 @@ The shape of your data decides which database fits. Trees of data that are read 
 | Joins | Native, optimized by query planner | Weak or none; done in application |
 
 > [!WARNING]
-> **"NoSQL is schemaless":** There is always a schema, it's just **implicit** in the reading code. You still pay for migrations, just later and in more places.
+> **"NoSQL is schemaless" is misleading.** There is always a schema; with documents it is **implicit**, spread through every piece of code that reads the data. You still pay for changing it, just later and in more places, often as `if field missing then …` branches that stay forever.
 
 ## Graph model: when relationships are the data
 
 *Property graphs*
 
+Some data is mostly **connections**: who knows whom, which account sent money to which, which place is inside which region. You can store connections in tables, but the questions you ask, like "friends of friends of friends" or "everything inside Europe, however deeply nested", need a variable number of joins. A **graph** model makes the connections themselves the main thing.
+
 ![Graph model: when relationships are the data](../diagrams/ddia-02-4.svg)
 
-1. Vertices (people, places) and edges (relationships), each with properties.
-2. Edges chain at different depths: Idaho is in the USA, but a city might be in a county, in a state, in a country.
-3. Anything can connect to anything. Adding a new kind of relationship needs no schema change.
-4. A recursive query ("WITHIN, any number of hops") is one line in Cypher and painful in SQL (recursive CTE).
+1. A graph has **vertices** (things: people, places, accounts) and **edges** (relationships: LIVES_IN, KNOWS, WITHIN). Both can carry properties, such as a name or a date.
+2. Real-world structure is irregular. Boise is WITHIN Idaho, which is WITHIN the USA. A French city is WITHIN a département, WITHIN a region, WITHIN France. The depth differs from place to place.
+3. Anything can connect to anything. A new kind of relationship is just a new edge label; no schema change is needed.
+4. That makes recursive questions easy. "Find people born in the USA and now living in Europe" follows WITHIN edges **any number of hops** up from each city. In a graph query language like Cypher that's one short pattern. In SQL it needs a recursive common table expression, which is long and hard to get right.
 
 > [!NOTE]
-> **In interviews:** Fraud rings, "people you may know", knowledge graphs. Most interview problems don't need a graph DB; adjacency lists in Postgres or Redis are usually enough.
+> **In interviews:** graph databases come up for fraud rings, "people you may know" and knowledge graphs. Most interview problems don't need one: a follows table in Postgres, or adjacency lists in Redis, handle one or two hops perfectly well.
 
 ## In the interview
 

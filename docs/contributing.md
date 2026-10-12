@@ -84,14 +84,23 @@ Only the numbers that change a decision.
 
 ## 4. v1: the simplest design, and where it breaks
 ![alt text](../diagrams/<name>-v1.svg)
+What v1 is and how one request flows through it.
 
-## 5. Final design
+**Where it breaks:** the specific failure, with a number from section 2.
+
+## 5. Evolving to the final design
 ![alt text](../diagrams/<name>-final.svg)
-| Component | Why it exists |
-|---|---|
+
+### Step 1: <what you add>
+**Why:** the problem with the previous step, in plain words.
+
+**How:** how the fix works, step by step, with the key query or command if there is one.
 
 ## 6. Deep dives
-### 6.1 <question the interviewer will ask>
+### <question the interviewer will ask>
+**Why it's hard:** what goes wrong with the obvious approach, as a concrete scenario.
+
+**How:** the solution and why it works, plus the trade-off you accept.
 
 ## 7. Interview script (45 minutes)
 | Time | What you do | What you say |
@@ -99,5 +108,18 @@ Only the numbers that change a decision.
 
 ## 8. Common mistakes
 
+## Self-check
+
+<details class="question" markdown>
+<summary>A question the reader should be able to answer after this page</summary>
+
+The answer in one or two sentences.
+
+</details>
+
 ## Related
 ````
+
+Every section must make sense on its own to someone new to the topic: say **why** the problem happens (a concrete scenario beats an abstract rule) and **how** the fix works, step by step. Sketchnotes are for revision; they never replace the explanation on the page.
+
+Every page ends with three self-check questions in `<details>` blocks like the one above. They fold open on the website and on GitHub.

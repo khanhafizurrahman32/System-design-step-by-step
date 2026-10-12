@@ -52,36 +52,63 @@ GET /topk?window=hour|day|month|all&k=100
 
 ![Top-K videos (YouTube): v1 design](../diagrams/problem-top-k-videos-v1.svg)
 
-Naive: increment a counter row per view and ORDER BY views. That is 800k UPDATEs/sec on hot rows, then a full sort.
+Keep a `views` counter column on each video row. Every view runs `UPDATE videos SET views = views + 1 WHERE id = ?`. The top-K query is `SELECT … ORDER BY views DESC LIMIT 100`.
+
+**Where it breaks:**
+
+- **Writes:** about 70 billion views a day is **~800k updates a second**. Popular videos get thousands of updates a second **on the same row**, and each update must wait for the row lock held by the previous one. No single database can do this.
+- **Reads:** `ORDER BY views` over **4 billion** videos is a huge sort, and an index on a constantly changing column would be updated 800k times a second.
+- **Time windows:** a single all-time counter can't answer "top videos in the **last hour**".
 
 ## 5. Evolving to the final design
 
 ![Top-K videos (YouTube): final design](../diagrams/problem-top-k-videos-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: increment a counter row per view and ORDER BY views. That is 800k UPDATEs/sec on hot rows, then a full sort.
-2. Stream views into Kafka partitioned by **video_id**, so every view of a video lands on the same consumer.
-3. Each consumer counts in memory in per-minute buckets and keeps a local top-K heap. The aggregator merges P×K candidates, which is exact because each video lives in exactly one partition.
-4. Windows: hour = sum of the last 60 minute-buckets (subtract the expiring one). Results are cached; raw events go to S3 for batch correction.
+### Step 1: stream views through Kafka, partitioned by video
+
+**Why:** 800k writes a second needs to be spread over many machines, and each video's views must be counted in **one** place, or you'd need to combine partial counts for every video.
+
+**How:** each view becomes an event on **Kafka**, keyed by `video_id`. Kafka hashes the key, so **every view of a given video goes to the same partition**, and so to the same consumer. With, say, 100 partitions, each consumer handles about 8k views a second, which is easy to count in memory.
+
+### Step 2: count in memory and keep a local top-K
+
+**Why:** writing every single view to a database is exactly the problem we're escaping. And we only care about the **top** few, not the exact count of every one of 4 billion videos at every moment.
+
+**How:** each consumer keeps per-video counts **in memory**, in per-minute buckets, and maintains a **min-heap of its top K** videos (K = 100). A min-heap keeps the smallest of the top K at the root, so checking whether a video now belongs takes O(1), and replacing takes O(log K). An aggregator collects each partition's top K, 100 partitions × 100 candidates = 10,000 videos, and picks the overall top 100. That merge is **exact**, not approximate (see the first deep dive).
+
+### Step 3: support time windows, cache results, keep a safety net
+
+**Why:** users want the top videos for the last hour, day and month, not just all time. And in-memory counts need a backup if consumers lose state.
+
+**How:** with per-minute buckets, the **last hour** is the sum of the last 60 buckets. Each minute, add the new bucket and **subtract the one that just fell out**, so you never rescan. Longer windows use hourly or daily buckets. The finished top-K lists are written to a cache and served from there in well under 100 ms. Raw view events also land in **S3**, so a batch job can recompute exact counts if a stream bug is ever found.
 
 ## 6. Deep dives
 
 ### Why is the merge exact?
 
-A video's full count lives in one partition, so its global rank can only come from its local rank. The global top K ⊆ union of local top Ks.
+**Why you might doubt it:** merging "top 100 from each partition" sounds like it could miss a video that's 101st in two partitions but large overall.
+
+**Why it's exact:** that can only happen if a video's views are **split** across partitions. Here they never are: Kafka sends all views of a video to the same partition, so each partition holds the **complete** count for its videos. If a video is in the global top 100, it must beat everything in its own partition except at most 99 others, so it is in that partition's local top 100. The global top K is therefore always inside the union of the local top Ks.
 
 ### Sliding windows?
 
-A ring buffer of minute counts per video; for months use hourly buckets. Rolling sums avoid rescanning.
+**Why it's hard:** "the last hour" changes every minute. Recounting 60 minutes of events each time would mean rescanning millions of events.
+
+**How:** keep a **ring buffer** of per-minute counts for each active video (60 slots for an hour). Every minute, the window total is updated as `total += newest minute − minute that just expired`. That's constant work per video, not a rescan. For a month, use **hourly** buckets (720 slots), because minute precision isn't needed at that range.
 
 ### Very hot video?
 
-Pre-aggregate on producers (send counts per second, not individual views).
+**Why it's a problem:** partitioning by video means a viral video sends all its views to **one** partition. Millions of views a second on one video can overload that consumer.
+
+**How:** **pre-aggregate before Kafka**. Each server producing view events counts views per video locally for a second, then sends **one** event, "video 7: +3,412 views", instead of 3,412 events. The hot video's partition receives a few hundred messages a second instead of millions, and the total is identical.
 
 ### Approximate is OK?
 
-Count-Min Sketch + heap uses fixed memory and is good for trending; exact needs partitioned counting.
+**Why consider it:** exact counting needs memory for every active video, and careful partitioning.
+
+**How:** a **Count-Min Sketch** estimates counts for any number of items in **fixed memory**. It may overestimate slightly, but never underestimates. Pair it with a heap of the current top candidates. That's ideal for "trending now", where small errors don't matter. Anything that pays people, like creator revenue, uses the exact partitioned counts.
 
 ## 7. Interview script (45 minutes)
 
@@ -115,6 +142,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - A counter row per video in the DB: 800k writes/sec on hot rows.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why not keep a counter row per video in a database?</summary>
+
+About 800k updates a second on hot rows is far beyond what a database can take with row-level contention.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why is merging per-partition top-K lists exact?</summary>
+
+Partitioning by video ID means each video's full count lives in exactly one partition, so its true count is in that partition's list.
+
+</details>
+
+<details class="question" markdown>
+<summary>How would you handle one extremely hot video?</summary>
+
+Pre-aggregate before Kafka (count locally for a second, then send one update) so one partition isn't overwhelmed.
+
+</details>
 
 ## Related
 

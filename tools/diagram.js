@@ -14,7 +14,7 @@ const gen = rough.generator();
 
 const hash = s => { let h = 2166136261; for (const c of String(s)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return Math.abs(h) % 2 ** 31; };
 const tw = (s, size) => [...s].reduce((a, c) => a + (FONT.w[c] ?? 0.6), 0) * size;
-const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const MAIN = 20, SUB = 15, LH = 1.25;
 
 function fontFaces(chars) {

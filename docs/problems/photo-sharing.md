@@ -56,35 +56,61 @@ POST /users/{id}/follow
 
 ## 4. v1: the simplest design, and where it breaks
 
-Naive: media through the API and a fan-out-on-read feed. Both break at this scale.
+Users upload photos and videos through the API, which stores them and creates a post. The feed is built when a user opens it: find who they follow, fetch those users' recent posts, merge by time.
+
+**Where it breaks:** both halves fail at this scale.
+
+- **Media:** 100M posts a day at ~2 MB average is about **200 TB a day** passing through the API servers, plus all the downloads. The servers become expensive bandwidth pipes, and uploads on mobile connections fail and restart.
+- **Feed:** about **115k feed loads a second**, each needing lookups across hundreds of followed accounts, means millions of queries a second. The 500 ms p99 isn't achievable (the same problem as [News feed](news-feed.md)).
 
 ## 5. Evolving to the final design
 
 ![Photo sharing (Instagram): final design](../diagrams/problem-photo-sharing-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: media through the API and a fan-out-on-read feed. Both break at this scale.
-2. Media: the client uploads directly to S3 with a presigned URL; an S3 event triggers thumbnails and renditions; the CDN serves them.
-3. Feed: same as News Feed. New posts go to Kafka, workers push post IDs into followers' Redis feeds, and celebrities are pulled at read time (hybrid).
+### Step 1: media goes straight to object storage, is processed asynchronously, and is served by a CDN
+
+**Why:** media bytes are large and must be fast to upload and view anywhere in the world. App servers should handle only small requests.
+
+**How:**
+
+- `POST /posts` creates the post with status **PROCESSING** and returns a **presigned upload URL**.
+- The app uploads the photo or video **directly to S3**.
+- An **S3 event** triggers workers that create thumbnails and several sizes (and video renditions). When they finish, the post's status becomes **READY**.
+- All media is served through a **CDN**, so viewers download from a nearby edge server, and your servers never touch the bytes.
+
+### Step 2: precompute feeds, with a hybrid for celebrities
+
+**Why:** feeds are read far more often than posts are created, so computing them on each read wastes work, exactly as in the news feed problem.
+
+**How:** when a post becomes READY, put a "new post" event on **Kafka**. Fan-out workers push the post ID into each follower's **feed list in Redis** (a sorted set by time). Reading a feed is then one Redis read, plus a batch fetch of post details. Accounts with millions of followers are **not** fanned out; their posts are **pulled at read time** and merged in (the hybrid approach).
 
 ## 6. Deep dives
 
 ### Post visible before media is processed?
 
-Keep status PROCESSING; show it once renditions are ready (or show to the author only).
+**Why it's a problem:** if a post appears in followers' feeds as soon as it's created, they may see a broken image or a video that won't play, because thumbnails and renditions aren't ready yet.
+
+**How:** keep the post in **PROCESSING** status and only fan it out to followers when processing marks it **READY**. Meanwhile, the **author** can see it in their own profile with a "processing" indicator, using the original upload or a local copy on their phone.
 
 ### Celebrities?
 
-Hybrid fan-out as in News Feed.
+**Why they're a problem:** pushing one post into 100M followers' feeds means 100M writes, delaying it by minutes and backing up everyone else's posts.
+
+**How:** the same **hybrid** as [News feed](news-feed.md): skip fan-out for accounts above a follower threshold. When a user opens their feed, merge their precomputed list with the recent posts of the celebrities they follow, which are heavily cached because many users fetch the same ones.
 
 ### Like counts?
 
-Redis INCR or sharded counters, flushed asynchronously to the DB.
+**Why it's hard:** a popular post can get thousands of likes a second. Running `UPDATE posts SET likes = likes + 1` for each one makes every like wait on the same row's lock.
+
+**How:** count likes in **Redis** with atomic `INCR` (thousands a second per key is fine), or spread one post's count over several **sharded counters** (`likes:post7:0` … `:9`) added up on read. **Flush** totals to the database periodically for durability. The displayed count can lag a little, and nobody minds. Who liked what is recorded separately (one row per like), so a user can't like twice.
 
 ### Global latency?
 
-CDN for media; regional read replicas or caches for the feed.
+**Why it matters:** users are everywhere, and round trips to one data centre add hundreds of milliseconds for distant users.
+
+**How:** **media** is served by the CDN from edge locations near users, which is the bulk of the bytes. For **feeds and metadata**, run read replicas or caches in several regions, so feed reads are served locally. Writes go to the home region, and a few seconds of replication lag is fine for a feed.
 
 ## 7. Interview script (45 minutes)
 
@@ -118,6 +144,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Serving images from app servers or storing blobs in the database.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why process thumbnails asynchronously?</summary>
+
+Upload returns fast; resizing happens in workers from a queue, and the post is shown only once its media is ready.
+
+</details>
+
+<details class="question" markdown>
+<summary>How are feeds built for most users vs celebrities?</summary>
+
+Fan-out on write into Redis for most; celebrity posts are pulled at read time.
+
+</details>
+
+<details class="question" markdown>
+<summary>How is media served globally with low latency?</summary>
+
+From a CDN in front of object storage.
+
+</details>
 
 ## Related
 

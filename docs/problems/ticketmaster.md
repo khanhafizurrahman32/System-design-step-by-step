@@ -174,6 +174,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - **Treating browse and book the same.** Making browsing strongly consistent wastes money; making booking eventually consistent sells seats twice.
 - **Sharding the bookings database "for scale".** Booking volume is capped by seat count; one primary handles it.
 
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>What is the core double-booking bug?</summary>
+
+Check, then book: two people both see the seat as free, then both buy it.
+
+</details>
+
+<details class="question" markdown>
+<summary>How do you fix it?</summary>
+
+Make check and write one atomic statement, for example a conditional update on the seat (WHERE status = available), or a short reservation with a TTL.
+
+</details>
+
+<details class="question" markdown>
+<summary>How do you survive ten million people at on-sale time?</summary>
+
+A virtual waiting room admits users at the rate the booking path can handle; browsing is cached separately.
+
+</details>
+
 ## Related
 
 - **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md)

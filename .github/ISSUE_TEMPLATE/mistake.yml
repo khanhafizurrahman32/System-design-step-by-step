@@ -1,0 +1,23 @@
+name: Report a mistake
+description: Something is wrong, outdated or unclear on a page.
+labels: [correction]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: Link to the page (filled in automatically when you use the link at the bottom of a page).
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong or unclear?
+      description: Quote the sentence, number or diagram if you can.
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: What should it say instead?
+      description: A source (docs, paper, talk) helps us check it quickly.

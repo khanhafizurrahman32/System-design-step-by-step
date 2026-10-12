@@ -20,11 +20,14 @@ Most resources show you a finished architecture and expect you to memorize it. T
 |---|---|
 | [Start here](start-here.md) | Learning paths for intermediate, senior and staff engineers |
 | [Foundations](foundations/index.md) | The basics of how requests flow, the method, non-functional requirements and the numbers to know |
+| [System Design 101](101/index.md) | 25 one-screen explainers: protocols, API styles, HTTPS, auth, retries, circuit breakers, deploys, SQL vs NoSQL, replication, queues vs streams, outbox |
 | [Core concepts](core-concepts/index.md) | Networking, API design, data modeling, indexing, caching, sharding, consistent hashing, CAP |
 | [7 patterns](patterns/index.md) | Scaling reads and writes, real-time updates, contention, multi-step processes, large blobs, long-running tasks |
 | [Technologies](technologies.md) | Postgres, Redis, Kafka, Cassandra, DynamoDB, Elasticsearch, Flink, ZooKeeper, API gateways: when and when not |
 | [29 problems](problems/index.md) | URL shortener to payments, each from v1 to final design with an interview script |
 | [DDIA, chapter by chapter](ddia/index.md) | All 12 chapters of *Designing Data-Intensive Applications* as diagrams, tied to interview problems |
+| [Computer Networking](cn/index.md) | All 8 chapters of Kurose & Ross's *Computer Networking: A Top-Down Approach* as diagrams, from HTTP and DNS down to Wi-Fi, tied to system design |
+| [Operating Systems](os/index.md) | The OS ideas behind real system behaviour: threads vs event loops, latency vs utilisation, page cache and GC pauses, fsync and group commit, SSDs, container limits |
 | [Low-level design](lld/index.md) | File system, movie booking, logger, inventory: class diagrams and tested Java |
 | [Interview playbook](playbook/index.md) | The 45-minute framework, what senior answers sound like, quick-fire practice |
 | [Staff-level answers](playbook/staff-level.md) | Senior vs staff, and all 29 problems through a staff lens ([interactive atlas](slides/staff-atlas.html)) |
@@ -70,4 +73,4 @@ Fixes and new pages are welcome. See [CONTRIBUTING](contributing.md) for the pag
 
 ## Credits
 
-Written in our own words, with our own diagrams. The DDIA pages are study notes on *Designing Data-Intensive Applications* by Martin Kleppmann; please read the book. Diagrams use the open-source [Excalifont](https://plus.excalidraw.com/excalifont) (SIL OFL 1.1). Problem names refer to well-known products only to describe the kind of system; this project is not affiliated with any company or course.
+Written in our own words, with our own diagrams. The DDIA pages are study notes on *Designing Data-Intensive Applications* by Martin Kleppmann; please read the book. The Computer Networking pages are study notes on *Computer Networking: A Top-Down Approach* by James Kurose and Keith Ross; please read that book too. The Operating Systems pages follow the themes of *Operating Systems: Three Easy Pieces* by Remzi and Andrea Arpaci-Dusseau, free online. Diagrams use the open-source [Excalifont](https://plus.excalidraw.com/excalifont) (SIL OFL 1.1). Problem names refer to well-known products only to describe the kind of system; this project is not affiliated with any company or course.

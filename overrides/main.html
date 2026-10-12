@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  {% set title = page.meta.title if page and page.meta and page.meta.title else config.site_name %}
+  {% set desc = page.meta.description if page and page.meta and page.meta.description else config.site_description %}
+  {% set image = config.site_url ~ "assets/social-preview.png" %}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ desc }}">
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  <meta property="og:image" content="{{ image }}">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ desc }}">
+  <meta name="twitter:image" content="{{ image }}">
+  {% if config.extra.google_site_verification %}
+  <meta name="google-site-verification" content="{{ config.extra.google_site_verification }}">
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {{ super() }}
+  {% if page and page.file and page.file.src_uri %}
+  <aside class="page-feedback">
+    Spotted a mistake or something unclear?
+    <a href="{{ config.repo_url }}/issues/new?template=mistake.yml&title={{ ('[' ~ page.title ~ '] ') | urlencode }}&page={{ page.canonical_url | urlencode }}">Report it</a>
+    or <a href="{{ config.repo_url }}/edit/main/docs/{{ page.file.src_uri }}">edit this page</a> on GitHub.
+  </aside>
+  {% endif %}
+{% endblock %}

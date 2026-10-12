@@ -57,36 +57,66 @@ GET /auctions/{id}/stream (SSE)
 
 ![Online auction: v1 design](../diagrams/problem-online-auction-v1.svg)
 
-Naive: read max_bid, compare in application code, insert. Two concurrent bids both "win", a lost update.
+To place a bid, the server reads the auction's current highest bid, checks in application code that the new bid is higher, and if so writes the new maximum and inserts the bid.
+
+**Where it breaks:** the highest bid is $100. Two bidders send $110 and $120 at the same moment. Both requests read $100, both pass the check, and both write. If the $110 write lands second, the auction now says **$110 is winning** and the $120 bid is silently lost. Or both bidders are told they're the highest bidder. This is a **lost update** ([DDIA Ch 7](../ddia/07-transactions.md)). It's rare on quiet auctions, but popular auctions get **~1k bids a second** in the final seconds, all on the same row, so it happens constantly exactly when it matters most.
 
 ## 5. Evolving to the final design
 
 ![Online auction: final design](../diagrams/problem-online-auction-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Naive: read max_bid, compare in application code, insert. Two concurrent bids both "win", a lost update.
-2. Make it atomic in the DB: UPDATE auctions SET max_bid=:amt, max_bidder=:u WHERE id=:a AND max_bid < :amt AND end_time > now(). 1 row = accepted, 0 = outbid. Bids are also appended for history.
-3. Accepted bids are published to pub/sub and pushed over SSE to everyone watching.
-4. For very hot auctions, a Kafka partition per auction_id serializes bids before the DB (durable and ordered). A delayed job closes the auction at end time.
+### Step 1: make "is it higher?" and "save it" one atomic step
+
+**Why:** the bug lives in the gap between reading the maximum and writing the new one. Close the gap and the race disappears.
+
+**How:** let the database do the comparison inside the update:
+
+```sql
+UPDATE auctions SET max_bid = :amount, max_bidder = :user
+WHERE id = :auction AND max_bid < :amount AND end_time > now();
+```
+
+The database applies updates to one row one at a time. **1 row updated** means your bid is now the highest. **0 rows** means someone outbid you first, or the auction has ended, so tell the bidder. Every bid is also appended to the `bids` table for history. The check includes `end_time > now()`, so late bids are rejected by the same rule.
+
+### Step 2: push accepted bids to watchers
+
+**Why:** watchers need to see the new highest bid within a second. Polling by thousands of watchers in the final seconds would add huge load at the worst moment.
+
+**How:** after a bid is accepted, publish it to a **pub/sub channel per auction**. Realtime servers subscribed to that channel push it to every watcher over **SSE**.
+
+### Step 3: serialize bids for very hot auctions, and close auctions on time
+
+**Why:** at about 1k bids a second, every bid waits for the row lock held by the one before it. Latency climbs, connections pile up, and the database row becomes a bottleneck.
+
+**How:** send bids for hot auctions through **Kafka, partitioned by `auction_id`**. All bids for one auction go to one partition, **in order**, and are durably stored as soon as Kafka acknowledges them. One consumer per partition applies them to the database one by one, with no lock contention, and returns the result to the bidder. A **delayed job** fires at each auction's end time to mark it closed and notify the winner.
 
 ## 6. Deep dives
 
 ### Two bids at the same instant?
 
-Conditional update (or SELECT FOR UPDATE) on the auction row. That is the lost-update fix from DDIA Ch 7.
+**Why it's the core problem:** comparing in application code means each request decides based on a value that may already be stale by the time it writes. That's the classic lost update.
+
+**How:** make the database the referee. Either use the **conditional update** above, where the comparison happens atomically on the row, or lock the row with `SELECT … FOR UPDATE` before comparing, so the second bid waits for the first to commit and then sees the new maximum. Both guarantee that exactly one bid at a time can raise the maximum.
 
 ### Clock fairness at the deadline?
 
-Use the DB server time inside the same conditional update, never client time.
+**Why it matters:** if the server checking the end time uses its own clock, or worse, trusts the time the client sends, then two servers with slightly different clocks can disagree about whether a bid at 11:59:59.900 was on time. Clients can lie about their time.
+
+**How:** use **one clock**: the database server's `now()`, evaluated **inside** the same conditional update that accepts the bid. Every bid is judged against the same clock at the moment it's applied. With the Kafka path, the single consumer per auction applies the same rule in order.
 
 ### Durability?
 
-Acknowledge only after commit (or Kafka acks=all).
+**Why it matters:** telling a bidder "you're winning" and then losing that bid after a crash is unacceptable, and could be a legal problem.
+
+**How:** **acknowledge only after the bid is durably stored**: after the database transaction commits, or, on the Kafka path, after Kafka confirms the write to all in-sync replicas (`acks=all`). A crash before that means the bidder gets an error and can retry (with an idempotency key, so the retry isn't counted twice).
 
 ### Anti-sniping?
 
-Extend end_time by N seconds on late bids, inside the same update.
+**Why it's a problem:** "snipers" bid in the final second so others have no time to respond. Many auction sites consider that unfair.
+
+**How:** **extend the end time** when a bid arrives near the end: if a bid lands in the last 30 seconds, push `end_time` out by another 30 seconds. Do it **inside the same conditional update** that accepts the bid (`SET end_time = GREATEST(end_time, now() + interval '30 seconds')`), so the extension and the bid are atomic, and the close job checks the current end time before closing.
 
 ## 7. Interview script (45 minutes)
 
@@ -120,6 +150,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - Comparing bids in a Redis cache without atomicity.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why can't you compare bids in application code?</summary>
+
+Two concurrent bids both read the old maximum and both "win" (lost update).
+
+</details>
+
+<details class="question" markdown>
+<summary>How is a bid accepted safely?</summary>
+
+One conditional update: set the new maximum only if the bid beats the current one and the auction is still open.
+
+</details>
+
+<details class="question" markdown>
+<summary>How do you handle very hot auctions?</summary>
+
+Serialize bids for that auction through a partitioned log, so one consumer processes them in order.
+
+</details>
 
 ## Related
 

@@ -18,13 +18,24 @@ tags: [pattern]
 - Limited resources: seats, stock, a username, a driver, the highest bid.
 - Any "check, then act" sequence that two requests can run at the same time.
 
-## The idea in one diagram
+## The problem
+
+**Contention** is many users competing for the **same limited thing** at the same moment: the last seat, the last item in stock, the highest bid, the nearest driver. The natural way to write it is **check, then act**: read whether the seat is free, and if so, book it. Under concurrency, that has a gap between the check and the act, and two users can both pass the check.
+
+## The idea, step by step
 
 ![Pattern 4: Dealing with Contention](../diagrams/pattern-contention.svg)
 
-1. Check-then-act from two users: both see AVAILABLE, both book. A race condition (DDIA Ch 7 write skew).
-2. Make the check and the write **one atomic statement**. The database guarantees only one succeeds.
-3. Other tools: pessimistic lock (high contention), optimistic version check (low contention), distributed lock with TTL (holds across services), or a per-item queue (extreme contention).
+1. **The bug.** Users A and B both load seat 12A at the same moment. Both read `status = AVAILABLE`. Both send "book". Both bookings succeed, and the seat is **sold twice**. No error was raised; each request was correct on its own. In database terms this is a race condition (*write skew*, see [DDIA Ch 7](../ddia/07-transactions.md)).
+2. **The fix: make the check and the write a single atomic step**, so there's no gap. Put the condition **inside** the update:
+
+    ```sql
+    UPDATE seats SET status = 'HELD', held_by = :user
+    WHERE id = '12A' AND status = 'AVAILABLE';
+    ```
+
+    The database applies updates to one row one at a time. The first request finds the seat AVAILABLE, changes it, and reports **1 row updated**: you won. The second finds it already HELD, matches nothing, and reports **0 rows updated**: tell that user "sorry, just taken". No locks to manage, no window for a race.
+3. **Other tools, for situations the single statement doesn't cover:**
 
 | Tool | Use when |
 |---|---|
@@ -33,6 +44,11 @@ tags: [pattern]
 | Optimistic (version column) | Low contention; retry on conflict |
 | Redis lock SET NX PX | Temporary holds across services (seat hold, driver lock) |
 | Queue per resource | Extreme hot spots (auction last seconds) |
+
+- **`SELECT … FOR UPDATE`** (pessimistic lock): lock the rows when you read them, so other transactions wait until you commit. Use it when you must read, run some logic, then write, and conflicts are frequent.
+- **Version column** (optimistic): read the row with its version, then `UPDATE … WHERE version = 7`. If someone else changed it first, 0 rows update and you retry. It's cheap when conflicts are rare.
+- **Redis lock with an expiry** (`SET key value NX PX 600000`): a temporary hold that spans services or minutes, such as "this seat is held for you for 10 minutes while you pay" or "this driver is being offered a ride". The expiry frees it automatically if the user walks away. For correctness, back it with the database check (see [fencing tokens](../ddia/08-trouble-with-distributed-systems.md)).
+- **A queue per item:** for extreme hot spots, such as the last seconds of a popular auction, send every request for that item through one queue and process them **one at a time**. No contention is possible, at the cost of throughput on that one item.
 
 ## Decision checklist
 

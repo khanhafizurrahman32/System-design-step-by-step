@@ -18,14 +18,30 @@ tags: [pattern]
 - Work takes more than a second or two: transcoding, report generation, code execution, model inference.
 - Work is bursty and expensive, so it needs backpressure.
 
-## The idea in one diagram
+## The problem
+
+Some work takes far longer than a web request should: transcoding a video (minutes), generating a large report, running code submitted to an online judge, sending 100,000 emails. If you do it **inside** the HTTP request:
+
+- **Timeouts:** load balancers and browsers give up after 30–60 seconds, so the user gets an error even if the work later succeeds.
+- **Duplicates:** the client, seeing a timeout, retries, and now the work runs twice.
+- **No control over load:** a burst of requests starts a burst of heavy jobs at once, all on your web servers, slowing every other request.
+- **Lost work:** a deploy or crash mid-job loses it with no record.
+
+The fix is to **separate accepting the work from doing the work**.
+
+## The idea, step by step
 
 ![Pattern 7: Long-running Tasks](../diagrams/pattern-long-running-tasks.svg)
 
-1. Doing heavy work inside the request: timeouts, retried requests duplicate work, and no backpressure.
-2. Return a job ID immediately; enqueue the work. Workers scale independently of the API.
-3. Workers update the job status; the client polls or subscribes (SSE/WebSocket) for progress.
-4. Failures retry with backoff (visibility timeout); poison jobs go to a dead-letter queue. Jobs must be idempotent.
+1. **Accept fast.** The API validates the request, writes a row in a jobs table (`status = QUEUED`), puts a message on a **queue**, and immediately returns `202 Accepted` with a `job_id`. This takes milliseconds.
+2. **Do the work elsewhere.** A separate pool of **workers** takes jobs off the queue and does the heavy lifting. Because workers are separate from the web servers, each side scales on its own. Workers **autoscale on queue depth**: when 10,000 jobs are waiting, add workers; when the queue is empty, scale down. A burst just makes the queue longer for a while; nothing falls over.
+3. **Report progress.** Workers update the job's status (`RUNNING`, then `DONE` with a link to the result, or `FAILED` with a reason). The client either **polls** `GET /jobs/{id}` every few seconds, or subscribes with SSE or a WebSocket for live progress. For very long jobs, send an email or push notification.
+4. **Handle failure.** If a worker crashes mid-job, it never acknowledges the message, so after a **visibility timeout** the queue hands the job to another worker. Failed jobs are retried with **backoff**. A job that keeps failing (a **poison** job, for example a corrupt input file) goes to a **dead-letter queue** after a few attempts, so it doesn't block the others, and someone gets alerted.
+
+Because a job may be retried, it might run **more than once**, so every job must be **idempotent**. Writing the result to a path named by `job_id` (so a rerun overwrites the same file), or checking "already done?" first, makes a second run harmless.
+
+> [!NOTE]
+> **Queue choice:** a simple task queue (SQS, RabbitMQ, or a Postgres table with `SELECT … FOR UPDATE SKIP LOCKED`) is enough for most job systems. Use Kafka when you also need ordering per key, replay, or several consumers of the same events (see [Message queue vs event stream](../101/queue-vs-stream.md)).
 
 ## Decision checklist
 

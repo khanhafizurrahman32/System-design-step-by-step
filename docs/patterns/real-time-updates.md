@@ -18,17 +18,26 @@ tags: [pattern]
 - Users expect to see changes within about a second: chat, live comments, prices, collaboration, ride tracking.
 - Polling would be mostly empty responses or far too frequent.
 
-## The idea in one diagram
+## The problem
+
+The web was built for the client to **ask** and the server to **answer**. But many features need the server to **tell** the client something the moment it happens: a new chat message, a comment on a live stream, a driver's position, a price change. The server can't start a conversation with a browser on its own. So you need a way to **push** updates, and once you have many servers, a way to get each update to the **right** server.
+
+## The idea, step by step
 
 ![Pattern 3: Real-time Updates](../diagrams/pattern-real-time-updates.svg)
 
-1. **Polling**: simple, but latency = interval and most requests return nothing. Fine for slow updates (every ~30s).
-2. **Server push**: SSE (server→client, plain HTTP, auto-reconnect) or WebSocket (bidirectional). Long-polling is the fallback.
-3. With many servers, the receiver's connection lives on **another server** than the one that got the event.
-4. **Pub/sub** routes events to whichever servers hold the interested connections: channel per video, per user, or per symbol.
+1. **Polling.** The client asks "anything new?" every few seconds. It's simple and works everywhere. But updates arrive up to one interval late, and most requests return nothing. A million viewers polling every 2 seconds is 500,000 mostly-empty requests a second. Polling is fine when updates are slow and few people are watching, such as a dashboard refreshed every 30 seconds.
+2. **Push over a held-open connection.** The client opens a connection and **keeps it open**, and the server writes to it whenever something happens:
+   - **Server-Sent Events (SSE):** one-way, server to client, over ordinary HTTP. It's simple, goes through proxies, and the browser reconnects automatically. Ideal for feeds, live comments, notifications and streaming AI responses.
+   - **WebSocket:** two-way. Both sides can send at any time. Needed for chat, multiplayer games and collaborative editing.
+   - **Long polling:** the client asks, and the server holds the request until there's news, then the client immediately asks again. It's a fallback when the others are blocked.
+3. **The multi-server problem.** You have many servers, each holding thousands of open connections. Client A is connected to Server 1. Client B, watching the same live stream, is connected to Server 2. A new comment arrives at Server 1. How does it reach Client B, whose connection lives on a **different** server?
+4. **Pub/sub between servers.** Add a publish/subscribe layer such as Redis Pub/Sub or Kafka. Each server **subscribes** to the channels its connected clients care about: "video 123", "user 42", "symbol AAPL". When an event happens, it is **published once** to its channel, and every server subscribed to that channel receives it and forwards it to its own connected clients. The event source doesn't need to know where anyone is connected.
 
 > [!NOTE]
-> **Choosing:** Updates rare → poll. Server→client stream → SSE. Chat, games, collaboration → WebSocket. Between servers → pub/sub.
+> **Choosing:** updates rare, or a few seconds' delay is fine → **poll**. Server-to-client stream → **SSE**. Both directions, high frequency (chat, games, collaboration) → **WebSocket**. Getting events between your servers → **pub/sub**.
+
+**Things to mention:** held-open connections are **stateful**, so a deploy or crash drops them, and clients must reconnect and catch up (send "last event ID seen"). And routing viewers of the same stream to the same few servers reduces how many channels each server must subscribe to.
 
 ## Decision checklist
 

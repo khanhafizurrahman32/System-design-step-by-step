@@ -53,36 +53,64 @@ S3: raw/{url_hash}, text/{url_hash}
 
 ## 4. v1: the simplest design, and where it breaks
 
-Start with a frontier queue of URLs and fetcher workers pulling from it.
+Put the seed URLs in a **frontier queue**. A pool of workers loops: take a URL, download the page, extract the text and the links, save the text, and add the new links back onto the queue.
+
+**Where it breaks:** the target is 10 billion pages in 5 days, about **23k pages a second**, or roughly 46 GB/s of downloads. One kind of worker doing everything hits several problems at once:
+
+- **Mixed bottlenecks:** downloading waits on the network, while parsing HTML burns CPU. Each worker spends time idle on one while the other waits, so you can't size the fleet well for either.
+- **Fragility:** if parsing crashes on a weird page, the download is wasted. If you improve the parser later, you'd have to re-download billions of pages.
+- **Impoliteness:** nothing stops 500 workers hitting the same site at once, which gets you blocked and can take small sites down.
+- **Duplicates:** the same URL is discovered thousands of times, and without dedup it is crawled thousands of times.
 
 ## 5. Evolving to the final design
 
 ![Web crawler: final design](../diagrams/problem-web-crawler-final.svg)
 
-Each step fixes one specific problem with the step before it:
+Each step fixes one specific problem with the step before it.
 
-1. Start with a frontier queue of URLs and fetcher workers pulling from it.
-2. Split **fetch** (network-bound) from **parse** (CPU-bound) with S3 + a second queue. Each scales independently, and parsing can be re-run from stored HTML.
-3. Politeness: per-domain token buckets and cached robots.txt in Redis. Not allowed yet? Re-queue with a delay (visibility timeout).
-4. Extracted links pass a dedupe check (URL hash in DB or Bloom filter) before entering the frontier. Content hashes catch mirrored pages.
+### Step 1: split fetching from parsing
+
+**Why:** fetching is **network-bound** and parsing is **CPU-bound**. They need different machines in different numbers, and they fail for different reasons.
+
+**How:** **fetchers** take URLs from the frontier, download the raw HTML, save it to **S3** keyed by the URL's hash, and put a message on a second queue. **Parsers** read from that queue, load the HTML from S3, and extract the text and links. Each stage scales on its own, and a parser crash just retries the parse. Because the raw pages are stored, you can **re-parse** everything with an improved parser without crawling again.
+
+### Step 2: be polite, per domain
+
+**Why:** websites have limits and rules. `robots.txt` says what you may crawl and how fast. Ignoring it gets your crawler blocked and can overload small sites.
+
+**How:** for each domain, fetch and **cache `robots.txt`** in Redis, and keep a **per-domain rate limit**, such as a token bucket or a "next allowed fetch time". Before fetching, a worker checks the domain's limit. If it isn't allowed yet, the URL is **re-queued with a delay** (for example by setting the queue message's visibility timeout), and the worker moves on to a URL from another domain. Total throughput stays high while each site sees only a gentle trickle.
+
+### Step 3: deduplicate URLs and content
+
+**Why:** popular pages are linked from millions of places, and many sites serve the same content under different URLs. Crawling duplicates wastes bandwidth and fills the dataset with repeats.
+
+**How:** **normalize** each extracted URL (lowercase the host, remove fragments and tracking parameters, sort query parameters), hash it, and check whether it has been seen before adding it to the frontier. Use the `urls` table, or a **Bloom filter** for a fast first check. After fetching, hash the **content** too: identical content under a different URL (mirrors, `http` vs `https`) is stored once.
 
 ## 6. Deep dives
 
 ### Why separate stages?
 
-Different bottlenecks, independent scaling and retries, and you can re-parse 20PB without re-crawling.
+**Why it's worth the complexity:** the two halves have **different bottlenecks** (network vs CPU), **different failure modes** (timeouts and slow servers vs malformed HTML) and **different change rates** (the parser changes often, while fetching is stable).
+
+**What you get:** each stage scales and retries independently, and stored raw pages make the expensive part, the crawl, a one-time cost. When you improve text extraction, you re-run only the parsers over 20 PB in S3, which is far cheaper and faster than re-crawling 10 billion pages.
 
 ### Crash mid-crawl?
 
-A message is acked only after the raw page is in S3: at-least-once, idempotent by URL hash.
+**Why it matters:** over 5 days and thousands of machines, workers will crash. You must not lose progress or corrupt anything.
+
+**How:** a fetcher **acknowledges** a URL's queue message only **after** the raw page is safely in S3. If it crashes before that, the message becomes visible again and another worker fetches it. That's **at-least-once** processing. A page might occasionally be fetched twice, so make it harmless: it's stored under its URL hash, so a second fetch simply overwrites the same object (**idempotent**). Crawl status in the `urls` table lets you resume after a full restart.
 
 ### Crawler traps?
 
-Max depth per domain, URL normalization, content-hash dedupe.
+**Why they exist:** some sites generate **infinite** URLs, like calendars with a "next month" link forever, or session IDs in every link, so a naive crawler never leaves them.
+
+**How:** cap the **depth** and the **number of pages per domain**, normalize URLs so session-ID variants collapse into one, and use **content hashes** to notice when "new" pages are the same content again. Domains that hit the caps are flagged for review.
 
 ### DNS bottleneck?
 
-Cache DNS per worker; multiple resolvers.
+**Why it happens:** each fetch needs the domain's IP address. At 23k fetches a second, querying DNS each time overwhelms public resolvers and adds latency to every request.
+
+**How:** **cache DNS answers** in each worker (respecting their TTLs). Most fetches go to domains already crawled recently, so the hit rate is very high. Run your own resolvers, or several, so DNS isn't a single point of failure or a rate-limited shared service.
 
 ## 7. Interview script (45 minutes)
 
@@ -116,6 +144,31 @@ All 29 problems through this lens: [Staff-level answers](../playbook/staff-level
 - One monolithic fetch→parse loop: a slow parser stalls fetching and a crash loses in-flight work.
 - Adding components before showing which number makes them necessary.
 - Skipping failure handling: what happens on timeouts, retries and crashes.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>What limits a crawler's throughput: CPU or network?</summary>
+
+Network bandwidth. About 23k pages a second means sizing the fleet by bandwidth.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why separate fetching from parsing with queues?</summary>
+
+Each stage scales and retries on its own, and stored raw pages mean a parse bug doesn't require refetching.
+
+</details>
+
+<details class="question" markdown>
+<summary>How do you stay polite to websites?</summary>
+
+Respect robots.txt and per-domain rate limits, usually with a per-domain queue and delay.
+
+</details>
 
 ## Related
 
