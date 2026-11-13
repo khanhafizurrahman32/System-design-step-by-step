@@ -8,7 +8,7 @@ tags: [real-time-updates, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) consistent prefix · [Ch 11](../ddia/11-stream-processing.md) at-least-once + idempotency
+**Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 6](../ddia/06-replication.md) consistent prefix · [Ch 12](../ddia/12-stream-processing.md) at-least-once + idempotency
 
 *Chat looks like CRUD until you notice the two users are on different servers and one of them is offline.*
 
@@ -98,9 +98,9 @@ Each step fixes one specific problem with the step before it.
 
 ### Ordering?
 
-**Why it's tricky:** two group members send messages at nearly the same time through different servers. Without a single authority, each phone might order them differently. Timestamps from different machines can't be trusted to agree ([DDIA Ch 8](../ddia/08-trouble-with-distributed-systems.md)).
+**Why it's tricky:** two group members send messages at nearly the same time through different servers. Without a single authority, each phone might order them differently. Timestamps from different machines can't be trusted to agree ([DDIA Ch 9](../ddia/09-trouble-with-distributed-systems.md)).
 
-**How:** all messages for one chat go to the **same partition** (`chat_id` is the partition key), where **one writer** assigns increasing **sequence numbers**. That gives one agreed order per chat, which is all users need. There is no global order across chats, and none is needed. This is the "consistent prefix" guarantee from [DDIA Ch 5](../ddia/05-replication.md).
+**How:** all messages for one chat go to the **same partition** (`chat_id` is the partition key), where **one writer** assigns increasing **sequence numbers**. That gives one agreed order per chat, which is all users need. There is no global order across chats, and none is needed. This is the "consistent prefix" guarantee from [DDIA Ch 6](../ddia/06-replication.md).
 
 ### Groups?
 
@@ -176,5 +176,5 @@ Partition by conversation and number messages sequentially within each conversat
 
 - **Operating systems:** [OS 5: I/O models](../os/05-io-models.md) (holding millions of WebSockets)
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md)
-- **DDIA:** [Ch 5](../ddia/05-replication.md) consistent prefix · [Ch 11](../ddia/11-stream-processing.md) at-least-once + idempotency
+- **DDIA:** [Ch 6](../ddia/06-replication.md) consistent prefix · [Ch 12](../ddia/12-stream-processing.md) at-least-once + idempotency
 - **Similar problems:** [Ride sharing (Uber)](ride-sharing.md) · [Live comments (Facebook Live)](live-comments.md) · [Collaborative editor (Google Docs)](collaborative-editor.md) · [Stock trading (Robinhood)](stock-trading.md)

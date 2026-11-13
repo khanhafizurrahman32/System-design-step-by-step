@@ -8,7 +8,7 @@ tags: [scaling-writes, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) inverted index · [Ch 6](../ddia/06-partitioning.md) term-partitioned index · [Ch 11](../ddia/11-stream-processing.md) stream indexing
+**Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 4](../ddia/04-storage-and-retrieval.md) inverted index · [Ch 7](../ddia/07-sharding.md) term-partitioned index · [Ch 12](../ddia/12-stream-processing.md) stream indexing
 
 *Search over billions of posts, where like counts change constantly.*
 
@@ -169,5 +169,5 @@ Update like-based ranking only when a post crosses thresholds, or in periodic ba
 ## Related
 
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) inverted index · [Ch 6](../ddia/06-partitioning.md) term-partitioned index · [Ch 11](../ddia/11-stream-processing.md) stream indexing
+- **DDIA:** [Ch 4](../ddia/04-storage-and-retrieval.md) inverted index · [Ch 7](../ddia/07-sharding.md) term-partitioned index · [Ch 12](../ddia/12-stream-processing.md) stream indexing
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Ad click aggregator](ad-click-aggregator.md) · [Web crawler](web-crawler.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md)

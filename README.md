@@ -20,7 +20,7 @@ Most resources show you a finished architecture and expect you to memorize it. T
 | [7 patterns](docs/patterns/index.md) | Scaling reads and writes, real-time updates, contention, multi-step processes, large blobs, long-running tasks |
 | [Technologies](docs/technologies.md) | Postgres, Redis, Kafka, Cassandra, DynamoDB, Elasticsearch, Flink, ZooKeeper, API gateways: when and when not |
 | [29 problems](docs/problems/index.md) | URL shortener to payments, each from v1 to final design with an interview script |
-| [DDIA, chapter by chapter](docs/ddia/index.md) | All 12 chapters of *Designing Data-Intensive Applications* as diagrams, tied to interview problems |
+| [DDIA, chapter by chapter](docs/ddia/index.md) | All 14 chapters of *Designing Data-Intensive Applications* (2nd edition) as diagrams, tied to interview problems |
 | [Computer Networking](docs/cn/index.md) | All 8 chapters of Kurose & Ross's *Computer Networking: A Top-Down Approach* as diagrams, from HTTP and DNS down to Wi-Fi, tied to system design |
 | [Operating Systems](docs/os/index.md) | The OS ideas behind real system behaviour: threads vs event loops, latency vs utilisation, page cache and GC pauses, fsync and group commit, SSDs, container limits |
 | [Low-level design](docs/lld/index.md) | File system, movie booking, logger, inventory: class diagrams and tested Java |
@@ -68,6 +68,6 @@ Fixes and new pages are welcome. See [CONTRIBUTING](CONTRIBUTING.md) for the pag
 
 ## Credits
 
-Written in our own words, with our own diagrams. The DDIA pages are study notes on *Designing Data-Intensive Applications* by Martin Kleppmann; please read the book. The Computer Networking pages are study notes on *Computer Networking: A Top-Down Approach* by James Kurose and Keith Ross; please read that book too. The Operating Systems pages follow the themes of *Operating Systems: Three Easy Pieces* by Remzi and Andrea Arpaci-Dusseau, free online. Diagrams use the open-source [Excalifont](https://plus.excalidraw.com/excalifont) (SIL OFL 1.1). Problem names refer to well-known products only to describe the kind of system; this project is not affiliated with any company or course.
+Written in our own words, with our own diagrams. The DDIA pages are study notes on *Designing Data-Intensive Applications* (2nd edition) by Martin Kleppmann and Chris Riccomini; please read the book. The Computer Networking pages are study notes on *Computer Networking: A Top-Down Approach* by James Kurose and Keith Ross; please read that book too. The Operating Systems pages follow the themes of *Operating Systems: Three Easy Pieces* by Remzi and Andrea Arpaci-Dusseau, free online. Diagrams use the open-source [Excalifont](https://plus.excalidraw.com/excalifont) (SIL OFL 1.1). Problem names refer to well-known products only to describe the kind of system; this project is not affiliated with any company or course.
 
 <!-- Generated from docs/index.md by scripts/sync_readme.py. Edit that file instead. -->

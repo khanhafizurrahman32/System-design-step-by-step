@@ -139,3 +139,21 @@
 *[compare-and-swap]: An atomic operation that sets a value only if it still equals the expected old value; the basis of lock-free code and optimistic concurrency.
 *[OOM killer]: The Linux mechanism that kills a process when memory (or a container's memory limit) is exhausted.
 *[CPU throttling]: A container being paused for the rest of a scheduling period after using up its CPU quota, causing latency spikes.
+*[CQRS]: Command query responsibility segregation: writes go to one model (often an event log), reads come from separate views built from it.
+*[ETL]: Extract, transform, load: copy data out of operational systems, reshape it, and load it into a warehouse. ELT loads first and transforms inside the warehouse.
+*[ELT]: Extract, load, transform: load raw data into the warehouse first, then transform it there with SQL.
+*[HNSW]: Hierarchical navigable small world: a layered graph index for fast approximate nearest-neighbour vector search.
+*[HLC]: Hybrid logical clock: wall-clock time plus a counter, so timestamps stay near real time and never go backwards.
+*[IVM]: Incremental view maintenance: updating a query result by applying only each change.
+*[SPOF]: Single point of failure: a component whose failure takes down the whole system.
+*[data lake]: A store of raw data files (usually on object storage) in whatever format they arrived, kept for analytics and ML.
+*[data warehouse]: A separate database built for analytical queries over data copied from operational systems.
+*[lakehouse]: Warehouse-style tables (Iceberg, Delta Lake) over open file formats on object storage, readable by many query engines.
+*[vector clock]: One counter per node, attached to each version; comparing two vectors shows whether one happened before the other or they were concurrent.
+*[sync engine]: A library or service that keeps a local copy of data on each device and syncs changes in the background.
+*[durable execution]: Running a multi-step workflow so each step's result is logged; after a crash the workflow replays and resumes without repeating finished steps.
+*[crypto-shredding]: Encrypting each person's data with their own key and deleting the key to make the data unreadable everywhere, even in immutable logs and backups.
+*[metastable failure]: An overload that sustains itself, typically through retries, even after the original trigger is gone.
+*[shared-nothing]: An architecture where each node has its own CPU, memory and disk and nodes coordinate only over the network.
+*[system of record]: The authoritative source of a piece of data; other copies are derived from it.
+*[gray failure]: A component that is slow or partly broken rather than clearly dead, so failure detection doesn't trigger.

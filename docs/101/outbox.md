@@ -57,4 +57,4 @@ The relay can publish an event and crash before marking it sent, so it publishes
 
 - [Delivery guarantees](delivery-guarantees.md)
 - [Multi-step processes](../patterns/multi-step-processes.md)
-- [DDIA Ch 11: stream processing](../ddia/11-stream-processing.md)
+- [DDIA Ch 12: stream processing](../ddia/12-stream-processing.md)

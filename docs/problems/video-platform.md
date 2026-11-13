@@ -8,7 +8,7 @@ tags: [large-blobs, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 10](../ddia/10-batch-processing.md) batch DAGs · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) bandwidth math
+**Difficulty:** Hard · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 11](../ddia/11-batch-processing.md) batch DAGs · [Ch 2](../ddia/02-nonfunctional-requirements.md) bandwidth math
 
 *Two hard problems: getting gigabyte uploads in reliably, and streaming smoothly on any connection.*
 
@@ -182,5 +182,5 @@ The player switches quality per segment based on current bandwidth, with segment
 ## Related
 
 - **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 10](../ddia/10-batch-processing.md) batch DAGs · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) bandwidth math
+- **DDIA:** [Ch 11](../ddia/11-batch-processing.md) batch DAGs · [Ch 2](../ddia/02-nonfunctional-requirements.md) bandwidth math
 - **Similar problems:** [File storage and sync (Dropbox)](file-sync.md) · [Photo sharing (Instagram)](photo-sharing.md)

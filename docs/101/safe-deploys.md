@@ -54,4 +54,4 @@ Expand and contract: add the new column, write both, backfill, switch reads, the
 ## Related
 
 - [Metrics, logs and traces](observability.md)
-- [DDIA Ch 4: encoding and evolution](../ddia/04-encoding-and-evolution.md)
+- [DDIA Ch 5: encoding and evolution](../ddia/05-encoding-and-evolution.md)

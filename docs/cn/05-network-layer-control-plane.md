@@ -62,7 +62,7 @@ The control plane decides **which paths** packets take and fills in every router
 
 **How it works:** the switches become simple **match + action** devices (Chapter 4). A **logically centralised controller** (in practice replicated for reliability) holds the network view: topology, link states, flows. It computes forwarding rules and installs them through a **southbound** API such as OpenFlow. **Network applications** (routing, access control, load balancing) run on the controller through a **northbound** API. Google's inter-data-centre WAN and every major cloud's virtual networks are built this way.
 
-The trade-off: the controller is now critical infrastructure. It must be replicated with consensus (as in [DDIA Ch 9](../ddia/09-consistency-and-consensus.md)), and the network must keep forwarding if it's briefly unreachable.
+The trade-off: the controller is now critical infrastructure. It must be replicated with consensus (as in [DDIA Ch 10](../ddia/10-consistency-and-consensus.md)), and the network must keep forwarding if it's briefly unreachable.
 
 ## ICMP: errors and diagnostics
 
@@ -117,7 +117,7 @@ It sends probes with increasing TTL. Each router that decrements a probe's TTL t
 ## Related
 
 - [Ch 4: Network layer, data plane](04-network-layer-data-plane.md)
-- [DDIA Ch 9: consensus](../ddia/09-consistency-and-consensus.md) (replicated controllers)
+- [DDIA Ch 10: consensus](../ddia/10-consistency-and-consensus.md) (replicated controllers)
 
 ---
 

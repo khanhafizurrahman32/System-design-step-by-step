@@ -40,7 +40,7 @@ The question to ask for each feature: **is a stale or conflicting answer worse t
 > **Say this in the interview:** "CAP is a per-feature choice: the booking path is CP, browsing is AP."
 
 > [!NOTE]
-> **PACELC, the everyday version:** even with **no** partition, strong consistency costs **latency**, because each write must wait for other replicas to confirm. So the extended rule is: during a **P**artition choose **A** or **C**; **E**lse choose **L**atency or **C**onsistency. More in [DDIA Chapter 9](../ddia/09-consistency-and-consensus.md).
+> **PACELC, the everyday version:** even with **no** partition, strong consistency costs **latency**, because each write must wait for other replicas to confirm. So the extended rule is: during a **P**artition choose **A** or **C**; **E**lse choose **L**atency or **C**onsistency. More in [DDIA Chapter 10](../ddia/10-consistency-and-consensus.md).
 
 > [!TIP]
 > **One-page sketchnote:** [CAP THEOREM AND PACELC on a single page](../sketchnotes/concept-cap-theorem.svg), for revision or printing.

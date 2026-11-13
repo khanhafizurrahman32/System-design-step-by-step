@@ -164,4 +164,4 @@ See the system design version in [Ticketmaster](../problems/ticketmaster.md).
 ## Related
 
 - [Dealing with contention](../patterns/contention.md)
-- [DDIA Ch 7: Transactions](../ddia/07-transactions.md) explains write skew, the bug this design prevents.
+- [DDIA Ch 8: Transactions](../ddia/08-transactions.md) explains write skew, the bug this design prevents.

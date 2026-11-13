@@ -7,7 +7,7 @@ description: Plain-language definitions of every term used in the handbook.
 
 Plain-language definitions of the terms used across the handbook. On the website, hovering over most of these terms on any page shows the definition.
 
-Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#networking) · [Correctness](#correctness) · [Databases](#databases) · [Distribution](#distribution) · [Caching](#caching) · [Messaging](#messaging) · [Storage](#storage) · [Reliability](#reliability) · [Security](#security) · [Operating systems](#operating systems)
+Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#networking) · [Correctness](#correctness) · [Databases](#databases) · [Distribution](#distribution) · [Caching](#caching) · [Messaging](#messaging) · [Storage](#storage) · [Reliability](#reliability) · [Security](#security) · [Operating systems](#operating-systems)
 
 ## Numbers
 
@@ -101,13 +101,21 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **B-tree** | The default index structure: a shallow sorted tree of pages. Fast lookups and range scans. |
 | **Column store** | A database that stores each column separately, so analytics read only the columns they need. |
 | **Conditional update** | An UPDATE whose WHERE clause includes the condition (e.g. status = AVAILABLE), so the check and the write happen atomically. |
+| **CQRS** | Command query responsibility segregation: writes go to one model (often an event log), reads come from separate views built from it. |
+| **Data lake** | A store of raw data files (usually on object storage) in whatever format they arrived, kept for analytics and ML. |
+| **Data warehouse** | A separate database built for analytical queries over data copied from operational systems. |
 | **Denormalization** | Copying data into several places to make a hot read cheaper, at the cost of keeping copies in sync. |
+| **ETL** | Extract, transform, load: copy data out of operational systems, reshape it, and load it into a warehouse. ELT loads first and transforms inside the warehouse. |
+| **Event sourcing** | Storing every change as an immutable event and deriving current state (and other views) by replaying the events. |
 | **fsync** | Forcing data from memory to disk so it survives a crash. Each commit waits for it, which limits single-row write rates. |
 | **GSI** | Global secondary index (DynamoDB): an index partitioned separately from the table; updated asynchronously. |
+| **HNSW** | Hierarchical navigable small world: a layered graph index for fast approximate nearest-neighbour vector search. |
 | **Index** | A sorted lookup structure that lets the database find rows without scanning the whole table. |
 | **Isolation level** | How much concurrent transactions are shielded from each other (Read Committed, Snapshot, Serializable). |
+| **Lakehouse** | Warehouse-style tables (Iceberg, Delta Lake) over open file formats on object storage, readable by many query engines. |
 | **Lost update** | Two read-modify-write cycles overlap and one overwrites the other's change. |
 | **LSM-tree** | Log-structured merge tree: writes go to memory and are flushed to sorted files that are merged later. Very fast writes; used by Cassandra and RocksDB. |
+| **Materialized view** | A stored query result kept up to date as the underlying data changes. |
 | **MVCC** | Multi-version concurrency control: rows keep several versions so readers see a consistent snapshot without blocking writers. |
 | **Normalization** | Storing each fact once and referring to it by ID, so updates happen in one place. |
 | **OLAP** | Online analytical processing: large scans and aggregations, as in dashboards and warehouses. |
@@ -115,6 +123,7 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **Optimistic locking** | Allow concurrent work; at write time check a version number and retry if it changed. Good for low contention. |
 | **Pessimistic locking** | Lock rows before changing them (SELECT … FOR UPDATE). Good for high contention on few rows. |
 | **Transaction** | A group of reads and writes that succeed or fail together. |
+| **Vector embedding** | A list of numbers produced by a model so that items with similar meaning end up close together; used for semantic search. |
 | **WAL** | Write-ahead log: every change is appended to a log before it is applied, so a crash can be recovered by replaying the log. |
 | **Write skew** | Two transactions each read the same condition, then write different rows; together they break a rule neither broke alone. The double-booking bug. |
 
@@ -124,6 +133,7 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 |---|---|
 | **2PC** | Two-phase commit: a coordinator asks all participants to prepare, then to commit. Blocks if the coordinator fails. |
 | **CAP** | During a network partition, a system must choose between consistency (refuse) and availability (answer, possibly stale). |
+| **Cell-based architecture** | Running many independent copies (cells) of the whole stack, each serving a subset of tenants, to limit the blast radius of failures. |
 | **Consensus** | Nodes agreeing on one value or order despite failures (Raft, Paxos, ZooKeeper). |
 | **Consistent hashing** | Placing nodes and keys on a ring so adding or removing a node moves only a small share of keys. |
 | **CRDT** | Conflict-free replicated data type: data that merges concurrent edits automatically. |
@@ -131,10 +141,15 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **Failover** | Promoting a replica to replace a failed leader. |
 | **Fencing token** | An increasing number issued with each lock; storage rejects writes carrying an older number, so a stalled old lock-holder can't corrupt data. |
 | **Hot key** | One key (a celebrity, a viral item) that gets so much traffic it overloads the single node holding it. |
+| **Hybrid logical clock** | A timestamp combining wall-clock time with a counter: close to real time, never goes backwards, respects causality. |
+| **Lamport timestamp** | A (counter, node ID) pair that orders events consistently with cause and effect, without physical clocks. |
 | **Leader** | The one replica that accepts writes and orders them; followers copy from it. |
 | **Lease** | A lock that expires automatically after a set time. |
 | **Linearizability** | The system behaves as if there is one copy of the data: once anyone sees a new value, everyone does. |
+| **Local-first** | Software where the copy of data on the user's device is primary and works offline, syncing with others when possible. |
 | **LWW** | Last write wins: keep the value with the latest timestamp and silently drop the other. |
+| **Multitenancy** | One system serving many customers (tenants) on shared infrastructure, with their data kept apart. |
+| **Operational transformation** | A way to merge concurrent text edits by adjusting each edit's position for edits that happened at the same time (Google Docs). |
 | **OT** | Operational transformation: a server orders concurrent edits and adjusts them so all copies converge (Google Docs). |
 | **PACELC** | Extends CAP: even without partitions, stronger consistency costs latency. |
 | **Quorum** | A majority (or w + r > n) of replicas that must agree, so reads overlap the latest writes. |
@@ -143,7 +158,13 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **Saga** | A multi-step process across services where each step has a compensating action to undo it on failure. |
 | **Shard key** | The field used to decide which shard a record lives on. |
 | **Sharding** | Splitting data across machines so each holds and serves only part of it. Also called partitioning. |
+| **Shared-nothing** | An architecture where each node has its own CPU, memory and disk and nodes coordinate only over the network. |
+| **Snowflake ID** | A 64-bit unique ID made of a timestamp, a machine ID and a sequence number, so IDs sort roughly by creation time. |
 | **Split brain** | Two nodes both believe they are the leader and accept writes. |
+| **Sync engine** | A library or service that keeps a local copy of data on each device and syncs changes in the background. |
+| **Two-phase commit** | A protocol where a coordinator asks all participants to prepare, then tells them all to commit or abort, so a transaction is atomic across nodes. |
+| **Vector clock** | One counter per node, attached to each version; comparing two vectors shows whether one happened before the other or they were concurrent. |
+| **Zombie** | A node that still acts on authority it has lost (a lease or leadership), for example after a long pause. |
 
 ## Caching
 
@@ -165,10 +186,12 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **CDC** | Change data capture: streaming every database change (from its log) to other systems. |
 | **Consumer group** | Consumers that share a topic's partitions, each partition read by one of them. |
 | **DLQ** | Dead-letter queue: where messages go after repeatedly failing, so they don't block others. |
+| **Durable execution** | Running a multi-step workflow so each step's result is logged; after a crash the workflow replays and resumes without repeating finished steps. |
 | **Event sourcing** | Storing the sequence of events as the source of truth and deriving current state from it. |
 | **Fan-out** | Sending one item to many recipients, such as a post to all followers. |
 | **Fan-out on read** | Assemble each recipient's view when they read it, making writes cheap. |
 | **Fan-out on write** | Precompute each recipient's copy when the item is created, making reads cheap. |
+| **Incremental view maintenance** | Keeping a query result up to date by applying only each change to it, instead of re-running the query. |
 | **Kafka partition** | An ordered, append-only log that is one slice of a Kafka topic. Order is kept only within a partition. |
 | **Message queue** | A buffer between producers and consumers so work can be done later, retried and spread over workers. |
 | **Offset** | A consumer's position in a log such as a Kafka partition; each consumer group tracks its own. |
@@ -176,6 +199,7 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **Partition key** | The field used to choose a partition (for example user ID); order is guaranteed only within one partition. |
 | **Poison message** | A message that fails every time it is processed; it should be moved to a dead-letter queue. |
 | **Pub/sub** | Publish/subscribe: senders publish to a channel and every subscriber receives the message. |
+| **Schema registry** | A service that stores message schemas and rejects incompatible changes, so producers and consumers can evolve independently. |
 | **Stream processing** | Processing events continuously as they arrive. |
 | **Tumbling window** | Fixed, non-overlapping time buckets for stream aggregation, such as one per minute. |
 | **Visibility timeout** | How long a taken message stays hidden; if the worker doesn't finish in time, it reappears for a retry. |
@@ -200,13 +224,19 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **Bulkhead** | Separate pools of threads or connections per dependency, so one slow dependency can't exhaust everything. |
 | **Canary deploy** | Releasing a new version to a small share of traffic first and comparing its errors and latency before rolling it out further. |
 | **Circuit breaker** | Stops calling a failing dependency for a while and fails fast instead, then lets a few trial calls through to test recovery. |
+| **Deterministic simulation testing** | Running a whole distributed system in a seeded simulator so any failure can be replayed exactly from its seed. |
 | **Expand and contract** | Changing a schema in backward-compatible steps: add the new thing, migrate, switch over, then remove the old thing. |
 | **Exponential backoff** | Waiting longer after each failed attempt (100 ms, 200, 400…) so a struggling service can recover. |
 | **Feature flag** | A runtime switch that turns a feature on or off for some users without redeploying. |
+| **Gray failure** | A component that is slow or partly broken rather than clearly dead, so failure detection doesn't trigger. |
+| **Hedged request** | Sending a duplicate request to another replica if the first is slow, and using whichever answers first. |
 | **Jitter** | Randomness added to retry delays so many clients don't retry at the same instant. |
 | **Load shedding** | Rejecting some requests early (usually the least important) when a service is overloaded, so the rest stay fast. |
+| **Metastable failure** | An overload that sustains itself, typically through retries, even after the original trigger is gone. |
 | **RED method** | Monitor every service by request Rate, Errors and Duration. |
 | **Retry budget** | A cap on how much extra load retries may add (for example 10%), so retries can't multiply an outage. |
+| **SPOF** | Single point of failure: a component whose failure takes down the whole system. |
+| **System of record** | The authoritative source of a piece of data; other copies are derived from it. |
 | **Thundering herd** | Many clients hitting a service at the same moment, for example all retrying together or all missing an expired cache key. |
 | **Token bucket** | A rate-limiting algorithm: tokens refill at a steady rate, each request spends one, and bursts up to the bucket size are allowed. |
 | **Trace** | The record of one request as it passes through several services, with the time spent in each. |
@@ -221,7 +251,9 @@ Jump to: [Numbers](#numbers) · [Requirements](#requirements) · [Networking](#n
 | **Authorization** | Deciding what an authenticated caller is allowed to do. Often shortened to authz. |
 | **bcrypt** | A long-established slow password hashing function with a tunable cost factor. |
 | **CA** | Certificate authority: an organisation browsers trust to sign certificates that bind a domain name to a public key. |
+| **Crypto-shredding** | Encrypting each person's data with their own key and deleting the key to make the data unreadable everywhere, even in immutable logs and backups. |
 | **CSRF** | Cross-site request forgery: another site makes the user's browser send a request with their cookies. Stopped with SameSite cookies or tokens. |
+| **Data minimisation** | Collecting and keeping only the personal data needed for a stated purpose, for no longer than necessary. |
 | **HMAC** | A signature made from a message and a shared secret key; used to prove a webhook or request really came from the sender. |
 | **IdP** | Identity provider: the service that logs users in and vouches for them to other apps (Okta, Entra ID, Google). |
 | **JWT** | JSON Web Token: a signed, base64url-encoded set of claims (who, expiry, audience) that a server can verify without a database lookup. Readable by anyone, so it holds no secrets. |

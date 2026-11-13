@@ -8,7 +8,7 @@ tags: [scaling-writes, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) windows, exactly-once · [Ch 12](../ddia/12-future-of-data-systems.md) Lambda · [Ch 3](../ddia/03-storage-and-retrieval.md) column stores
+**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 12](../ddia/12-stream-processing.md) windows, exactly-once · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) Lambda · [Ch 4](../ddia/04-storage-and-retrieval.md) column stores
 
 *Clicks are money, so the numbers must be fast for dashboards and exact for billing.*
 
@@ -84,7 +84,7 @@ Each step fixes one specific problem with the step before it.
 
 **Why:** streaming systems are fast, but bugs, edge cases with very late events, or a misconfigured deploy can make counts drift. For billing, "probably right" isn't enough.
 
-**How:** every raw click is also written to **S3**, partitioned by date and never modified. A nightly **batch job** recomputes exact counts from those raw files and corrects the aggregates. The streaming numbers serve live dashboards; the batch numbers are what invoices use. This is the Lambda pattern ([DDIA Ch 12](../ddia/12-future-of-data-systems.md)).
+**How:** every raw click is also written to **S3**, partitioned by date and never modified. A nightly **batch job** recomputes exact counts from those raw files and corrects the aggregates. The streaming numbers serve live dashboards; the batch numbers are what invoices use. This is the Lambda pattern ([DDIA Ch 13](../ddia/13-philosophy-of-streaming-systems.md)).
 
 ## 6. Deep dives
 
@@ -110,7 +110,7 @@ Each step fixes one specific problem with the step before it.
 
 **Why not Postgres for the aggregates?** Advertisers slice the data many ways: by campaign, country or device, over days or months. Those queries scan and sum many rows.
 
-**How a column store helps:** it stores each column separately and compresses it heavily, so a query reads only the columns it needs. Combined with pre-aggregated per-minute rows, queries over billions of underlying clicks return in under a second (see [DDIA Ch 3](../ddia/03-storage-and-retrieval.md) on column storage).
+**How a column store helps:** it stores each column separately and compresses it heavily, so a query reads only the columns it needs. Combined with pre-aggregated per-minute rows, queries over billions of underlying clicks return in under a second (see [DDIA Ch 4](../ddia/04-storage-and-retrieval.md) on column storage).
 
 ## 7. Interview script (45 minutes)
 
@@ -173,5 +173,5 @@ Billing needs exact numbers; the batch recount from raw logs corrects any stream
 ## Related
 
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
-- **DDIA:** [Ch 11](../ddia/11-stream-processing.md) windows, exactly-once · [Ch 12](../ddia/12-future-of-data-systems.md) Lambda · [Ch 3](../ddia/03-storage-and-retrieval.md) column stores
+- **DDIA:** [Ch 12](../ddia/12-stream-processing.md) windows, exactly-once · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) Lambda · [Ch 4](../ddia/04-storage-and-retrieval.md) column stores
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Web crawler](web-crawler.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md) · [Fitness tracking (Strava)](fitness-tracking.md)

@@ -8,7 +8,7 @@ tags: [scaling-writes, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) LSM, compression · [Ch 11](../ddia/11-stream-processing.md) stream alerting
+**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 4](../ddia/04-storage-and-retrieval.md) LSM, compression · [Ch 12](../ddia/12-stream-processing.md) stream alerting
 
 *Millions of data points per second arrive, and alerts must fire within a minute.*
 
@@ -182,5 +182,5 @@ Alerts fire as data arrives without repeatedly querying the database for every r
 
 - **Operating systems:** [OS 7: Storage devices](../os/07-storage-devices.md) (why write-heavy stores are append-only)
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
-- **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) LSM, compression · [Ch 11](../ddia/11-stream-processing.md) stream alerting
+- **DDIA:** [Ch 4](../ddia/04-storage-and-retrieval.md) LSM, compression · [Ch 12](../ddia/12-stream-processing.md) stream alerting
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Ad click aggregator](ad-click-aggregator.md) · [Web crawler](web-crawler.md) · [Fitness tracking (Strava)](fitness-tracking.md)

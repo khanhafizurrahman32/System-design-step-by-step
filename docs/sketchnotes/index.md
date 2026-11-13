@@ -303,75 +303,78 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 
 ## DDIA chapters
 
+> [!NOTE]
+> These sketchnotes were drawn for the 1st edition, so their chapter numbers are one lower than the 2nd-edition pages they link to (for example, sketchnote 6 is now Chapter 7, Sharding). The 2nd edition's new material (Chapters 1 and 14, and the new sections in the others) is covered on the full pages.
+
 ### DDIA 1 · RELIABLE, SCALABLE, MAINTAINABLE
 
 [![DDIA 1 · RELIABLE, SCALABLE, MAINTAINABLE sketchnote](ddia-01.svg)](ddia-01.svg)
 
-[Read the full page](../ddia/01-reliability-scalability-maintainability.md) · [Open full size](ddia-01.svg)
+[Read the full page](../ddia/02-nonfunctional-requirements.md) · [Open full size](ddia-01.svg)
 
 ### DDIA 2 · DATA MODELS & QUERY LANGUAGES
 
 [![DDIA 2 · DATA MODELS & QUERY LANGUAGES sketchnote](ddia-02.svg)](ddia-02.svg)
 
-[Read the full page](../ddia/02-data-models.md) · [Open full size](ddia-02.svg)
+[Read the full page](../ddia/03-data-models.md) · [Open full size](ddia-02.svg)
 
 ### DDIA 3 · STORAGE & RETRIEVAL
 
 [![DDIA 3 · STORAGE & RETRIEVAL sketchnote](ddia-03.svg)](ddia-03.svg)
 
-[Read the full page](../ddia/03-storage-and-retrieval.md) · [Open full size](ddia-03.svg)
+[Read the full page](../ddia/04-storage-and-retrieval.md) · [Open full size](ddia-03.svg)
 
 ### DDIA 4 · ENCODING & EVOLUTION
 
 [![DDIA 4 · ENCODING & EVOLUTION sketchnote](ddia-04.svg)](ddia-04.svg)
 
-[Read the full page](../ddia/04-encoding-and-evolution.md) · [Open full size](ddia-04.svg)
+[Read the full page](../ddia/05-encoding-and-evolution.md) · [Open full size](ddia-04.svg)
 
 ### DDIA 5 · REPLICATION
 
 [![DDIA 5 · REPLICATION sketchnote](ddia-05.svg)](ddia-05.svg)
 
-[Read the full page](../ddia/05-replication.md) · [Open full size](ddia-05.svg)
+[Read the full page](../ddia/06-replication.md) · [Open full size](ddia-05.svg)
 
 ### DDIA 6 · PARTITIONING (SHARDING)
 
 [![DDIA 6 · PARTITIONING (SHARDING) sketchnote](ddia-06.svg)](ddia-06.svg)
 
-[Read the full page](../ddia/06-partitioning.md) · [Open full size](ddia-06.svg)
+[Read the full page](../ddia/07-sharding.md) · [Open full size](ddia-06.svg)
 
 ### DDIA 7 · TRANSACTIONS
 
 [![DDIA 7 · TRANSACTIONS sketchnote](ddia-07.svg)](ddia-07.svg)
 
-[Read the full page](../ddia/07-transactions.md) · [Open full size](ddia-07.svg)
+[Read the full page](../ddia/08-transactions.md) · [Open full size](ddia-07.svg)
 
 ### DDIA 8 · THE TROUBLE WITH DISTRIBUTED SYSTEMS
 
 [![DDIA 8 · THE TROUBLE WITH DISTRIBUTED SYSTEMS sketchnote](ddia-08.svg)](ddia-08.svg)
 
-[Read the full page](../ddia/08-trouble-with-distributed-systems.md) · [Open full size](ddia-08.svg)
+[Read the full page](../ddia/09-trouble-with-distributed-systems.md) · [Open full size](ddia-08.svg)
 
 ### DDIA 9 · CONSISTENCY & CONSENSUS
 
 [![DDIA 9 · CONSISTENCY & CONSENSUS sketchnote](ddia-09.svg)](ddia-09.svg)
 
-[Read the full page](../ddia/09-consistency-and-consensus.md) · [Open full size](ddia-09.svg)
+[Read the full page](../ddia/10-consistency-and-consensus.md) · [Open full size](ddia-09.svg)
 
 ### DDIA 10 · BATCH PROCESSING
 
 [![DDIA 10 · BATCH PROCESSING sketchnote](ddia-10.svg)](ddia-10.svg)
 
-[Read the full page](../ddia/10-batch-processing.md) · [Open full size](ddia-10.svg)
+[Read the full page](../ddia/11-batch-processing.md) · [Open full size](ddia-10.svg)
 
 ### DDIA 11 · STREAM PROCESSING
 
 [![DDIA 11 · STREAM PROCESSING sketchnote](ddia-11.svg)](ddia-11.svg)
 
-[Read the full page](../ddia/11-stream-processing.md) · [Open full size](ddia-11.svg)
+[Read the full page](../ddia/12-stream-processing.md) · [Open full size](ddia-11.svg)
 
 ### DDIA 12 · THE FUTURE OF DATA SYSTEMS
 
 [![DDIA 12 · THE FUTURE OF DATA SYSTEMS sketchnote](ddia-12.svg)](ddia-12.svg)
 
-[Read the full page](../ddia/12-future-of-data-systems.md) · [Open full size](ddia-12.svg)
+[Read the full page](../ddia/13-philosophy-of-streaming-systems.md) · [Open full size](ddia-12.svg)
 

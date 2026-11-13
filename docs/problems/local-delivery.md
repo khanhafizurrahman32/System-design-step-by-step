@@ -8,7 +8,7 @@ tags: [scaling-reads, easy]
 
 <span class="lvl lvl-b">Beginner-friendly</span>
 
-**Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) conditional updates · [Ch 5](../ddia/05-replication.md) replica lag
+**Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 8](../ddia/08-transactions.md) conditional updates · [Ch 6](../ddia/06-replication.md) replica lag
 
 *It looks like an ordering system, but most of the load is people checking what is available near them.*
 
@@ -181,5 +181,5 @@ The API is slow and costly; a cheap distance filter on an in-memory list removes
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 7](../ddia/07-transactions.md) conditional updates · [Ch 5](../ddia/05-replication.md) replica lag
+- **DDIA:** [Ch 8](../ddia/08-transactions.md) conditional updates · [Ch 6](../ddia/06-replication.md) replica lag
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md)

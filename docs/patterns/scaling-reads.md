@@ -31,7 +31,7 @@ The fix comes in layers, cheapest first. Each layer stops a share of reads from 
 
 1. **Start: one database serves every read.** This is fine until the numbers say otherwise. Calculate peak reads per second before adding anything.
 2. **Add a cache (cache-aside).** Put Redis or Memcached in front of the database. On each read, the app **checks the cache first**. On a **hit**, it returns the value in under a millisecond, and the database isn't touched. On a **miss**, it reads the database (5–50 ms), stores the result in the cache with an expiry time (**TTL**), and returns it. Popular data is requested most, so it is usually in the cache: hit rates of 80–99% are common, which cuts database reads by 5 to 100 times.
-3. **Add read replicas** for the reads that still miss. Replicas are copies of the database that receive every write from the primary and serve reads. Three replicas roughly triple read capacity. The catch is **replication lag**: a replica can be a little behind, so a user who just changed something might not see it yet. Send those reads to the primary (see [DDIA Ch 5](../ddia/05-replication.md)).
+3. **Add read replicas** for the reads that still miss. Replicas are copies of the database that receive every write from the primary and serve reads. Three replicas roughly triple read capacity. The catch is **replication lag**: a replica can be a little behind, so a user who just changed something might not see it yet. Send those reads to the primary (see [DDIA Ch 6](../ddia/06-replication.md)).
 4. **Add a CDN** for content that's the same for many users: images, scripts, and even API responses like "today's top stories". CDN servers near the user answer directly, so those requests never reach your servers at all.
 
 > [!WARNING]
@@ -80,5 +80,5 @@ More detail on caching strategies in [Caching](../core-concepts/caching.md).
 
 ## The theory underneath
 
-- [DDIA Ch 5: Replication](../ddia/05-replication.md)
-- [DDIA Ch 6: Partitioning](../ddia/06-partitioning.md)
+- [DDIA Ch 6: Replication](../ddia/06-replication.md)
+- [DDIA Ch 7: Sharding](../ddia/07-sharding.md)

@@ -8,7 +8,7 @@ tags: [real-time-updates, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) conflict resolution · [Ch 9](../ddia/09-consistency-and-consensus.md) total order · [Ch 11](../ddia/11-stream-processing.md) event log
+**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 6](../ddia/06-replication.md) conflict resolution · [Ch 10](../ddia/10-consistency-and-consensus.md) total order · [Ch 12](../ddia/12-stream-processing.md) event log
 
 *The challenge is correctness, not scale: everyone must end up with the same document.*
 
@@ -99,7 +99,7 @@ In an interview, OT with a server per document is the simpler story when there's
 
 ### Why one server per doc?
 
-**Why it's needed:** OT's correctness depends on every operation being transformed against a **single, agreed order** of the operations before it. That's a **total order**, which requires one place making the decision ([DDIA Ch 9](../ddia/09-consistency-and-consensus.md)).
+**Why it's needed:** OT's correctness depends on every operation being transformed against a **single, agreed order** of the operations before it. That's a **total order**, which requires one place making the decision ([DDIA Ch 10](../ddia/10-consistency-and-consensus.md)).
 
 **Why it's fine:** a hot document has ~100 editors doing a few operations a second each, about **500 operations a second**, which one server handles easily. The many millions of documents are spread across many servers, so the system scales by documents, not by splitting one document.
 
@@ -176,5 +176,5 @@ When you need offline or peer-to-peer editing without a central server ordering 
 ## Related
 
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md)
-- **DDIA:** [Ch 5](../ddia/05-replication.md) conflict resolution · [Ch 9](../ddia/09-consistency-and-consensus.md) total order · [Ch 11](../ddia/11-stream-processing.md) event log
+- **DDIA:** [Ch 6](../ddia/06-replication.md) conflict resolution · [Ch 10](../ddia/10-consistency-and-consensus.md) total order · [Ch 12](../ddia/12-stream-processing.md) event log
 - **Similar problems:** [Ride sharing (Uber)](ride-sharing.md) · [Live comments (Facebook Live)](live-comments.md) · [Stock trading (Robinhood)](stock-trading.md) · [Online auction](online-auction.md)

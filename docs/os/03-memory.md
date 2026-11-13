@@ -66,7 +66,7 @@ So a database server showing "1 GB free" out of 64 GB is usually **healthy**: mo
 
 1. **Tail latency:** every request in flight during the pause waits. A 300 ms pause every few minutes shows up as a p99.9 spike.
 2. **Missed heartbeats:** the process doesn't answer health checks, so the load balancer or cluster manager may mark it dead and fail over.
-3. **Expired leases (correctness bug):** a process holding a lock or lease pauses, the lease expires, another process takes over, and then the first process wakes up and acts as if it still holds it. This is the scenario in [DDIA Ch 8](../ddia/08-trouble-with-distributed-systems.md), and the reason **fencing tokens** exist.
+3. **Expired leases (correctness bug):** a process holding a lock or lease pauses, the lease expires, another process takes over, and then the first process wakes up and acts as if it still holds it. This is the scenario in [DDIA Ch 9](../ddia/09-trouble-with-distributed-systems.md), and the reason **fencing tokens** exist.
 
 Swapping, VM migration and CPU throttling (see [Containers](08-containers.md)) cause exactly the same kind of freeze.
 
@@ -121,7 +121,7 @@ A process paused longer than its lease's TTL loses the lease to another process,
 ## Related
 
 - [Files and durability](06-files-and-durability.md) · [Containers](08-containers.md)
-- [DDIA Ch 8: process pauses and fencing](../ddia/08-trouble-with-distributed-systems.md) · [Distributed cache](../problems/distributed-cache.md)
+- [DDIA Ch 9: process pauses and fencing](../ddia/09-trouble-with-distributed-systems.md) · [Distributed cache](../problems/distributed-cache.md)
 
 ---
 

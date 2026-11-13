@@ -8,7 +8,7 @@ tags: [real-time-updates, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) unknown outcomes · [Ch 12](../ddia/12-future-of-data-systems.md) idempotency · [Ch 11](../ddia/11-stream-processing.md) pub/sub
+**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 9](../ddia/09-trouble-with-distributed-systems.md) unknown outcomes · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) idempotency · [Ch 12](../ddia/12-stream-processing.md) pub/sub
 
 *Two separate problems: pushing live prices to millions, and never losing or duplicating an order.*
 
@@ -91,7 +91,7 @@ Each step fixes one specific problem with the step before it.
 
 **Why it matters:** this single choice decides whether a crash can leave an order we don't know about.
 
-**How to think about it:** **after** fails dangerously. If we crash between sending and saving, a real order sits at the exchange with no record on our side: the user's money is committed and we can't show it, cancel it or reconcile it. A timeout is the same: the exchange may have accepted it (see [DDIA Ch 8](../ddia/08-trouble-with-distributed-systems.md)). **Before** fails safely. The worst case is a PENDING row for an order that never reached the exchange, which reconciliation finds and marks as failed. Always record intent first.
+**How to think about it:** **after** fails dangerously. If we crash between sending and saving, a real order sits at the exchange with no record on our side: the user's money is committed and we can't show it, cancel it or reconcile it. A timeout is the same: the exchange may have accepted it (see [DDIA Ch 9](../ddia/09-trouble-with-distributed-systems.md)). **Before** fails safely. The worst case is a PENDING row for an order that never reached the exchange, which reconciliation finds and marks as failed. Always record intent first.
 
 ### Duplicate submits?
 
@@ -172,5 +172,5 @@ One consumer of the exchange feed publishes per symbol; push servers subscribe a
 ## Related
 
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md)
-- **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) unknown outcomes · [Ch 12](../ddia/12-future-of-data-systems.md) idempotency · [Ch 11](../ddia/11-stream-processing.md) pub/sub
+- **DDIA:** [Ch 9](../ddia/09-trouble-with-distributed-systems.md) unknown outcomes · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) idempotency · [Ch 12](../ddia/12-stream-processing.md) pub/sub
 - **Similar problems:** [Ride sharing (Uber)](ride-sharing.md) · [Live comments (Facebook Live)](live-comments.md) · [Collaborative editor (Google Docs)](collaborative-editor.md) · [Online auction](online-auction.md)

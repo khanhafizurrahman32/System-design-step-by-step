@@ -31,7 +31,7 @@ When threads share memory, operations that look like one step (`counter++`) are 
 
 The code that touches shared data and must not be interleaved is a **critical section**. The goal is **mutual exclusion**: only one thread inside it at a time.
 
-This is exactly the **lost update** from databases ([DDIA Ch 7](../ddia/07-transactions.md)), with threads in place of transactions and memory in place of rows.
+This is exactly the **lost update** from databases ([DDIA Ch 8](../ddia/08-transactions.md)), with threads in place of transactions and memory in place of rows.
 
 ## Locks, atomics and condition variables
 
@@ -120,7 +120,7 @@ Always acquire locks in one global order (for example, sorted by ID), so no cycl
 
 ## Related
 
-- [Dealing with contention](../patterns/contention.md) · [DDIA Ch 7: transactions](../ddia/07-transactions.md)
+- [Dealing with contention](../patterns/contention.md) · [DDIA Ch 8: transactions](../ddia/08-transactions.md)
 - [ACID and isolation levels](../101/acid-and-isolation.md) · [Ticketmaster](../problems/ticketmaster.md)
 
 ---

@@ -26,7 +26,7 @@ Each page explains **why** the problem exists and **how** the mechanism works, t
 
 - **Short on time?** Read 1, 5 and 6: threads vs event loops, and why fsync limits writes. They come up most often.
 - **Debugging production?** Pages 2, 3 and 8 explain most "latency spikes but nothing looks wrong" mysteries.
-- **Going deeper?** Pair page 6 and 7 with [DDIA Ch 3](../ddia/03-storage-and-retrieval.md), and page 3 with [DDIA Ch 8](../ddia/08-trouble-with-distributed-systems.md).
+- **Going deeper?** Pair page 6 and 7 with [DDIA Ch 4](../ddia/04-storage-and-retrieval.md), and page 3 with [DDIA Ch 9](../ddia/09-trouble-with-distributed-systems.md).
 
 ## Related
 

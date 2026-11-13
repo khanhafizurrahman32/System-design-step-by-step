@@ -8,7 +8,7 @@ tags: [real-time-updates, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · [Dealing with contention](../patterns/contention.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) lost update · [Ch 11](../ddia/11-stream-processing.md) partitioned log · [Ch 8](../ddia/08-trouble-with-distributed-systems.md) clocks
+**Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · [Dealing with contention](../patterns/contention.md) · **DDIA:** [Ch 8](../ddia/08-transactions.md) lost update · [Ch 12](../ddia/12-stream-processing.md) partitioned log · [Ch 9](../ddia/09-trouble-with-distributed-systems.md) clocks
 
 *Many people bid on one row at the same time, and exactly one of them must win each race.*
 
@@ -59,7 +59,7 @@ GET /auctions/{id}/stream (SSE)
 
 To place a bid, the server reads the auction's current highest bid, checks in application code that the new bid is higher, and if so writes the new maximum and inserts the bid.
 
-**Where it breaks:** the highest bid is $100. Two bidders send $110 and $120 at the same moment. Both requests read $100, both pass the check, and both write. If the $110 write lands second, the auction now says **$110 is winning** and the $120 bid is silently lost. Or both bidders are told they're the highest bidder. This is a **lost update** ([DDIA Ch 7](../ddia/07-transactions.md)). It's rare on quiet auctions, but popular auctions get **~1k bids a second** in the final seconds, all on the same row, so it happens constantly exactly when it matters most.
+**Where it breaks:** the highest bid is $100. Two bidders send $110 and $120 at the same moment. Both requests read $100, both pass the check, and both write. If the $110 write lands second, the auction now says **$110 is winning** and the $120 bid is silently lost. Or both bidders are told they're the highest bidder. This is a **lost update** ([DDIA Ch 8](../ddia/08-transactions.md)). It's rare on quiet auctions, but popular auctions get **~1k bids a second** in the final seconds, all on the same row, so it happens constantly exactly when it matters most.
 
 ## 5. Evolving to the final design
 
@@ -179,5 +179,5 @@ Serialize bids for that auction through a partitioned log, so one consumer proce
 ## Related
 
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · [Dealing with contention](../patterns/contention.md)
-- **DDIA:** [Ch 7](../ddia/07-transactions.md) lost update · [Ch 11](../ddia/11-stream-processing.md) partitioned log · [Ch 8](../ddia/08-trouble-with-distributed-systems.md) clocks
+- **DDIA:** [Ch 8](../ddia/08-transactions.md) lost update · [Ch 12](../ddia/12-stream-processing.md) partitioned log · [Ch 9](../ddia/09-trouble-with-distributed-systems.md) clocks
 - **Similar problems:** [Ride sharing (Uber)](ride-sharing.md) · [Live comments (Facebook Live)](live-comments.md) · [Collaborative editor (Google Docs)](collaborative-editor.md) · [Stock trading (Robinhood)](stock-trading.md)

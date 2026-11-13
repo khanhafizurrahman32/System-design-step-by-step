@@ -8,7 +8,7 @@ tags: [contention, scaling-reads, medium]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Medium · **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md) · **Core concept:** [Caching](../core-concepts/caching.md) · **DDIA:** [Ch 5 Replication](../ddia/05-replication.md), [Ch 7 Transactions](../ddia/07-transactions.md)
+**Difficulty:** Medium · **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md) · **Core concept:** [Caching](../core-concepts/caching.md) · **DDIA:** [Ch 6 Replication](../ddia/06-replication.md), [Ch 8 Transactions](../ddia/08-transactions.md)
 
 > [!TIP]
 > **One-page sketchnote:** [TICKETMASTER on a single page](../sketchnotes/problem-ticketmaster.svg), for revision or printing.
@@ -203,5 +203,5 @@ A virtual waiting room admits users at the rate the booking path can handle; bro
 
 - **Patterns:** [Dealing with contention](../patterns/contention.md) · [Scaling reads](../patterns/scaling-reads.md)
 - **Core concepts:** [Caching](../core-concepts/caching.md)
-- **DDIA:** [Ch 5 Replication](../ddia/05-replication.md) for why replicas can serve a stale seat map; [Ch 7 Transactions](../ddia/07-transactions.md) for write skew and why the default isolation level doesn't save you.
+- **DDIA:** [Ch 6 Replication](../ddia/06-replication.md) for why replicas can serve a stale seat map; [Ch 8 Transactions](../ddia/08-transactions.md) for write skew and why the default isolation level doesn't save you.
 - **Similar problems:** [Online auction](online-auction.md) (contention on one row) · [Local delivery](local-delivery.md) (decrement stock without overselling) · [LLD: Movie ticket booking](../lld/movie-booking.md)

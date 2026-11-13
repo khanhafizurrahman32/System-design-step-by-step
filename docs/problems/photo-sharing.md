@@ -8,7 +8,7 @@ tags: [large-blobs, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) fan-out · [Ch 11](../ddia/11-stream-processing.md) async pipelines
+**Difficulty:** Medium · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 2](../ddia/02-nonfunctional-requirements.md) fan-out · [Ch 12](../ddia/12-stream-processing.md) async pipelines
 
 *A news feed plus a media pipeline: two well-known problems combined.*
 
@@ -173,5 +173,5 @@ From a CDN in front of object storage.
 ## Related
 
 - **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) fan-out · [Ch 11](../ddia/11-stream-processing.md) async pipelines
+- **DDIA:** [Ch 2](../ddia/02-nonfunctional-requirements.md) fan-out · [Ch 12](../ddia/12-stream-processing.md) async pipelines
 - **Similar problems:** [Video platform (YouTube)](video-platform.md) · [File storage and sync (Dropbox)](file-sync.md)

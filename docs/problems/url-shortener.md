@@ -8,7 +8,7 @@ tags: [scaling-reads, easy]
 
 <span class="lvl lvl-b">Beginner-friendly</span>
 
-**Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) replicas · [Ch 6](../ddia/06-partitioning.md) hash sharding
+**Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 6](../ddia/06-replication.md) replicas · [Ch 7](../ddia/07-sharding.md) hash sharding
 
 *It sounds like a toy, but it is the cleanest example of a read-heavy system: almost every request is a redirect.*
 
@@ -164,5 +164,5 @@ Redirects outnumber writes about 100:1 and a small share of links get most click
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 5](../ddia/05-replication.md) replicas · [Ch 6](../ddia/06-partitioning.md) hash sharding
+- **DDIA:** [Ch 6](../ddia/06-replication.md) replicas · [Ch 7](../ddia/07-sharding.md) hash sharding
 - **Similar problems:** [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md) · [News aggregator (Google News)](news-aggregator.md)

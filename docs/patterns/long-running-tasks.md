@@ -70,5 +70,5 @@ Because a job may be retried, it might run **more than once**, so every job must
 
 ## The theory underneath
 
-- [DDIA Ch 11: Stream processing](../ddia/11-stream-processing.md)
-- [DDIA Ch 8: Trouble with distributed systems](../ddia/08-trouble-with-distributed-systems.md)
+- [DDIA Ch 12: Stream processing](../ddia/12-stream-processing.md)
+- [DDIA Ch 9: Trouble with distributed systems](../ddia/09-trouble-with-distributed-systems.md)

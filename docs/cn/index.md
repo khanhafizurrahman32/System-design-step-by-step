@@ -34,4 +34,4 @@ The book goes **top-down**: it starts with the applications you already use (the
 
 - [System Design 101](../101/index.md): one-screen explainers of TCP vs UDP, HTTP versions, HTTPS, API gateways and more.
 - [Networking essentials](../core-concepts/networking.md): the short version for interviews.
-- [DDIA Ch 8](../ddia/08-trouble-with-distributed-systems.md): what unreliable networks mean for distributed systems.
+- [DDIA Ch 9](../ddia/09-trouble-with-distributed-systems.md): what unreliable networks mean for distributed systems.

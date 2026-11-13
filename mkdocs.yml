@@ -35,6 +35,24 @@ extra:
   google_site_verification: ""
 extra_css:
   - assets/extra.css
+plugins:
+  - search
+  - redirects:
+      # DDIA 1st-edition URLs -> 2nd-edition pages
+      redirect_maps:
+        ddia/01-reliability-scalability-maintainability.md: ddia/02-nonfunctional-requirements.md
+        ddia/02-data-models.md: ddia/03-data-models.md
+        ddia/03-storage-and-retrieval.md: ddia/04-storage-and-retrieval.md
+        ddia/04-encoding-and-evolution.md: ddia/05-encoding-and-evolution.md
+        ddia/05-replication.md: ddia/06-replication.md
+        ddia/06-partitioning.md: ddia/07-sharding.md
+        ddia/07-transactions.md: ddia/08-transactions.md
+        ddia/08-trouble-with-distributed-systems.md: ddia/09-trouble-with-distributed-systems.md
+        ddia/09-consistency-and-consensus.md: ddia/10-consistency-and-consensus.md
+        ddia/10-batch-processing.md: ddia/11-batch-processing.md
+        ddia/11-stream-processing.md: ddia/12-stream-processing.md
+        ddia/12-future-of-data-systems.md: ddia/13-philosophy-of-streaming-systems.md
+
 markdown_extensions:
   - tables
   - toc: {permalink: true}
@@ -150,18 +168,20 @@ nav:
   - Long-running tasks: []
 - DDIA:
   - Overview: ddia/index.md
-  - 'Ch 1: Reliable, Scalable, Maintainable': ddia/01-reliability-scalability-maintainability.md
-  - 'Ch 2: Data Models & Query Languages': ddia/02-data-models.md
-  - 'Ch 3: Storage & Retrieval': ddia/03-storage-and-retrieval.md
-  - 'Ch 4: Encoding & Evolution': ddia/04-encoding-and-evolution.md
-  - 'Ch 5: Replication': ddia/05-replication.md
-  - 'Ch 6: Partitioning (Sharding)': ddia/06-partitioning.md
-  - 'Ch 7: Transactions': ddia/07-transactions.md
-  - 'Ch 8: The Trouble with Distributed Systems': ddia/08-trouble-with-distributed-systems.md
-  - 'Ch 9: Consistency & Consensus': ddia/09-consistency-and-consensus.md
-  - 'Ch 10: Batch Processing': ddia/10-batch-processing.md
-  - 'Ch 11: Stream Processing': ddia/11-stream-processing.md
-  - 'Ch 12: The Future of Data Systems': ddia/12-future-of-data-systems.md
+  - 'Ch 1: Trade-Offs in Data Systems Architecture': ddia/01-trade-offs-in-data-systems-architecture.md
+  - 'Ch 2: Defining Nonfunctional Requirements': ddia/02-nonfunctional-requirements.md
+  - 'Ch 3: Data Models & Query Languages': ddia/03-data-models.md
+  - 'Ch 4: Storage & Retrieval': ddia/04-storage-and-retrieval.md
+  - 'Ch 5: Encoding & Evolution': ddia/05-encoding-and-evolution.md
+  - 'Ch 6: Replication': ddia/06-replication.md
+  - 'Ch 7: Sharding': ddia/07-sharding.md
+  - 'Ch 8: Transactions': ddia/08-transactions.md
+  - 'Ch 9: The Trouble with Distributed Systems': ddia/09-trouble-with-distributed-systems.md
+  - 'Ch 10: Consistency & Consensus': ddia/10-consistency-and-consensus.md
+  - 'Ch 11: Batch Processing': ddia/11-batch-processing.md
+  - 'Ch 12: Stream Processing': ddia/12-stream-processing.md
+  - 'Ch 13: A Philosophy of Streaming Systems': ddia/13-philosophy-of-streaming-systems.md
+  - 'Ch 14: Doing the Right Thing': ddia/14-doing-the-right-thing.md
 - Computer Networking:
   - Overview: cn/index.md
   - 'Ch 1: Networks and the Internet': cn/01-computer-networks-and-the-internet.md

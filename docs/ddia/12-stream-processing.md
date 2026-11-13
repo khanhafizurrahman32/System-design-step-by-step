@@ -1,23 +1,23 @@
 ---
-title: "DDIA Ch 11: Stream Processing"
-description: "Stream processing explained: queues vs logs, Kafka partitions, the dual-write problem, CDC and outbox, event sourcing, windows, stream joins and exactly-once."
+title: "DDIA Ch 12: Stream Processing"
+description: "Processing events as they happen: message brokers, Kafka, CDC and the outbox pattern, event sourcing, uses of stream processing including incremental view maintenance, windows and watermarks, stream joins, and exactly-once."
 tags: [ddia]
 ---
 
-# DDIA Chapter 11: Stream Processing
+# DDIA Chapter 12: Stream Processing
 
 <span class="lvl lvl-a">Advanced</span>
 
-> These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
+> These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **One-page sketchnote:** [DDIA 11 · STREAM PROCESSING on a single page](../sketchnotes/ddia-11.svg), for revision or printing.
+> **Revision sketchnote:** [Stream processing on one page](../sketchnotes/ddia-11.svg) (drawn for the 1st edition, where this was Chapter 11).
 
 ## TL;DR
 
 Batch with the input never ending. Events are processed shortly after they happen. This is Kafka, CDC, the outbox pattern, event sourcing, windowed aggregation, and exactly-once semantics: the backbone of most modern interview designs.
 
-**Key ideas:** message brokers · Kafka partitions · consumer groups · CDC · outbox · event sourcing · windows · watermarks · exactly-once
+**Key ideas:** message brokers · Kafka partitions · consumer groups · CDC · outbox · event sourcing · CEP · stream analytics · incremental view maintenance · windows · watermarks · exactly-once
 
 ## Two kinds of message broker
 
@@ -82,7 +82,7 @@ The fix is to write to **one** place, the database, and let everything else **fo
 ![Change data capture (CDC) and the outbox pattern](../diagrams/ddia-11-4.svg)
 
 1. **Outbox:** when the app saves an order, it also inserts a row describing the event ("order 42 placed") into an `outbox` table, **in the same transaction**. Either both rows commit or neither does, so an event exists if and only if the change does.
-2. **Change data capture (CDC):** every database already keeps a log of all changes for its own replicas, Postgres's **WAL** or MySQL's **binlog** (Chapter 5). A CDC tool such as **Debezium** reads that log like a replica would and publishes each change, outbox rows included, to Kafka, **in commit order**.
+2. **Change data capture (CDC):** every database already keeps a log of all changes for its own replicas, Postgres's **WAL** or MySQL's **binlog** (Chapter 6). A CDC tool such as **Debezium** reads that log like a replica would and publishes each change, outbox rows included, to Kafka, **in commit order**.
 3. Every other system consumes from Kafka and updates itself: the search index, the cache, the data warehouse. They all see changes in the same order as the database, so they converge on the same state. And if one gets corrupted, or you add a new one, you rebuild it by **replaying** the log, or from a snapshot plus the log since then.
 
 > [!NOTE]
@@ -101,10 +101,32 @@ Normally a database stores the **current state**: the booking's status is `CANCE
 3. The current state ("status = CANCELLED") is a **view** computed by replaying the events in order (a *fold*). You can build **other** views from the same events later, such as an audit trail or an analytics table, even ones you didn't think of at the start. To debug, you can replay up to any moment and see exactly what the state was then.
 
 > [!WARNING]
-> **Costs:** replaying a long history gets slow, so you store periodic **snapshots**. Changing the format of old events is hard (Chapter 4). And "delete my data" requests (GDPR) clash with "never delete anything". Use event sourcing where the history really matters, such as payments, ledgers and orders, not everywhere.
+> **Costs:** replaying a long history gets slow, so you store periodic **snapshots**. Changing the format of old events is hard (Chapter 5). And "delete my data" requests (GDPR) clash with "never delete anything". Use event sourcing where the history really matters, such as payments, ledgers and orders, not everywhere.
+
+> [!NOTE]
+> Chapter 3 shows the same idea as a data model, with commands, events and **CQRS** read views: [Event sourcing and CQRS](03-data-models.md#event-sourcing-and-cqrs).
 
 > [!NOTE]
 > **CDC vs event sourcing:** CDC turns low-level **row changes** into events after the fact ("row 42's status column changed"). Event sourcing records high-level **business events** as the source of truth ("customer cancelled"), so the intent is preserved.
+
+## What stream processing is used for
+
+Once events flow through a log, there are several kinds of job you can hang off it:
+
+- **Complex event processing (CEP).** Store *queries* and run *events* past them, the reverse of a database. "Alert if a card is used in two countries within 10 minutes" is a pattern matched continuously against the event stream. Used for fraud detection, trading and monitoring.
+- **Stream analytics.** Aggregates over windows: requests per second, p99 latency over the last 5 minutes, trending hashtags. Exact answers can be costly, so **probabilistic** structures are common: **HyperLogLog** estimates the number of distinct users in a few kilobytes, and t-digest estimates percentiles (Chapter 2).
+- **Search on streams.** Store search queries (a saved search for "2-bedroom flats under $2,000") and match every new listing against them as it arrives, notifying users of matches.
+- **Event-driven services.** Instead of service A calling B synchronously, A emits an event and B reacts. The services are decoupled in time (B can be down for a while), at the cost of the request no longer getting an immediate answer from B.
+- **Maintaining materialized views.** Keep a derived dataset, such as a cache, a search index or an aggregate table, continuously up to date from a change stream.
+
+**How incremental view maintenance works.** The last item has become a product category of its own:
+
+![Incremental view maintenance from a change stream](../diagrams/ddia2-12-ivm.svg)
+
+1. You define a view as an ordinary SQL query: total order value per customer.
+2. Recomputing that query from scratch over all orders on every change would be far too slow.
+3. An **incremental view maintenance (IVM)** engine (Materialize, RisingWave, Feldera) reads the database's change stream and works out how each change alters the result: a new $30 order for Asha adds 30 to her total; a cancelled order subtracts.
+4. The view is always fresh (to within the stream's lag), and reading it is instant.
 
 ## Time and windows
 
@@ -132,7 +154,7 @@ Just like batch jobs, stream processors often need to combine data. Because both
 |---|---|---|
 | Stream–stream (window join) | Search event + click event within 1 hour → click-through rate | Buffer both streams in state, indexed by session ID, for the window length |
 | Stream–table (enrichment) | Click event + user profile → add country and age | Keep a **local copy** of the table in the processor, updated by CDC. No remote DB call per event. |
-| Table–table (materialized view) | Tweets ⋈ follows → each user's timeline cache | Both are changelogs; maintain the joined view incrementally (fan-out on write from Ch 1) |
+| Table–table (materialized view) | Tweets ⋈ follows → each user's timeline cache | Both are changelogs; maintain the joined view incrementally (fan-out on write from Ch 2) |
 
 > [!NOTE]
 > **Joins depend on time:** if you join a sale with a tax-rate table, do you want the rate when the sale happened or today's rate? Replaying later could give a different answer. To keep results reproducible, give each version of the record its own ID and join on that version.
@@ -149,10 +171,12 @@ A stream processor runs forever, so it will crash at some point. When it restart
 2. **Checkpointing** (as Flink does it): special **barrier** markers flow through the data with the events. When an operator sees barrier #42, it saves its state (the counts so far) to durable storage such as S3, together with the **source offsets** it had reached. After a crash, everything restores from the last complete checkpoint and re-reads the source from those offsets, so nothing is lost. Spark Streaming gets the same effect by processing small **micro-batches**.
 3. But replaying from the checkpoint means some events are processed **again**, and their output may be written twice. So the destination must handle duplicates. Either make writes **idempotent** (upsert by key, so writing "ad 7, 10:00 → 523 clicks" twice gives the same result), or **transactional** (Kafka transactions commit the output and the new offsets together, atomically). Duplicates still occur inside the system; they just have **no effect** on the result. That's what "exactly-once" really means.
 
+**Two more tools for exactly-once.** **Idempotence via offsets:** when writing to an external store, also store the Kafka offset of the event that produced the write; on replay, skip events whose offset is at or below the stored one (this assumes events are replayed in the same order, which a single Kafka partition guarantees). **Rebuilding state after a crash:** a processor's local state (counts, join tables) must survive a restart. Flink saves it in checkpoints; Kafka Streams writes every state change to a compacted Kafka topic and rebuilds from it; sometimes it's cheapest to just reprocess the last window of input.
+
 > [!TIP]
 > **Say this in the interview:** "Flink checkpoints every 10s. The sink upserts (ad_id, minute) → count, so replays after a failure overwrite instead of double-counting."
 
-## In the interview
+## In the system design interview
 
 > [!IMPORTANT]
 > **Interviewer asks:** "Ad click aggregation at 10k/sec?"  
@@ -170,6 +194,47 @@ A stream processor runs forever, so it will crash at some point. When it restart
 > **Interviewer asks:** "Exactly-once?"  
 > → "At-least-once delivery plus idempotent processing equals effectively-once. I make the consumer idempotent with an event ID."
 
+> [!IMPORTANT]
+> **Interviewer asks:** "The dashboard query is too slow to run on every page load."
+> → Maintain it as a materialized view from the change stream (Flink, or an IVM engine like Materialize), so each event updates the result incrementally and reads are instant.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Why is writing to the database and then to Kafka from application code (dual write) unsafe?</summary>
+
+The process can crash between the two writes, or the two writes from concurrent requests can be applied in different orders in each system, leaving them permanently inconsistent. Use CDC or the outbox pattern so there is one write and the second system follows it.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why count clicks by event time rather than arrival time, and what new problem does that create?</summary>
+
+Late events (a phone offline in a tunnel) would otherwise be counted in the wrong window. The new problem is knowing when a window is complete; a watermark estimates it, and late events after it are dropped or used to correct results.
+
+</details>
+
+<details class="question" markdown>
+<summary>What does incremental view maintenance avoid, and how?</summary>
+
+Re-running the whole query over all data on each change. It applies only the effect of each change (a delta) from the change stream to the stored result.
+
+</details>
+
+<details class="question" markdown>
+<summary>After a crash, Flink replays events since the last checkpoint. Why don't counts double?</summary>
+
+The sink is idempotent (upsert by key, or offsets stored with the output) or transactional (output and offsets committed together), so replayed events have no extra effect.
+
+</details>
+
+## Related
+
+- [Queue vs stream](../101/queue-vs-stream.md) · [Outbox](../101/outbox.md) · [Delivery guarantees](../101/delivery-guarantees.md) · [Dead-letter queues](../101/dead-letter-queues.md)
+- [Ad click aggregator](../problems/ad-click-aggregator.md) · [Top-K videos](../problems/top-k-videos.md) · [Real-time updates](../patterns/real-time-updates.md)
+
 ---
 
-← [Ch 10: Batch processing](10-batch-processing.md) · [Ch 12: The future of data systems](12-future-of-data-systems.md) →
+← [Ch 11: Batch processing](11-batch-processing.md) · [Ch 13: A philosophy of streaming systems](13-philosophy-of-streaming-systems.md) →

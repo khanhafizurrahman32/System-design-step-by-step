@@ -60,5 +60,5 @@ A conditional update: UPDATE … SET stock = stock − 1 WHERE id = ? AND stock 
 ## Related
 
 - [Dealing with contention](../patterns/contention.md)
-- [DDIA Ch 7: transactions](../ddia/07-transactions.md)
+- [DDIA Ch 8: transactions](../ddia/08-transactions.md)
 - [Ticketmaster](../problems/ticketmaster.md)

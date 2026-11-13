@@ -8,7 +8,7 @@ tags: [real-time-updates, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) logs and streams · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) tail latency
+**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 12](../ddia/12-stream-processing.md) logs and streams · [Ch 2](../ddia/02-nonfunctional-requirements.md) tail latency
 
 *GPUs are the scarce resource, so every queueing decision is really a cost decision.*
 
@@ -182,5 +182,5 @@ Tokens are buffered per message, so the reconnecting client resumes from where i
 ## Related
 
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md)
-- **DDIA:** [Ch 11](../ddia/11-stream-processing.md) logs and streams · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) tail latency
+- **DDIA:** [Ch 12](../ddia/12-stream-processing.md) logs and streams · [Ch 2](../ddia/02-nonfunctional-requirements.md) tail latency
 - **Similar problems:** [Ride sharing (Uber)](ride-sharing.md) · [Live comments (Facebook Live)](live-comments.md) · [Collaborative editor (Google Docs)](collaborative-editor.md) · [Stock trading (Robinhood)](stock-trading.md)

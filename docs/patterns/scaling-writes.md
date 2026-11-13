@@ -34,7 +34,7 @@ There are four moves, best applied in this order: **absorb** the spikes, **batch
 3. **Shard.** If the sustained rate is still more than one database can take, split the data across several databases by a key that spreads load evenly, such as `hash(ad_id)`. Each shard takes a fraction of the writes, and each Kafka partition can feed its own shard.
 4. **Write less, and use storage built for writes.**
    - **Pre-aggregate:** if the product only ever needs "clicks per ad per minute", count them in the stream processor and write **one row per ad per minute** instead of one row per click. 10,000 clicks become 1 write.
-   - Choose a **write-optimized** store (an LSM-tree database such as Cassandra), which turns random writes into sequential appends (see [DDIA Ch 3](../ddia/03-storage-and-retrieval.md)).
+   - Choose a **write-optimized** store (an LSM-tree database such as Cassandra), which turns random writes into sequential appends (see [DDIA Ch 4](../ddia/04-storage-and-retrieval.md)).
 
 > [!WARNING]
 > **Hot partition:** sharding spreads **different** keys. One very hot key, such as a viral ad or a celebrity's post, still lands on one shard and can overload it. Fixes: split that key across several sub-keys with a suffix (`ad42_0` … `ad42_9`) and add them up on read, or aggregate its events in memory before writing.
@@ -70,6 +70,6 @@ There are four moves, best applied in this order: **absorb** the spikes, **batch
 
 ## The theory underneath
 
-- [DDIA Ch 3: Storage and retrieval](../ddia/03-storage-and-retrieval.md)
-- [DDIA Ch 6: Partitioning](../ddia/06-partitioning.md)
-- [DDIA Ch 11: Stream processing](../ddia/11-stream-processing.md)
+- [DDIA Ch 4: Storage and retrieval](../ddia/04-storage-and-retrieval.md)
+- [DDIA Ch 7: Sharding](../ddia/07-sharding.md)
+- [DDIA Ch 12: Stream processing](../ddia/12-stream-processing.md)

@@ -8,7 +8,7 @@ tags: [scaling-reads, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Dealing with contention](../patterns/contention.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) lost update · [Ch 6](../ddia/06-partitioning.md) shard by key
+**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Dealing with contention](../patterns/contention.md) · **DDIA:** [Ch 8](../ddia/08-transactions.md) lost update · [Ch 7](../ddia/07-sharding.md) shard by key
 
 *Every public API needs one, and the obvious implementation has a race condition.*
 
@@ -98,7 +98,7 @@ Each step fixes one specific problem with the step before it.
 
 ### Race between servers?
 
-**Why it happens:** read-modify-write from several servers on the same counter is the classic lost update ([DDIA Ch 7](../ddia/07-transactions.md)). Both servers read the old value before either writes.
+**Why it happens:** read-modify-write from several servers on the same counter is the classic lost update ([DDIA Ch 8](../ddia/08-transactions.md)). Both servers read the old value before either writes.
 
 **How:** never split the read and the write across round trips. Use a Lua script that does refill, check and decrement in one atomic step, or atomic commands like `INCR`. Redis is single-threaded per shard, so these are applied one after another.
 
@@ -175,5 +175,5 @@ You choose per endpoint: fail-open (allow traffic, risk abuse) for most APIs, fa
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Dealing with contention](../patterns/contention.md)
-- **DDIA:** [Ch 7](../ddia/07-transactions.md) lost update · [Ch 6](../ddia/06-partitioning.md) shard by key
+- **DDIA:** [Ch 8](../ddia/08-transactions.md) lost update · [Ch 7](../ddia/07-sharding.md) shard by key
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md) · [News aggregator (Google News)](news-aggregator.md)

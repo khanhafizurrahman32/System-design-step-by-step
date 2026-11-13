@@ -8,7 +8,7 @@ tags: [scaling-reads, easy]
 
 <span class="lvl lvl-b">Beginner-friendly</span>
 
-**Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) load parameters · [Ch 10](../ddia/10-batch-processing.md) ingest pipelines
+**Difficulty:** Easy · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 2](../ddia/02-nonfunctional-requirements.md) load parameters · [Ch 11](../ddia/11-batch-processing.md) ingest pipelines
 
 *A feed problem where the feed is the same for everyone in a region, which changes everything.*
 
@@ -168,5 +168,5 @@ About as fresh as the cache TTL, for example a minute, which is usually acceptab
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) load parameters · [Ch 10](../ddia/10-batch-processing.md) ingest pipelines
+- **DDIA:** [Ch 2](../ddia/02-nonfunctional-requirements.md) load parameters · [Ch 11](../ddia/11-batch-processing.md) ingest pipelines
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md)

@@ -26,7 +26,7 @@ tags: [pattern]
 
 ![Pattern 4: Dealing with Contention](../diagrams/pattern-contention.svg)
 
-1. **The bug.** Users A and B both load seat 12A at the same moment. Both read `status = AVAILABLE`. Both send "book". Both bookings succeed, and the seat is **sold twice**. No error was raised; each request was correct on its own. In database terms this is a race condition (*write skew*, see [DDIA Ch 7](../ddia/07-transactions.md)).
+1. **The bug.** Users A and B both load seat 12A at the same moment. Both read `status = AVAILABLE`. Both send "book". Both bookings succeed, and the seat is **sold twice**. No error was raised; each request was correct on its own. In database terms this is a race condition (*write skew*, see [DDIA Ch 8](../ddia/08-transactions.md)).
 2. **The fix: make the check and the write a single atomic step**, so there's no gap. Put the condition **inside** the update:
 
     ```sql
@@ -47,7 +47,7 @@ tags: [pattern]
 
 - **`SELECT … FOR UPDATE`** (pessimistic lock): lock the rows when you read them, so other transactions wait until you commit. Use it when you must read, run some logic, then write, and conflicts are frequent.
 - **Version column** (optimistic): read the row with its version, then `UPDATE … WHERE version = 7`. If someone else changed it first, 0 rows update and you retry. It's cheap when conflicts are rare.
-- **Redis lock with an expiry** (`SET key value NX PX 600000`): a temporary hold that spans services or minutes, such as "this seat is held for you for 10 minutes while you pay" or "this driver is being offered a ride". The expiry frees it automatically if the user walks away. For correctness, back it with the database check (see [fencing tokens](../ddia/08-trouble-with-distributed-systems.md)).
+- **Redis lock with an expiry** (`SET key value NX PX 600000`): a temporary hold that spans services or minutes, such as "this seat is held for you for 10 minutes while you pay" or "this driver is being offered a ride". The expiry frees it automatically if the user walks away. For correctness, back it with the database check (see [fencing tokens](../ddia/09-trouble-with-distributed-systems.md)).
 - **A queue per item:** for extreme hot spots, such as the last seconds of a popular auction, send every request for that item through one queue and process them **one at a time**. No contention is possible, at the cost of throughput on that one item.
 
 ## Decision checklist
@@ -77,5 +77,5 @@ tags: [pattern]
 
 ## The theory underneath
 
-- [DDIA Ch 7: Transactions](../ddia/07-transactions.md)
-- [DDIA Ch 8: Trouble with distributed systems](../ddia/08-trouble-with-distributed-systems.md)
+- [DDIA Ch 8: Transactions](../ddia/08-transactions.md)
+- [DDIA Ch 9: Trouble with distributed systems](../ddia/09-trouble-with-distributed-systems.md)

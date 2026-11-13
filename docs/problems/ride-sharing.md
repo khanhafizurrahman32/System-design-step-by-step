@@ -8,7 +8,7 @@ tags: [real-time-updates, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) leases · [Ch 3](../ddia/03-storage-and-retrieval.md) geo index · [Ch 6](../ddia/06-partitioning.md) partition by region
+**Difficulty:** Hard · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 9](../ddia/09-trouble-with-distributed-systems.md) leases · [Ch 4](../ddia/04-storage-and-retrieval.md) geo index · [Ch 7](../ddia/07-sharding.md) partition by region
 
 *Four problems in one: a flood of location updates, matching, locking drivers, and a multi-step trip lifecycle.*
 
@@ -177,5 +177,5 @@ Ride requests sit in a durable per-region queue, so another matcher picks the re
 ## Related
 
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md)
-- **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) leases · [Ch 3](../ddia/03-storage-and-retrieval.md) geo index · [Ch 6](../ddia/06-partitioning.md) partition by region
+- **DDIA:** [Ch 9](../ddia/09-trouble-with-distributed-systems.md) leases · [Ch 4](../ddia/04-storage-and-retrieval.md) geo index · [Ch 7](../ddia/07-sharding.md) partition by region
 - **Similar problems:** [Live comments (Facebook Live)](live-comments.md) · [Collaborative editor (Google Docs)](collaborative-editor.md) · [Stock trading (Robinhood)](stock-trading.md) · [Online auction](online-auction.md)

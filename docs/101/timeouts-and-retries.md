@@ -57,4 +57,4 @@ Each layer multiplies attempts (3 layers × 3 tries = 27 calls), piling extra lo
 
 - [Circuit breaker](circuit-breaker.md)
 - [Payment system](../problems/payment-system.md)
-- [DDIA Ch 8: trouble with distributed systems](../ddia/08-trouble-with-distributed-systems.md)
+- [DDIA Ch 9: trouble with distributed systems](../ddia/09-trouble-with-distributed-systems.md)

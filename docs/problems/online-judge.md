@@ -8,7 +8,7 @@ tags: [multi-step-processes, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) queues · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) bursty load
+**Difficulty:** Medium · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 12](../ddia/12-stream-processing.md) queues · [Ch 2](../ddia/02-nonfunctional-requirements.md) bursty load
 
 *You are running strangers' code on your servers, so isolation comes first.*
 
@@ -188,5 +188,5 @@ In a Redis sorted set keyed by contest, with score and tie-break encoded.
 
 - **Operating systems:** [OS 8: Containers](../os/08-containers.md) (namespaces, cgroups and sandboxes)
 - **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md)
-- **DDIA:** [Ch 11](../ddia/11-stream-processing.md) queues · [Ch 1](../ddia/01-reliability-scalability-maintainability.md) bursty load
+- **DDIA:** [Ch 12](../ddia/12-stream-processing.md) queues · [Ch 2](../ddia/02-nonfunctional-requirements.md) bursty load
 - **Similar problems:** [Payment system (Stripe)](payment-system.md) · [Job scheduler](job-scheduler.md)

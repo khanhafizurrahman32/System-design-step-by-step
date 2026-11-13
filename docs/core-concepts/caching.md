@@ -110,5 +110,5 @@ One key gets so much traffic that the single cache node holding it saturates, fo
 ## Related
 
 - **Problems:** [Ticketmaster](../problems/ticketmaster.md) · [Distributed cache](../problems/distributed-cache.md) (design the cache itself)
-- **DDIA:** [Ch 5 Replication](../ddia/05-replication.md). Read replicas are the other way to scale reads, with the same staleness trade-off.
+- **DDIA:** [Ch 6 Replication](../ddia/06-replication.md). Read replicas are the other way to scale reads, with the same staleness trade-off.
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)

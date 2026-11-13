@@ -57,7 +57,7 @@ Databases use exactly the same idea for user data: the **write-ahead log**.
 3. The changed data pages are written to the data files **later**, in the background (at checkpoints), with no fsync on the critical path.
 4. After a crash, the database **replays the WAL** from the last checkpoint, redoing committed changes. The data files are brought back up to date.
 
-The same log is reused for replication: replicas just apply the leader's WAL ([DDIA Ch 5](../ddia/05-replication.md)), and change data capture reads it ([DDIA Ch 11](../ddia/11-stream-processing.md)).
+The same log is reused for replication: replicas just apply the leader's WAL ([DDIA Ch 6](../ddia/06-replication.md)), and change data capture reads it ([DDIA Ch 12](../ddia/12-stream-processing.md)).
 
 ![Group commit: many transactions, one fsync](../diagrams/os-06-group-commit.svg)
 
@@ -112,7 +112,7 @@ It makes many transactions durable with a single fsync, by collecting the commit
 ## Related
 
 - [Storage devices](07-storage-devices.md) · [Memory and the page cache](03-memory.md)
-- [DDIA Ch 3: storage and retrieval](../ddia/03-storage-and-retrieval.md) · [Numbers and estimation](../foundations/numbers-and-estimation.md)
+- [DDIA Ch 4: storage and retrieval](../ddia/04-storage-and-retrieval.md) · [Numbers and estimation](../foundations/numbers-and-estimation.md)
 
 ---
 

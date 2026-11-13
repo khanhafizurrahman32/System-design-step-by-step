@@ -1,23 +1,25 @@
 ---
-title: "DDIA Ch 7: Transactions"
-description: "What transactions really guarantee: ACID, isolation levels and the bugs each allows (dirty reads, read skew, lost updates, write skew), with the fixes."
+title: "DDIA Ch 8: Transactions"
+description: "What ACID really guarantees, the isolation anomalies behind booking and inventory bugs, how databases make transactions serializable, and distributed transactions: two-phase commit and exactly-once processing."
 tags: [ddia]
 ---
 
-# DDIA Chapter 7: Transactions
+# DDIA Chapter 8: Transactions
 
 <span class="lvl lvl-a">Advanced</span>
 
-> These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
+> These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **One-page sketchnote:** [DDIA 7 · TRANSACTIONS on a single page](../sketchnotes/ddia-07.svg), for revision or printing.
+> **Revision sketchnote:** [Transactions on one page](../sketchnotes/ddia-07.svg) (drawn for the 1st edition, where this was Chapter 7).
 
 ## TL;DR
 
 A transaction groups reads and writes into one unit: all of it happens or none of it does, and concurrent transactions don't see each other's half-finished work. Most interview "contention" questions, such as seat booking, inventory, payments, and auctions, come down to which **isolation anomaly** you are defending against.
 
-**Key ideas:** ACID · dirty reads · read skew · MVCC · lost update · write skew · phantoms · 2PL · SSI
+The 2nd edition moves **distributed transactions** into this chapter: how two-phase commit makes one transaction atomic across several databases or shards, why it blocks when the coordinator fails, and how modern distributed databases make it work.
+
+**Key ideas:** ACID · dirty reads · read skew · MVCC · lost update · write skew · phantoms · 2PL · SSI · atomic commit · 2PC · XA · exactly-once processing
 
 ## What ACID really means
 
@@ -137,7 +139,56 @@ There are two main ways a database provides full serializability while running t
 1. **Two-phase locking (2PL), pessimistic:** reading a row takes a shared lock, and writing needs an exclusive lock. Locks are held until the transaction ends. If Transaction 1 has read a row, Transaction 2 must **wait** to write it. It is correct, but under contention transactions queue behind each other, throughput drops, latency becomes unpredictable, and **deadlocks** happen (the database kills one transaction to break them).
 2. **Serializable snapshot isolation (SSI), optimistic:** everyone runs on their own snapshot with no blocking. At commit, the database checks: "has anything this transaction **read** been changed by a transaction that committed since?" If so, the decision might have been based on stale data, so this transaction is **aborted** and the application retries it. This is fast when conflicts are rare. When many transactions fight over the same rows, it causes lots of aborts and retries. Postgres's SERIALIZABLE level uses SSI.
 
-## In the interview
+## Distributed transactions
+
+*Atomic commit across machines*
+
+**Why it's hard.** On one node, atomicity is easy: the commit is a single record written to the log; if it's there after a crash, the transaction happened. Across several nodes (two shards, or two different databases) there is no single log. If you just send "commit" to each, one might succeed while another fails a constraint or crashes, leaving the transaction half-applied. And a node can't take back a commit once others may have seen the data. This is the **atomic commitment** problem: every participant must reach the **same** decision, commit or abort.
+
+### Two-phase commit (2PC)
+
+Sometimes one transaction has to change data in **two different databases**, say the payments database and the bookings database, and both changes must happen or neither. Each database can only promise atomicity for itself, so a **coordinator** runs a protocol across them: **two-phase commit**.
+
+![Two-phase commit (2PC)](../diagrams/ddia-09-5.svg)
+
+1. **Phase 1, prepare:** the coordinator asks every participant, "can you commit this?"
+2. Each participant checks it can (constraints pass, data written durably to disk) and replies **YES**. A YES is a **binding promise**: the participant must be able to commit later, even if it crashes and restarts in between. So it keeps the affected rows **locked** while it waits.
+3. **Phase 2, commit:** once all participants have said YES, the coordinator writes its decision, "COMMIT", to its own log. That is the point of no return. Then it tells every participant to commit. If anyone said NO, it tells everyone to abort.
+4. The weakness: if the coordinator **dies after the prepare phase**, the participants are stuck "in doubt". They promised to commit, so they can't abort on their own, and they don't know the decision, so they can't commit. They wait, **holding their locks**, until the coordinator recovers. Other transactions touching those rows stall too. That blocking, plus tight coupling between services, is why microservice architectures use **sagas** instead: a sequence of local transactions, each with a compensating action to undo it if a later step fails.
+
+**Why not fix the coordinator problem with a smarter protocol?** **Three-phase commit (3PC)** avoids blocking only if network delays are bounded and failures can be detected perfectly, which real networks don't provide (Chapter 9). The real fix is to make the coordinator itself fault-tolerant, by replicating its decision with consensus (Chapter 10).
+
+> [!TIP]
+> **Say this in the interview:** "I won't use 2PC across the payment and booking services. I'll use a saga: reserve room → charge → confirm, with compensations (release room, refund), driven by events with the outbox pattern."
+
+### XA and why it has a bad name
+
+**XA** is a standard that lets one coordinator (often a library inside the application server) run 2PC across *different* systems, say a Postgres database and a message broker. In practice it causes trouble:
+
+- If the coordinator runs inside the application server and that server dies, the in-doubt transactions wait for it to come back; the coordinator's log has become a critical part of the database's availability.
+- **In-doubt locks** can't be released by the database on its own. Administrators sometimes make a **heuristic decision**, forcing a commit or abort by hand, which can break atomicity.
+- XA must work with any system, so it's a lowest common denominator: it can't detect deadlocks across systems or support SSI across them.
+
+### Distributed transactions inside one database
+
+These problems mostly come from coordinating **heterogeneous** systems. When one distributed database runs 2PC between its **own** shards (Google Spanner, CockroachDB, YugabyteDB, TiDB, FoundationDB), it can do much better: the coordinator and its log are **replicated with consensus**, so a coordinator crash doesn't leave anyone in doubt; and the database controls locking and isolation on every shard. Cross-shard transactions still cost extra round trips, so good shard-key design keeps most transactions on one shard.
+
+### Exactly-once message processing
+
+**Why.** A consumer reads a message ("add $50 to account 7"), updates the database, then acknowledges the message to the broker. If it crashes between the update and the ack, the broker redelivers the message and the $50 is added twice. Wrapping the broker and the database in one XA transaction would fix it, at XA's cost.
+
+**How to get the same effect without XA:**
+
+![Exactly-once processing with a processed-messages table](../diagrams/ddia2-08-exactly-once.svg)
+
+1. Each message carries a unique ID.
+2. In **one local database transaction**, the consumer applies the effect *and* inserts the message ID into a `processed_messages` table.
+3. Only after commit does it acknowledge the broker.
+4. If the message comes again, the consumer finds its ID already recorded and skips it.
+
+The effect is applied exactly once even though the message may be **delivered** more than once. This is the same idea as the idempotency keys in Chapter 13.
+
+## In the system design interview
 
 > [!IMPORTANT]
 > **Interviewer asks:** "Two users book the last room at the same time."  
@@ -153,8 +204,57 @@ There are two main ways a database provides full serializability while running t
 
 > [!IMPORTANT]
 > **Interviewer asks:** "Transaction across 2 services?"  
-> → No distributed ACID. Use a **saga** with compensations plus the outbox pattern (Ch 9 and 12).
+> → Across services owned by different teams: avoid 2PC; use a **saga** with compensations plus the outbox pattern (Ch 12 and 13). Within one distributed database (Spanner, CockroachDB), cross-shard transactions are fine but cost latency.
+
+> [!IMPORTANT]
+> **Interviewer asks:** "How do you avoid processing a message twice?"
+> → Make the consumer idempotent: record the message ID in the same DB transaction as the effect, and ack only after commit.
+
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>Postgres defaults to Read Committed. Which booking bug can still happen?</summary>
+
+Write skew: two transactions each check "the room is free", both see yes, and both insert a booking. Read Committed (and snapshot isolation) don't prevent it; you need a lock (SELECT FOR UPDATE), a unique constraint, a conditional update, or SERIALIZABLE.
+
+</details>
+
+<details class="question" markdown>
+<summary>How does snapshot isolation stop a long report from seeing half of a transfer?</summary>
+
+The report reads from a consistent snapshot taken when it started (MVCC keeps old row versions), so it never sees writes committed after that point, including the second half of a transfer.
+
+</details>
+
+<details class="question" markdown>
+<summary>In 2PC, what is the point of no return, and why can participants get stuck?</summary>
+
+The coordinator writing COMMIT to its log. Participants that voted YES have promised to commit and can't decide alone; if the coordinator dies before telling them, they wait, holding locks, until it recovers.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why do distributed databases like Spanner run 2PC without XA's problems?</summary>
+
+They replicate the coordinator's state and decision with consensus, so a crashed coordinator is replaced without losing the decision, and they control locking and isolation on all shards themselves.
+
+</details>
+
+<details class="question" markdown>
+<summary>How can a consumer apply each message exactly once when the broker may redeliver?</summary>
+
+Store the message ID in a processed-messages table in the same local transaction as the effect, ack only after commit, and skip any message whose ID is already recorded.
+
+</details>
+
+## Related
+
+- [ACID and isolation](../101/acid-and-isolation.md) · [Outbox](../101/outbox.md) · [Delivery guarantees](../101/delivery-guarantees.md)
+- [Contention](../patterns/contention.md) · [Multi-step processes](../patterns/multi-step-processes.md)
+- [Ticketmaster](../problems/ticketmaster.md) · [Payment system](../problems/payment-system.md) · [Online auction](../problems/online-auction.md)
 
 ---
 
-← [Ch 6: Partitioning](06-partitioning.md) · [Ch 8: Trouble with distributed systems](08-trouble-with-distributed-systems.md) →
+← [Ch 7: Sharding](07-sharding.md) · [Ch 9: Trouble with distributed systems](09-trouble-with-distributed-systems.md) →

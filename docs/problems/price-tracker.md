@@ -8,7 +8,7 @@ tags: [scaling-writes, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) event-driven · [Ch 3](../ddia/03-storage-and-retrieval.md) time-series storage
+**Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 12](../ddia/12-stream-processing.md) event-driven · [Ch 4](../ddia/04-storage-and-retrieval.md) time-series storage
 
 *Five hundred million products can't all be crawled often, so decide what is worth checking.*
 
@@ -173,5 +173,5 @@ Event-driven: on a drop, look up only that product's subscriptions rather than s
 ## Related
 
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 11](../ddia/11-stream-processing.md) event-driven · [Ch 3](../ddia/03-storage-and-retrieval.md) time-series storage
+- **DDIA:** [Ch 12](../ddia/12-stream-processing.md) event-driven · [Ch 4](../ddia/04-storage-and-retrieval.md) time-series storage
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Ad click aggregator](ad-click-aggregator.md) · [Web crawler](web-crawler.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md)

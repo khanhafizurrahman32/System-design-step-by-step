@@ -136,7 +136,7 @@ Duplicate ACKs mean later segments are arriving but one is missing, so it was ve
 ## Related
 
 - [TCP vs UDP](../101/tcp-vs-udp.md) · [HTTP versions](../101/http-versions.md) · [Timeouts, retries and backoff](../101/timeouts-and-retries.md)
-- [DDIA Ch 8: unreliable networks](../ddia/08-trouble-with-distributed-systems.md)
+- [DDIA Ch 9: unreliable networks](../ddia/09-trouble-with-distributed-systems.md)
 
 ---
 

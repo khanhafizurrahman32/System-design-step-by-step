@@ -47,7 +47,7 @@ Sequential writes and large writes are still friendlier to SSDs than small rando
 **Why it matters:** many famous designs exist to avoid random writes:
 
 - **Append-only logs** (Kafka, write-ahead logs): every write goes to the end of a file, purely sequential.
-- **LSM-trees** (Cassandra, RocksDB): buffer writes in memory, then write sorted files sequentially, and merge them in the background (see [DDIA Ch 3](../ddia/03-storage-and-retrieval.md)). Random writes become sequential ones.
+- **LSM-trees** (Cassandra, RocksDB): buffer writes in memory, then write sorted files sequentially, and merge them in the background (see [DDIA Ch 4](../ddia/04-storage-and-retrieval.md)). Random writes become sequential ones.
 - **Column stores** read long contiguous runs of one column (sequential), rather than hopping between rows.
 - **B-trees** do random page writes. That's fine on SSDs, but it's why write-heavy workloads often prefer LSM engines.
 
@@ -108,7 +108,7 @@ They buffer writes in memory and flush them as sorted files with large sequentia
 
 ## Related
 
-- [Files and durability](06-files-and-durability.md) · [DDIA Ch 3: storage and retrieval](../ddia/03-storage-and-retrieval.md)
+- [Files and durability](06-files-and-durability.md) · [DDIA Ch 4: storage and retrieval](../ddia/04-storage-and-retrieval.md)
 - [Block, file and object storage](../101/storage-types.md) · [Metrics monitoring](../problems/metrics-monitoring.md)
 
 ---

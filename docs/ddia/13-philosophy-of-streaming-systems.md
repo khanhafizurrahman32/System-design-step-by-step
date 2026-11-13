@@ -1,29 +1,29 @@
 ---
-title: "DDIA Ch 12: The Future of Data Systems"
-description: "The book's conclusion: one source of truth with derived views, Lambda vs Kappa, end-to-end idempotency keys, and why timeliness and integrity are different."
+title: "DDIA Ch 13: A Philosophy of Streaming Systems"
+description: "The book's synthesis: a source of truth plus derived views connected by logs, unbundling the database, evolving schemas by reprocessing, pushing state to clients, end-to-end idempotency, and timeliness vs integrity."
 tags: [ddia]
 ---
 
-# DDIA Chapter 12: The Future of Data Systems
+# DDIA Chapter 13: A Philosophy of Streaming Systems
 
 <span class="lvl lvl-a">Advanced</span>
 
-> These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
+> These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **One-page sketchnote:** [DDIA 12 · THE FUTURE OF DATA SYSTEMS on a single page](../sketchnotes/ddia-12.svg), for revision or printing.
+> **Revision sketchnote:** [The future of data systems on one page](../sketchnotes/ddia-12.svg) (drawn for the 1st edition, where this was Chapter 12).
 
 ## TL;DR
 
-The book's conclusion: there is no one database that does everything. Build systems as a **source of truth plus derived views** connected by logs. Push correctness to the ends with idempotency, and separate "eventually up to date" (timeliness) from "never wrong" (integrity).
+In the 2nd edition this chapter is titled *A Philosophy of Streaming Systems*; it collects the book's architectural conclusions before the final chapter turns to ethics. The core message: there is no one database that does everything. Build systems as a **source of truth plus derived views** connected by logs. Push correctness to the ends with idempotency, and separate "eventually up to date" (timeliness) from "never wrong" (integrity).
 
-**Key ideas:** derived data · unbundling the DB · Lambda vs Kappa · end-to-end argument · idempotency keys · timeliness vs integrity · audit
+**Key ideas:** derived data · unbundling the DB · reprocessing for schema migration · Lambda vs Kappa · write path vs read path · end-to-end argument · idempotency keys · timeliness vs integrity · audit
 
 ## Unbundling the database
 
 *Data integration*
 
-By the last chapter, the book's big lesson is that **no single database does everything well**. Postgres is great for transactions, Elasticsearch for text search, Redis for fast lookups, a column store for analytics. Real systems use several. The question is how to keep them all consistent without the dual-write mess from Chapter 11.
+By the last chapter, the book's big lesson is that **no single database does everything well**. Postgres is great for transactions, Elasticsearch for text search, Redis for fast lookups, a column store for analytics. Real systems use several. The question is how to keep them all consistent without the dual-write mess from Chapter 12.
 
 ![Unbundling the database](../diagrams/ddia-12-1.svg)
 
@@ -35,11 +35,24 @@ Why "unbundling"? Inside a single database, an **index** is exactly this: a deri
 > [!TIP]
 > **Say this in the interview:** "Postgres is the source of truth for bookings. Search, the cache, and analytics are derived views fed from CDC, so they are eventually consistent and rebuildable."
 
+## Schema migrations on railways
+
+*Evolving by reprocessing*
+
+**Why it's hard.** Big data changes are frightening when there's only one copy of the data: an in-place migration of a billion rows can't easily be undone, and if the new schema turns out wrong you're stuck.
+
+**How derived views make it gentler.** The book borrows an image from 19th-century England, where railways were built with different track widths (gauges) and had to be converted. The solution was a **third rail**, so trains of both gauges could run on the same line during the transition, then the old rail was removed. With derived data you do the same:
+
+1. Keep the existing view (the old "gauge") serving users.
+2. Build the new view, in the new schema, by **reprocessing** the log or the raw data from the start, running alongside the old one.
+3. Move a small share of reads to the new view, compare, and increase gradually.
+4. Once everything uses the new view, retire the old one. At every step you could switch back.
+
 ## Lambda vs Kappa architecture
 
 *Batch + stream*
 
-You often want results that are both **fast** (a live dashboard) and **exact** (billing). Two architectures combine batch (Chapter 10) and stream (Chapter 11) processing to get there.
+You often want results that are both **fast** (a live dashboard) and **exact** (billing). Two architectures combine batch (Chapter 11) and stream (Chapter 12) processing to get there.
 
 ![Lambda vs Kappa architecture](../diagrams/ddia-12-2.svg)
 
@@ -48,6 +61,15 @@ You often want results that are both **fast** (a live dashboard) and **exact** (
 
 > [!NOTE]
 > **In interviews:** top-K and ad-click problems often still use a Lambda-like design: Flink for real-time dashboards, plus a nightly batch job that reconciles the exact counts for billing. Say why: **money needs exact numbers**, and a batch recount from immutable raw data is the simplest way to get them.
+
+## Observing derived state: the write path and the read path
+
+**Why think in two paths.** Every derived dataset splits work into the **write path** (work done when data comes in: updating the search index, fanning out a post) and the **read path** (work done when someone asks: querying the index, merging timelines). Caches, indexes and materialized views move work from the read path to the write path. The timeline case study in Chapter 2 is exactly this choice.
+
+**Pushing the boundary all the way to the client.** Today, a web page or app usually fetches state when it loads and then shows something increasingly stale. But a phone or browser that keeps a local copy of data (Chapter 6's sync engines) is itself a derived view. Extend the write path to it: **push** changes from the server as they happen (WebSockets, server-sent events) so the client's state stays current, rather than the client polling. End-to-end, a change flows from the user who made it, through the log and stream processors, to every screen that shows it.
+
+> [!NOTE]
+> See [Real-time updates](../patterns/real-time-updates.md) for the mechanics of pushing changes to clients.
 
 ## The end-to-end argument: idempotency keys
 
@@ -90,7 +112,7 @@ Most systems can relax timeliness, which is what makes eventual consistency, cac
 > [!NOTE]
 > **Trust, but verify:** run regular **reconciliation and audit** jobs that recompute derived data from the source and compare: do ledger entries sum to zero, do inventory counts match? Bugs, bad deploys and disk corruption happen in real systems, so plan to **detect** them.
 
-## In the interview
+## In the system design interview
 
 > [!IMPORTANT]
 > **Interviewer asks:** "How do you guarantee no double charge?"  
@@ -107,6 +129,43 @@ Most systems can relax timeliness, which is what makes eventual consistency, cac
 > [!TIP]
 > **Say this in the interview:** "I separate integrity from timeliness: money and inventory are strongly consistent and audited; everything the user browses is a derived, eventually consistent view."
 
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>What does "unbundling the database" mean?</summary>
+
+Doing at company scale what a database does internally: one ordered log of changes (the system of record's CDC stream in Kafka) feeding separate specialised systems that each maintain a derived view, like indexes do inside a single database.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why doesn't TCP's or the database's duplicate detection stop a double charge when the app retries?</summary>
+
+The retry is a new connection and a new request as far as those layers know. Only an ID created at the origin (the client's idempotency key) and checked where the effect is stored can recognise it as the same operation.
+
+</details>
+
+<details class="question" markdown>
+<summary>How does the "third rail" idea let you change a view's schema safely?</summary>
+
+Build the new view by reprocessing history, run it alongside the old one, shift reads over gradually while comparing, and retire the old view only at the end, so every step is reversible.
+
+</details>
+
+<details class="question" markdown>
+<summary>Give one example of a timeliness violation and one of an integrity violation in a booking system.</summary>
+
+Timeliness: a new booking appears in "My trips" a few seconds late. Integrity: the same room is sold twice, or a card is charged twice. The first heals itself; the second needs repair.
+
+</details>
+
+## Related
+
+- [Payment system](../problems/payment-system.md) (idempotency and reconciliation) · [Ad click aggregator](../problems/ad-click-aggregator.md) (Lambda-style reconciliation)
+- [Outbox](../101/outbox.md) · [Real-time updates](../patterns/real-time-updates.md)
+
 ---
 
-← [Ch 11: Stream processing](11-stream-processing.md)
+← [Ch 12: Stream processing](12-stream-processing.md) · [Ch 14: Doing the right thing](14-doing-the-right-thing.md) →

@@ -8,7 +8,7 @@ tags: [scaling-reads, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 7](../ddia/07-transactions.md) write skew · [Ch 3](../ddia/03-storage-and-retrieval.md) Bloom filters, LSM
+**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 8](../ddia/08-transactions.md) write skew · [Ch 4](../ddia/04-storage-and-retrieval.md) Bloom filters, LSM
 
 *Swipes are a firehose of writes, and two people swiping right at the same moment must never miss their match.*
 
@@ -92,7 +92,7 @@ Each step fixes one specific problem with the step before it.
 
 ### Both swipe at once: why can a match be missed?
 
-**Why it happens:** Alice and Bob swipe right on each other within the same millisecond. Alice's request saves "Alice → Bob: yes", then checks "has Bob said yes to Alice?". At that moment, Bob's save hasn't landed yet, so the answer is no. Meanwhile Bob's request saves his swipe and checks for Alice's, which also hasn't landed yet from his point of view. Both checks say no, and **no match is created**, even though both said yes. Each request read before the other's write was visible. That's **write skew** ([DDIA Ch 7](../ddia/07-transactions.md)).
+**Why it happens:** Alice and Bob swipe right on each other within the same millisecond. Alice's request saves "Alice → Bob: yes", then checks "has Bob said yes to Alice?". At that moment, Bob's save hasn't landed yet, so the answer is no. Meanwhile Bob's request saves his swipe and checks for Alice's, which also hasn't landed yet from his point of view. Both checks say no, and **no match is created**, even though both said yes. Each request read before the other's write was visible. That's **write skew** ([DDIA Ch 8](../ddia/08-transactions.md)).
 
 **How:** make "record my decision and read theirs" a **single atomic operation on a single key** for the pair. With a Lua script on `match:{min}:{max}` (or a conditional write in a database), the two operations are applied one after the other. The first sees only its own yes; the second sees **both**, and creates the match. Exactly one side wins, and no match is ever missed or created twice.
 
@@ -169,5 +169,5 @@ Each checks for the other's swipe before either is saved. Store both directions 
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 7](../ddia/07-transactions.md) write skew · [Ch 3](../ddia/03-storage-and-retrieval.md) Bloom filters, LSM
+- **DDIA:** [Ch 8](../ddia/08-transactions.md) write skew · [Ch 4](../ddia/04-storage-and-retrieval.md) Bloom filters, LSM
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md)

@@ -8,7 +8,7 @@ tags: [scaling-writes, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 10](../ddia/10-batch-processing.md) batch pipelines · [Ch 3](../ddia/03-storage-and-retrieval.md) Bloom filters · [Ch 11](../ddia/11-stream-processing.md) queues
+**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 11](../ddia/11-batch-processing.md) batch pipelines · [Ch 4](../ddia/04-storage-and-retrieval.md) Bloom filters · [Ch 12](../ddia/12-stream-processing.md) queues
 
 *Ten billion pages in five days is a pipeline problem, constrained by politeness and network bandwidth.*
 
@@ -173,5 +173,5 @@ Respect robots.txt and per-domain rate limits, usually with a per-domain queue a
 ## Related
 
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
-- **DDIA:** [Ch 10](../ddia/10-batch-processing.md) batch pipelines · [Ch 3](../ddia/03-storage-and-retrieval.md) Bloom filters · [Ch 11](../ddia/11-stream-processing.md) queues
+- **DDIA:** [Ch 11](../ddia/11-batch-processing.md) batch pipelines · [Ch 4](../ddia/04-storage-and-retrieval.md) Bloom filters · [Ch 12](../ddia/12-stream-processing.md) queues
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Ad click aggregator](ad-click-aggregator.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md) · [Fitness tracking (Strava)](fitness-tracking.md)

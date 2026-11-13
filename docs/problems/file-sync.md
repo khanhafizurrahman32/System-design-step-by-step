@@ -8,7 +8,7 @@ tags: [large-blobs, easy]
 
 <span class="lvl lvl-b">Beginner-friendly</span>
 
-**Difficulty:** Easy · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · **DDIA:** [Ch 5](../ddia/05-replication.md) conflicts · [Ch 11](../ddia/11-stream-processing.md) change log / cursor
+**Difficulty:** Easy · **Patterns:** [Handling large blobs](../patterns/large-blobs.md) · **DDIA:** [Ch 6](../ddia/06-replication.md) conflicts · [Ch 12](../ddia/12-stream-processing.md) change log / cursor
 
 *Syncing a 50 GB file after a one-byte edit should not mean uploading 50 GB again.*
 
@@ -107,7 +107,7 @@ One subtlety: with fixed 5 MB boundaries, inserting one byte near the start shif
 
 ### Edits on two offline devices?
 
-**Why it's hard:** you edit `report.docx` on your laptop on a plane, and a colleague edits it on their computer. Both later sync, and both changes are based on the same old version. Neither can simply win without destroying the other's work. This is the multi-leader conflict from [DDIA Ch 5](../ddia/05-replication.md).
+**Why it's hard:** you edit `report.docx` on your laptop on a plane, and a colleague edits it on their computer. Both later sync, and both changes are based on the same old version. Neither can simply win without destroying the other's work. This is the multi-leader conflict from [DDIA Ch 6](../ddia/06-replication.md).
 
 **How:** each upload states the **base version** it was edited from. If the server's current version is newer than that base, there's a conflict. Instead of overwriting, save the second upload as a separate **"conflicted copy"** (`report (Asha's conflicted copy).docx`) and let the people involved merge them. It's simple, nothing is lost, and the user decides.
 
@@ -178,5 +178,5 @@ Verify with object storage that the chunks exist (and match their hashes) before
 ## Related
 
 - **Patterns:** [Handling large blobs](../patterns/large-blobs.md)
-- **DDIA:** [Ch 5](../ddia/05-replication.md) conflicts · [Ch 11](../ddia/11-stream-processing.md) change log / cursor
+- **DDIA:** [Ch 6](../ddia/06-replication.md) conflicts · [Ch 12](../ddia/12-stream-processing.md) change log / cursor
 - **Similar problems:** [Video platform (YouTube)](video-platform.md) · [Photo sharing (Instagram)](photo-sharing.md)

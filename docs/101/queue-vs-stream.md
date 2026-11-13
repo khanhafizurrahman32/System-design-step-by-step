@@ -54,4 +54,4 @@ Resizing is a job for one worker: queue. "Order placed" is a fact several system
 
 - [Delivery guarantees](delivery-guarantees.md)
 - [Long-running tasks](../patterns/long-running-tasks.md)
-- [DDIA Ch 11: stream processing](../ddia/11-stream-processing.md)
+- [DDIA Ch 12: stream processing](../ddia/12-stream-processing.md)

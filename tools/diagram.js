@@ -35,7 +35,7 @@ function fontFaces(chars) {
 function measure(n) {
   const lines = String(n[3]).split('\n');
   let w = 0, h = 0;
-  for (const l of lines) { const [m, s] = l.split('|'); w = Math.max(w, tw(m, MAIN), s ? tw(s, SUB) : 0); h += MAIN * LH + (s !== undefined ? SUB * LH : 0); }
+  for (const l of lines) { const [m, s] = l.split('|'); w = Math.max(w, tw(m, MAIN), s ? tw(s, SUB) : 0); h += (m === '' && s !== undefined ? 0 : MAIN * LH) + (s !== undefined ? SUB * LH : 0); }
   const shape = n[5] || 'rect';
   const padX = shape === 'pill' ? 36 : 28, padY = shape === 'db' ? 34 : 22;
   return [n[6] || Math.max(90, w + padX), n[7] || Math.max(54, h + padY)];
@@ -136,10 +136,10 @@ function build(spec, name, outdir) {
     }
     // label
     const lines = String(label).split('\n');
-    const total = lines.reduce((a, l) => a + MAIN * LH + (l.includes('|') ? SUB * LH : 0), 0);
+    const total = lines.reduce((a, l) => a + (l.startsWith('|') ? 0 : MAIN * LH) + (l.includes('|') ? SUB * LH : 0), 0);
     let ty = cy - total / 2 + (shape === 'db' ? 5 : 0);
-    for (const l of lines) { const [m, sub] = l.split('|'); ty += MAIN * LH; nodeSvg += text(cx, ty - 6, m, MAIN, INK); if (sub !== undefined) { ty += SUB * LH; nodeSvg += text(cx, ty - 5, sub, SUB, s); } }
-    const plain = lines.map(l => l.replace('|', '\n')).join('\n');
+    for (const l of lines) { const [m, sub] = l.split('|'); if (m !== '' || sub === undefined) { ty += MAIN * LH; nodeSvg += text(cx, ty - 6, m, MAIN, INK); } if (sub !== undefined) { ty += SUB * LH; nodeSvg += text(cx, ty - 5, sub, SUB, s); } }
+    const plain = lines.map(l => l.startsWith('|') ? l.slice(1) : l.replace('|', '\n')).join('\n');
     exText(id + 't', x + 6, cy - total / 2, w - 12, total, plain, MAIN, INK, id);
   }
 

@@ -8,7 +8,7 @@ tags: [real-time-updates, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) pub/sub · [Ch 6](../ddia/06-partitioning.md) partition by video
+**Difficulty:** Medium · **Patterns:** [Real-time updates](../patterns/real-time-updates.md) · **DDIA:** [Ch 12](../ddia/12-stream-processing.md) pub/sub · [Ch 7](../ddia/07-sharding.md) partition by video
 
 *One popular stream can mean a million viewers each expecting new comments within a fraction of a second.*
 
@@ -174,5 +174,5 @@ Each server then subscribes to few channels, cutting pub/sub fan-out.
 
 - **Operating systems:** [OS 5: I/O models](../os/05-io-models.md) (event loops and connection limits)
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md)
-- **DDIA:** [Ch 11](../ddia/11-stream-processing.md) pub/sub · [Ch 6](../ddia/06-partitioning.md) partition by video
+- **DDIA:** [Ch 12](../ddia/12-stream-processing.md) pub/sub · [Ch 7](../ddia/07-sharding.md) partition by video
 - **Similar problems:** [Ride sharing (Uber)](ride-sharing.md) · [Collaborative editor (Google Docs)](collaborative-editor.md) · [Stock trading (Robinhood)](stock-trading.md) · [Online auction](online-auction.md)

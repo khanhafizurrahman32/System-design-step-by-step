@@ -8,7 +8,7 @@ tags: [scaling-reads, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) Twitter load · [Ch 11](../ddia/11-stream-processing.md) materialized views · [Ch 6](../ddia/06-partitioning.md) hot keys
+**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 2](../ddia/02-nonfunctional-requirements.md) Twitter load · [Ch 12](../ddia/12-stream-processing.md) materialized views · [Ch 7](../ddia/07-sharding.md) hot keys
 
 *The canonical fan-out problem: build a personalised feed for billions of users in a few hundred milliseconds.*
 
@@ -173,5 +173,5 @@ IDs are small, so feeds for many users fit in Redis memory; post bodies are fetc
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 1](../ddia/01-reliability-scalability-maintainability.md) Twitter load · [Ch 11](../ddia/11-stream-processing.md) materialized views · [Ch 6](../ddia/06-partitioning.md) hot keys
+- **DDIA:** [Ch 2](../ddia/02-nonfunctional-requirements.md) Twitter load · [Ch 12](../ddia/12-stream-processing.md) materialized views · [Ch 7](../ddia/07-sharding.md) hot keys
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News aggregator (Google News)](news-aggregator.md)

@@ -8,7 +8,7 @@ tags: [scaling-reads, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 6](../ddia/06-partitioning.md) consistent hashing · [Ch 5](../ddia/05-replication.md) async replication
+**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 7](../ddia/07-sharding.md) consistent hashing · [Ch 6](../ddia/06-replication.md) async replication
 
 *Design Redis itself: data structures inside one node, then distribution across many.*
 
@@ -177,5 +177,5 @@ Replicate it to several nodes (or add suffixes to spread it) and read from any c
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Long-running tasks](../patterns/long-running-tasks.md)
-- **DDIA:** [Ch 6](../ddia/06-partitioning.md) consistent hashing · [Ch 5](../ddia/05-replication.md) async replication
+- **DDIA:** [Ch 7](../ddia/07-sharding.md) consistent hashing · [Ch 6](../ddia/06-replication.md) async replication
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md)

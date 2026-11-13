@@ -8,7 +8,7 @@ tags: [scaling-writes, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) event time · [Ch 12](../ddia/12-future-of-data-systems.md) idempotent upload
+**Difficulty:** Medium · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 12](../ddia/12-stream-processing.md) event time · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) idempotent upload
 
 *The key insight is where the work happens: on the phone, not the server.*
 
@@ -176,5 +176,5 @@ Asynchronously from a queue after upload, stored in Redis sorted sets.
 ## Related
 
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
-- **DDIA:** [Ch 11](../ddia/11-stream-processing.md) event time · [Ch 12](../ddia/12-future-of-data-systems.md) idempotent upload
+- **DDIA:** [Ch 12](../ddia/12-stream-processing.md) event time · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) idempotent upload
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Ad click aggregator](ad-click-aggregator.md) · [Web crawler](web-crawler.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md)

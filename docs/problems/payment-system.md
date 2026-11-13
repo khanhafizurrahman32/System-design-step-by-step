@@ -8,7 +8,7 @@ tags: [multi-step-processes, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) unknown outcomes · [Ch 12](../ddia/12-future-of-data-systems.md) end-to-end idempotency, integrity · [Ch 11](../ddia/11-stream-processing.md) outbox
+**Difficulty:** Hard · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · **DDIA:** [Ch 9](../ddia/09-trouble-with-distributed-systems.md) unknown outcomes · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) end-to-end idempotency, integrity · [Ch 12](../ddia/12-stream-processing.md) outbox
 
 *Throughput is moderate. The hard part is staying correct when a call to the bank has an unknown outcome.*
 
@@ -63,7 +63,7 @@ When a customer pays, the API calls the card processor ("charge this card $50"),
 **Where it breaks:** look at what happens if anything fails **between** the processor call and the database write.
 
 - The server **crashes** after the processor charged the card but before the row was written. The customer has been charged, and **we have no record of it**.
-- The processor call **times out**. Did it charge or not? We don't know (see [DDIA Ch 8](../ddia/08-trouble-with-distributed-systems.md)). If we retry, we may **charge twice**. If we don't, we may lose a real payment.
+- The processor call **times out**. Did it charge or not? We don't know (see [DDIA Ch 9](../ddia/09-trouble-with-distributed-systems.md)). If we retry, we may **charge twice**. If we don't, we may lose a real payment.
 - The merchant's own server retries its request after a network blip, and we create a **second payment**.
 
 Throughput (about 10k transactions a second) isn't the hard part. **Correctness when outcomes are unknown** is.
@@ -183,5 +183,5 @@ Every movement is two balancing entries, so money is never created or lost and e
 ## Related
 
 - **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md)
-- **DDIA:** [Ch 8](../ddia/08-trouble-with-distributed-systems.md) unknown outcomes · [Ch 12](../ddia/12-future-of-data-systems.md) end-to-end idempotency, integrity · [Ch 11](../ddia/11-stream-processing.md) outbox
+- **DDIA:** [Ch 9](../ddia/09-trouble-with-distributed-systems.md) unknown outcomes · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) end-to-end idempotency, integrity · [Ch 12](../ddia/12-stream-processing.md) outbox
 - **Similar problems:** [Online judge (LeetCode)](online-judge.md) · [Job scheduler](job-scheduler.md)

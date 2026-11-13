@@ -70,4 +70,4 @@ The web was built for the client to **ask** and the server to **answer**. But ma
 
 ## The theory underneath
 
-- [DDIA Ch 11: Stream processing](../ddia/11-stream-processing.md)
+- [DDIA Ch 12: Stream processing](../ddia/12-stream-processing.md)

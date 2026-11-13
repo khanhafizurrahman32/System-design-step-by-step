@@ -8,7 +8,7 @@ tags: [multi-step-processes, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 9](../ddia/09-consistency-and-consensus.md) leader election · [Ch 8](../ddia/08-trouble-with-distributed-systems.md) leases / fencing · [Ch 6](../ddia/06-partitioning.md) time partitioning
+**Difficulty:** Hard · **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md) · **DDIA:** [Ch 10](../ddia/10-consistency-and-consensus.md) leader election · [Ch 9](../ddia/09-trouble-with-distributed-systems.md) leases / fencing · [Ch 7](../ddia/07-sharding.md) time partitioning
 
 *Ten thousand jobs per second, each within two seconds of its scheduled time.*
 
@@ -100,7 +100,7 @@ Each step fixes one specific problem with the step before it.
 
 **Why it matters:** jobs run for seconds to hours, and workers will crash, be redeployed or lose network during them.
 
-**How:** the **lease** (visibility timeout) expires and the job becomes available again, then is retried by another worker. For long jobs, the worker sends **heartbeats** that extend its lease, so healthy long jobs aren't stolen. Danger: a worker that was paused, not dead, might wake up and finish after another worker has taken over. So completion writes carry a **fencing token**, the lease's attempt number, and the database rejects a stale one (see [fencing tokens](../ddia/08-trouble-with-distributed-systems.md)).
+**How:** the **lease** (visibility timeout) expires and the job becomes available again, then is retried by another worker. For long jobs, the worker sends **heartbeats** that extend its lease, so healthy long jobs aren't stolen. Danger: a worker that was paused, not dead, might wake up and finish after another worker has taken over. So completion writes carry a **fencing token**, the lease's attempt number, and the database rejects a stale one (see [fencing tokens](../ddia/09-trouble-with-distributed-systems.md)).
 
 ### Duplicate enqueues?
 
@@ -175,5 +175,5 @@ Its lease (visibility timeout) expires and the job is retried by another worker,
 ## Related
 
 - **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md) · [Long-running tasks](../patterns/long-running-tasks.md)
-- **DDIA:** [Ch 9](../ddia/09-consistency-and-consensus.md) leader election · [Ch 8](../ddia/08-trouble-with-distributed-systems.md) leases / fencing · [Ch 6](../ddia/06-partitioning.md) time partitioning
+- **DDIA:** [Ch 10](../ddia/10-consistency-and-consensus.md) leader election · [Ch 9](../ddia/09-trouble-with-distributed-systems.md) leases / fencing · [Ch 7](../ddia/07-sharding.md) time partitioning
 - **Similar problems:** [Payment system (Stripe)](payment-system.md) · [Online judge (LeetCode)](online-judge.md)

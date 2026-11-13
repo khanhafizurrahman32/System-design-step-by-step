@@ -111,7 +111,7 @@ Another workload on the same physical machine competing for CPU, cache, memory b
 ## Related
 
 - [Processes and threads](01-processes-and-threads.md) · [Containers](08-containers.md)
-- [Rate limiting and load shedding](../101/load-shedding.md) · [DDIA Ch 1: percentiles](../ddia/01-reliability-scalability-maintainability.md)
+- [Rate limiting and load shedding](../101/load-shedding.md) · [DDIA Ch 2: percentiles](../ddia/02-nonfunctional-requirements.md)
 
 ---
 

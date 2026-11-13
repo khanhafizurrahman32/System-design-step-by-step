@@ -8,7 +8,7 @@ tags: [scaling-reads, medium]
 
 <span class="lvl lvl-i">Intermediate</span>
 
-**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) geo indexes · [Ch 7](../ddia/07-transactions.md) atomic updates · [Ch 5](../ddia/05-replication.md) read replicas
+**Difficulty:** Medium · **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · **DDIA:** [Ch 4](../ddia/04-storage-and-retrieval.md) geo indexes · [Ch 8](../ddia/08-transactions.md) atomic updates · [Ch 6](../ddia/06-replication.md) read replicas
 
 *The trap is over-engineering: the whole dataset fits on one database server.*
 
@@ -108,7 +108,7 @@ Each step fixes one specific problem with the step before it.
 
 ### Average rating with concurrent reviews?
 
-**Why it's hard:** the naive way is "read the current average and count, compute the new average, write it back". Two reviews at the same moment both read the same old values, and one of them is **lost** (a lost update, [DDIA Ch 7](../ddia/07-transactions.md)).
+**Why it's hard:** the naive way is "read the current average and count, compute the new average, write it back". Two reviews at the same moment both read the same old values, and one of them is **lost** (a lost update, [DDIA Ch 8](../ddia/08-transactions.md)).
 
 **How:** store `rating_sum` and `rating_count`, not the average, and update them with an **atomic** statement in the same transaction as the review insert:
 
@@ -129,7 +129,7 @@ The database applies these one at a time to the row, so nothing is lost. The ave
 
 **Why not at the start:** it's a second system to run and keep in sync, and Postgres with PostGIS and trigram indexes already handles 10 GB and these query types well.
 
-**When it becomes worth it:** when search needs relevance ranking, typo tolerance, synonyms and facets ("open now, $$, 4+ stars") beyond what Postgres does well, or when query volume outgrows the replicas. Then feed it from Postgres using **CDC**, so it follows the database's change log. Never write to both from the application (the dual-write problem, see [DDIA Ch 11](../ddia/11-stream-processing.md)).
+**When it becomes worth it:** when search needs relevance ranking, typo tolerance, synonyms and facets ("open now, $$, 4+ stars") beyond what Postgres does well, or when query volume outgrows the replicas. Then feed it from Postgres using **CDC**, so it follows the database's change log. Never write to both from the application (the dual-write problem, see [DDIA Ch 12](../ddia/12-stream-processing.md)).
 
 ## 7. Interview script (45 minutes)
 
@@ -192,5 +192,5 @@ Update the stored sum and count atomically in the same transaction as the review
 ## Related
 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)
-- **DDIA:** [Ch 3](../ddia/03-storage-and-retrieval.md) geo indexes · [Ch 7](../ddia/07-transactions.md) atomic updates · [Ch 5](../ddia/05-replication.md) read replicas
+- **DDIA:** [Ch 4](../ddia/04-storage-and-retrieval.md) geo indexes · [Ch 8](../ddia/08-transactions.md) atomic updates · [Ch 6](../ddia/06-replication.md) read replicas
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [News feed (Facebook)](news-feed.md) · [News aggregator (Google News)](news-aggregator.md)

@@ -20,7 +20,7 @@ tags: [pattern]
 
 ## The problem
 
-Booking a hotel room isn't one action. It's three, in three different services: **reserve** the room, **charge** the card, **confirm** the booking (and send the email). Inside a single database you'd wrap them in one transaction, so all of it happens or none of it does. But these steps live in different services, each with its own database, and some talk to outside companies like the payment provider. There is no transaction that spans all of them (and the protocol that tries, two-phase commit, blocks and couples services too tightly, see [DDIA Ch 9](../ddia/09-consistency-and-consensus.md)).
+Booking a hotel room isn't one action. It's three, in three different services: **reserve** the room, **charge** the card, **confirm** the booking (and send the email). Inside a single database you'd wrap them in one transaction, so all of it happens or none of it does. But these steps live in different services, each with its own database, and some talk to outside companies like the payment provider. There is no transaction that spans all of them (and the protocol that tries, two-phase commit, blocks and couples services too tightly, see [DDIA Ch 10](../ddia/10-consistency-and-consensus.md)).
 
 So you need another way to guarantee that the process either **finishes** or is **cleanly undone**, even if a step fails or a server crashes in the middle.
 
@@ -69,6 +69,6 @@ So you need another way to guarantee that the process either **finishes** or is 
 
 ## The theory underneath
 
-- [DDIA Ch 9: Consistency and consensus](../ddia/09-consistency-and-consensus.md)
-- [DDIA Ch 11: Stream processing](../ddia/11-stream-processing.md)
-- [DDIA Ch 12: The future of data systems](../ddia/12-future-of-data-systems.md)
+- [DDIA Ch 10: Consistency and consensus](../ddia/10-consistency-and-consensus.md)
+- [DDIA Ch 12: Stream processing](../ddia/12-stream-processing.md)
+- [DDIA Ch 13: A philosophy of streaming systems](../ddia/13-philosophy-of-streaming-systems.md)

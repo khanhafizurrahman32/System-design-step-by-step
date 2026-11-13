@@ -81,13 +81,13 @@ You can skip the DDIA pages, the Computer Networking chapters and the staff-leve
 1. Skim [Foundations](foundations/index.md) and [System Design 101](101/index.md), and read [Numbers and estimation](foundations/numbers-and-estimation.md) carefully.
 2. Read all [7 patterns](patterns/index.md) and [Choosing technologies](technologies.md).
 3. Do two [problems](problems/index.md) a day, medium and hard. Try each yourself first.
-4. Read the DDIA pages behind your weakest patterns, especially [Ch 5](ddia/05-replication.md), [Ch 7](ddia/07-transactions.md) and [Ch 11](ddia/11-stream-processing.md).
+4. Read the DDIA pages behind your weakest patterns, especially [Ch 6](ddia/06-replication.md), [Ch 8](ddia/08-transactions.md) and [Ch 12](ddia/12-stream-processing.md).
 5. Rehearse with the [interview deck](slides/interview.html) and the [quick-fire questions](playbook/quick-fire.md).
 
 ## Path 3: Staff and above
 
 1. [What's expected at each level](playbook/levels.md) and [Staff-level answers](playbook/staff-level.md).
-2. All 12 [DDIA chapters](ddia/index.md), plus [Operating Systems](os/index.md) for the single-machine behaviour behind them (threads, fsync, GC pauses, container limits).
+2. All 14 [DDIA chapters](ddia/index.md), plus [Operating Systems](os/index.md) for the single-machine behaviour behind them (threads, fsync, GC pauses, container limits).
 3. Every problem's **Staff-level lens** section, or all 29 at once in the [staff atlas](slides/staff-atlas.html).
 4. The night before: the [staff cheat sheet](sketchnotes/staff-cheat-sheet.svg) and the [interview cheat sheet](sketchnotes/interview-cheat-sheet.svg).
 

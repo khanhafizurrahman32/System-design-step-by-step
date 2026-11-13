@@ -59,4 +59,4 @@ A relational database such as Postgres, until you can name a specific scale or a
 
 - [Data modeling](../core-concepts/data-modeling.md)
 - [Choosing technologies](../technologies.md)
-- [DDIA Ch 2: data models](../ddia/02-data-models.md)
+- [DDIA Ch 3: data models](../ddia/03-data-models.md)

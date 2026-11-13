@@ -1,23 +1,25 @@
 ---
-title: "DDIA Ch 8: The Trouble with Distributed Systems"
-description: "Why networks, clocks and paused processes make distributed systems fail in strange ways, and the fixes: idempotency, logical ordering, fencing tokens and quorums."
+title: "DDIA Ch 9: The Trouble with Distributed Systems"
+description: "Why networks, clocks and paused processes make distributed systems fail in strange ways, and the fixes: idempotency, logical ordering, fencing tokens, quorums, and testing with fault injection and deterministic simulation."
 tags: [ddia]
 ---
 
-# DDIA Chapter 8: The Trouble with Distributed Systems
+# DDIA Chapter 9: The Trouble with Distributed Systems
 
 <span class="lvl lvl-a">Advanced</span>
 
-> These DDIA pages are study notes in our own words and diagrams, connecting the book to interview problems. They don't replace the book; *Designing Data-Intensive Applications* by Martin Kleppmann is worth reading in full.
+> These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **One-page sketchnote:** [DDIA 8 · THE TROUBLE WITH DISTRIBUTED SYSTEMS on a single page](../sketchnotes/ddia-08.svg), for revision or printing.
+> **Revision sketchnote:** [The trouble with distributed systems on one page](../sketchnotes/ddia-08.svg) (drawn for the 1st edition, where this was Chapter 8).
 
 ## TL;DR
 
 On one machine, things either work or crash. Across machines you get **partial failure**: some parts work, some don't, and you often can't tell which. The three villains are unreliable networks, unreliable clocks, and process pauses.
 
-**Key ideas:** partial failure · timeouts · clock skew · LWW danger · GC pauses · leases · fencing tokens · majority quorum
+New in the 2nd edition: more ways to fence off zombie nodes (including in leaderless systems), and how teams actually find these bugs: formal methods, fault injection and **deterministic simulation testing**.
+
+**Key ideas:** partial failure · timeouts · clock skew · LWW danger · GC pauses · leases · zombies · fencing tokens · majority quorum · Jepsen · deterministic simulation testing
 
 ## The network: you cannot tell why there was no reply
 
@@ -34,6 +36,9 @@ There are three common reasons you got no reply:
 3. **③ The server did the work, but the reply got lost.** The card **was** charged. If you retry now, you charge it twice.
 
 From the caller's side, all three look exactly the same: no answer before the timeout. You can't find out which one happened by waiting longer. So the system has to be safe **whichever** one it was.
+
+> [!NOTE]
+> **"But TCP is reliable!"** TCP retransmits lost packets and delivers bytes in order, but only between the two **kernels**. A TCP acknowledgement means the other machine's operating system received the bytes, not that the application processed them; the process may crash a moment later. Only an application-level reply tells you the work was done.
 
 The standard answer is to make the operation **idempotent**: doing it twice has the same effect as doing it once. The caller generates an ID for the operation (an *idempotency key*) and sends the same ID on every retry. The server remembers which IDs it has already processed and, for a repeat, returns the stored result instead of charging again.
 
@@ -61,7 +66,7 @@ Here is how that silently loses data:
 
 Nobody gets an error. Client B was told its write succeeded, and it simply disappears. The clocks weren't broken; a 3 ms difference is normal.
 
-So: **don't use wall-clock time to order events across machines.** Use something that can't disagree: a sequence number from a single leader, a Kafka partition offset, a version number checked with a conditional write, or logical clocks (see Chapter 9).
+So: **don't use wall-clock time to order events across machines.** Use something that can't disagree: a sequence number from a single leader, a Kafka partition offset, a version number checked with a conditional write, or logical clocks (see Chapter 10).
 
 > [!NOTE]
 > **Two kinds of clock on every machine:** the **time-of-day clock** (`System.currentTimeMillis()`, `Date.now()`) tells the date and time, but it can **jump backwards** when NTP corrects it, so never use it to measure how long something took. The **monotonic clock** (`System.nanoTime()`, `performance.now()`) only moves forward. Use it for durations and timeouts, but its value means nothing on another machine.
@@ -94,6 +99,8 @@ Follow the diagram:
 4. Client 2 asks for the lease, gets it, and writes the file. So far everything is correct.
 5. Client 1 wakes up. It still believes it holds the lock, because nothing told it otherwise, and it writes the file too. Two writers have now overwritten each other: the file is **corrupted**.
 
+A node like Client 1, still acting on an authority it has lost, is called a **zombie**. Delayed network packets cause the same problem without any pause: a write sent before the lease expired can arrive after someone else got the lock. One blunt fix used in HA clusters is **STONITH** ("shoot the other node in the head"): physically power off the old node before the new one takes over. It's crude, and it can go wrong (two nodes shooting each other), which is why fencing at the storage, next, is preferred.
+
 > [!WARNING]
 > **"Just check the lease before writing" does not fix it.** The pause can happen **after** the check and **before** the write: check (still valid) → pause 15 s → write (lease long gone). No check inside the client can close that gap, because the client can't know it paused.
 
@@ -116,7 +123,9 @@ Replay the same story with tokens:
 
 The crucial point is **who does the check**. The client can't reliably know it is stale, so the **resource being protected** (the database, the file store) enforces it. The safety no longer depends on clients behaving well.
 
-Where the numbers come from: ZooKeeper's transaction ID (`zxid`) or an etcd **revision** both increase on every change, so they make good fencing tokens. A plain Redis lock has no such number, which is why a Redis lock alone isn't enough when correctness matters.
+Where the numbers come from: ZooKeeper's transaction ID (`zxid`) or node version (`cversion`), an etcd **revision**, Chubby's **sequencers**, and Kafka's **leader epochs** all increase with every change of ownership, so they make good fencing tokens. Object stores can enforce fencing too: an S3 **conditional write** ("only replace this object if its version is still X") rejects a zombie's stale write. A plain Redis lock has no such number, which is why a Redis lock alone isn't enough when correctness matters.
+
+**Fencing with leaderless replicas.** In a leaderless store (Chapter 6) there's no single place to keep "the highest token seen": the zombie's write may reach replicas that never saw the newer token. One trick is to put the fencing token in the **most significant bits of the write's timestamp**. Last-write-wins conflict resolution then always prefers a write from a newer lock holder over a zombie's, whatever their wall-clock times.
 
 In a SQL database, a version column does the same job:
 
@@ -133,7 +142,7 @@ WHERE  id = :file_id
 > **Say this in the interview:** "A Redis lock alone isn't safe under GC pauses: the lock can expire while the holder is paused, and it will still write when it wakes up. I'd pair the lock with a fencing token, for example a version column the database checks with `UPDATE … WHERE lock_token < :token`, so a stale holder's write is rejected."
 
 > [!NOTE]
-> **Truth is decided by the majority.** The deeper lesson: a node can't trust its own view of the world ("am I still the leader?", "do I still hold the lock?"), because it might have been paused or cut off. Important decisions are made by a **quorum**, a majority of nodes, and enforced where the data lives. That idea is the foundation of Chapter 9.
+> **Truth is decided by the majority.** The deeper lesson: a node can't trust its own view of the world ("am I still the leader?", "do I still hold the lock?"), because it might have been paused or cut off. Important decisions are made by a **quorum**, a majority of nodes, and enforced where the data lives. That idea is the foundation of Chapter 10.
 
 ## System models and Byzantine faults
 
@@ -153,7 +162,26 @@ To reason about whether an algorithm (such as a leader election) is correct, you
 > [!NOTE]
 > **Safety vs liveness:** **Safety**: nothing bad ever happens (no two leaders). This must always hold. **Liveness**: something good eventually happens (a leader gets elected). This may wait for the network to heal.
 
-## In the interview
+## Testing for faults you can't reproduce
+
+*Formal methods, fault injection, deterministic simulation*
+
+**Why ordinary tests miss these bugs.** The bugs in this chapter appear only under one particular interleaving: this message delayed, that node paused, at exactly this moment. A unit test runs one interleaving. Production runs billions, and a bug seen once is nearly impossible to reproduce. Three techniques help:
+
+1. **Formal methods.** Write the algorithm in a specification language like **TLA+** and let a **model checker** explore every possible ordering of events in a small configuration (say 3 nodes, a few messages). It finds design bugs before any code exists. Amazon, Microsoft and others use it for core protocols. Its limit: it checks the design, not the code you actually ship.
+2. **Fault injection.** Run the real system and deliberately break things: drop and delay packets, partition the network, kill processes, skew clocks. **Jepsen** does this to databases while checking whether their consistency claims hold, and has found violations in many well-known systems. **Chaos engineering** (Netflix's Chaos Monkey) does it in production so teams learn how their systems really fail.
+3. **Deterministic simulation testing (DST).** Make the whole system run inside a simulator where *every* source of non-determinism is controlled:
+
+![Deterministic simulation testing: one seed, one exact run](../diagrams/ddia2-09-dst.svg)
+
+- All nodes run in **one process, on one thread**. Network, clock and disk are fakes.
+- A random number generator, started from a **seed**, decides every delay, drop, crash and disk error.
+- Time is simulated, so thousands of hours of chaos run in minutes.
+- When an invariant check fails ("two leaders in the same term"), rerunning with **the same seed** replays the exact same sequence of events, so the bug reproduces every time.
+
+FoundationDB was built this way from the start, and TigerBeetle does the same. Libraries such as MadSim (Rust) and services like Antithesis bring it to other systems. The lesson underneath is **the power of determinism**: if the same inputs always give the same outputs, a hard-to-catch bug becomes an ordinary one to debug.
+
+## In the system design interview
 
 > [!IMPORTANT]
 > **Interviewer asks:** "What if the payment provider times out?"  
@@ -165,15 +193,56 @@ To reason about whether an algorithm (such as a leader election) is correct, you
 
 > [!IMPORTANT]
 > **Interviewer asks:** "Order events by timestamp?"  
-> → Wall clocks skew. Use a sequence from one leader, a Kafka partition offset, or logical clocks (Ch 9).
+> → Wall clocks skew. Use a sequence from one leader, a Kafka partition offset, or logical clocks (Ch 10).
 
 > [!IMPORTANT]
 > **Interviewer asks:** "How do you detect a dead node?"  
 > → Heartbeats + timeouts tuned to p99.9, and accept false positives. Leader election by majority, with epochs to fence the old leader.
 
+> [!IMPORTANT]
+> **Interviewer asks:** "How would you test that your leader election is correct?"
+> → Model the protocol in TLA+ for design bugs, then test the implementation under injected faults (Jepsen-style partitions, pauses, clock skew); ideally build it to run under deterministic simulation so any failure reproduces from its seed.
+
 > [!NOTE]
 > **Underneath:** where process pauses come from (GC, swapping, CPU throttling) is explained in [OS 3: Memory and GC pauses](../os/03-memory.md) and [OS 8: Containers](../os/08-containers.md).
 
+## Self-check
+
+Try to answer before you open each one.
+
+<details class="question" markdown>
+<summary>A call to the payment provider times out. Name the three things that might have happened, and why it matters.</summary>
+
+The request was lost, the provider is stuck or slow, or it charged the card and the reply was lost. You can't tell which, so the retry must be safe: send it with the same idempotency key.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why can last-write-wins lose a write that really happened later?</summary>
+
+The timestamps come from different machines' clocks, which differ by milliseconds or more. A later write stamped by a slower clock gets a smaller timestamp and is discarded, with no error.
+
+</details>
+
+<details class="question" markdown>
+<summary>Why doesn't "check the lease, then write" stop a paused client from corrupting data?</summary>
+
+The pause can happen between the check and the write, and the client can't notice it paused. The storage must reject the write itself, using a fencing token that increases with every lock grant.
+
+</details>
+
+<details class="question" markdown>
+<summary>What makes deterministic simulation testing so good at concurrency bugs?</summary>
+
+Every source of non-determinism (network, clock, disk, scheduling) is driven by a seeded random generator inside one thread, so a failing run can be replayed exactly from its seed, and simulated time lets you run huge numbers of fault scenarios quickly.
+
+</details>
+
+## Related
+
+- [Timeouts and retries](../101/timeouts-and-retries.md) · [Delivery guarantees](../101/delivery-guarantees.md)
+- [Job scheduler](../problems/job-scheduler.md) (leases and fencing) · [Payment system](../problems/payment-system.md) (idempotency keys)
+
 ---
 
-← [Ch 7: Transactions](07-transactions.md) · [Ch 9: Consistency and consensus](09-consistency-and-consensus.md) →
+← [Ch 8: Transactions](08-transactions.md) · [Ch 10: Consistency and consensus](10-consistency-and-consensus.md) →

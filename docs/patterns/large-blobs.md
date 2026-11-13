@@ -69,4 +69,4 @@ The idea is that the bytes and the **information about** the bytes take **differ
 
 ## The theory underneath
 
-- [DDIA Ch 10: Batch processing](../ddia/10-batch-processing.md)
+- [DDIA Ch 11: Batch processing](../ddia/11-batch-processing.md)

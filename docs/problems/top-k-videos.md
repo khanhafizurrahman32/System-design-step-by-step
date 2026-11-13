@@ -8,7 +8,7 @@ tags: [scaling-writes, hard]
 
 <span class="lvl lvl-a">Advanced</span>
 
-**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 11](../ddia/11-stream-processing.md) windows, partitioned streams · [Ch 6](../ddia/06-partitioning.md) partition by key
+**Difficulty:** Hard · **Patterns:** [Scaling writes](../patterns/scaling-writes.md) · **DDIA:** [Ch 12](../ddia/12-stream-processing.md) windows, partitioned streams · [Ch 7](../ddia/07-sharding.md) partition by key
 
 *The design falls straight out of one number: hundreds of thousands of views per second.*
 
@@ -171,5 +171,5 @@ Pre-aggregate before Kafka (count locally for a second, then send one update) so
 ## Related
 
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
-- **DDIA:** [Ch 11](../ddia/11-stream-processing.md) windows, partitioned streams · [Ch 6](../ddia/06-partitioning.md) partition by key
+- **DDIA:** [Ch 12](../ddia/12-stream-processing.md) windows, partitioned streams · [Ch 7](../ddia/07-sharding.md) partition by key
 - **Similar problems:** [Ad click aggregator](ad-click-aggregator.md) · [Web crawler](web-crawler.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md) · [Fitness tracking (Strava)](fitness-tracking.md)

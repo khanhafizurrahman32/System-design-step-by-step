@@ -14,7 +14,7 @@ tags: [core-concept]
 
 Without an index, finding "all orders for user 42" means reading **every row** in the orders table and checking each one: a *full table scan*. With 100 million rows, that takes seconds or minutes. An **index** is a separate, sorted structure that maps values to row locations, like the index at the back of a book. The database jumps straight to user 42's entries, typically in 3–4 disk reads, whatever the table size.
 
-The default index is a **B-tree**: a shallow, sorted tree. It answers equality (`= 42`), ranges (`created_at > '2026-01-01'`) and sorting (`ORDER BY created_at`). See [DDIA Chapter 3](../ddia/03-storage-and-retrieval.md) for how it works inside.
+The default index is a **B-tree**: a shallow, sorted tree. It answers equality (`= 42`), ranges (`created_at > '2026-01-01'`) and sorting (`ORDER BY created_at`). See [DDIA Chapter 4](../ddia/04-storage-and-retrieval.md) for how it works inside.
 
 ## Pick the right kind
 
