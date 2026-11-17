@@ -1,0 +1,203 @@
+{
+ "type": "excalidraw",
+ "version": 2,
+ "source": "https://excalidraw.com",
+ "elements": [
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": null,
+   "seed": 108589186,
+   "versionNonce": 476267396,
+   "id": "arrow0",
+   "type": "arrow",
+   "x": 156.69230769230768,
+   "y": 223,
+   "width": 145.23076923076923,
+   "height": 118,
+   "strokeColor": "#e03131",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "roundness": null,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     145.23076923076923,
+     -118
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startBinding": {
+    "elementId": "ev",
+    "focus": 0,
+    "gap": 6
+   },
+   "endBinding": {
+    "elementId": "pg",
+    "focus": 0,
+    "gap": 8
+   },
+   "startArrowhead": null,
+   "endArrowhead": "arrow",
+   "elbowed": false
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "evt"
+    }
+   ],
+   "seed": 1226469922,
+   "versionNonce": 1621224868,
+   "id": "ev",
+   "type": "rectangle",
+   "x": 38.16999999999999,
+   "y": 229,
+   "width": 133.66000000000003,
+   "height": 72,
+   "strokeColor": "#0c8599",
+   "backgroundColor": "#c5f6fa",
+   "fillStyle": "solid",
+   "roundness": {
+    "type": 3
+   }
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": null,
+   "seed": 1789001058,
+   "versionNonce": 385787420,
+   "id": "evt",
+   "type": "text",
+   "x": 44.16999999999999,
+   "y": 240,
+   "width": 121.66000000000003,
+   "height": 50,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "text": "Post + like\nevents",
+   "originalText": "Post + like\nevents",
+   "fontSize": 20,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "ev",
+   "lineHeight": 1.25,
+   "autoResize": true,
+   "roundness": null
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "dashed",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "pgt"
+    }
+   ],
+   "seed": 1246646040,
+   "versionNonce": 1866929858,
+   "id": "pg",
+   "type": "rectangle",
+   "x": 248.35,
+   "y": 43,
+   "width": 193.3,
+   "height": 54,
+   "strokeColor": "#e03131",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "roundness": {
+    "type": 3
+   }
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": null,
+   "seed": 1699153668,
+   "versionNonce": 657413154,
+   "id": "pgt",
+   "type": "text",
+   "x": 254.35,
+   "y": 57.5,
+   "width": 181.3,
+   "height": 25,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "text": "LIKE '%term%' ✗",
+   "originalText": "LIKE '%term%' ✗",
+   "fontSize": 20,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "pg",
+   "lineHeight": 1.25,
+   "autoResize": true,
+   "roundness": null
+  }
+ ],
+ "appState": {
+  "viewBackgroundColor": "#ffffff",
+  "gridSize": null
+ },
+ "files": {}
+}

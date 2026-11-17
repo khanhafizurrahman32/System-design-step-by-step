@@ -1,0 +1,203 @@
+{
+ "type": "excalidraw",
+ "version": 2,
+ "source": "https://excalidraw.com",
+ "elements": [
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": null,
+   "seed": 108589186,
+   "versionNonce": 476267396,
+   "id": "arrow0",
+   "type": "arrow",
+   "x": 162,
+   "y": 232,
+   "width": 152,
+   "height": 88,
+   "strokeColor": "#e03131",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "roundness": null,
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     152,
+     -88
+    ]
+   ],
+   "lastCommittedPoint": null,
+   "startBinding": {
+    "elementId": "v",
+    "focus": 0,
+    "gap": 6
+   },
+   "endBinding": {
+    "elementId": "db",
+    "focus": 0,
+    "gap": 8
+   },
+   "startArrowhead": null,
+   "endArrowhead": "arrow",
+   "elbowed": false
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "vt"
+    }
+   ],
+   "seed": 217300791,
+   "versionNonce": 1128908517,
+   "id": "v",
+   "type": "rectangle",
+   "x": 34.13000000000001,
+   "y": 238,
+   "width": 141.73999999999998,
+   "height": 54,
+   "strokeColor": "#0c8599",
+   "backgroundColor": "#c5f6fa",
+   "fillStyle": "solid",
+   "roundness": {
+    "type": 3
+   }
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": null,
+   "seed": 1498016135,
+   "versionNonce": 2019244491,
+   "id": "vt",
+   "type": "text",
+   "x": 40.13000000000001,
+   "y": 252.5,
+   "width": 129.73999999999998,
+   "height": 25,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "text": "View events",
+   "originalText": "View events",
+   "fontSize": 20,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "v",
+   "lineHeight": 1.25,
+   "autoResize": true,
+   "roundness": null
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": [
+    {
+     "type": "text",
+     "id": "dbt"
+    }
+   ],
+   "seed": 1461503683,
+   "versionNonce": 817053097,
+   "id": "db",
+   "type": "rectangle",
+   "x": 296.98,
+   "y": 64,
+   "width": 186.04000000000002,
+   "height": 72,
+   "strokeColor": "#e03131",
+   "backgroundColor": "#ffe3e3",
+   "fillStyle": "solid",
+   "roundness": {
+    "type": 3
+   }
+  },
+  {
+   "angle": 0,
+   "strokeWidth": 2,
+   "strokeStyle": "solid",
+   "roughness": 1,
+   "opacity": 100,
+   "groupIds": [],
+   "frameId": null,
+   "version": 1,
+   "isDeleted": false,
+   "updated": 1,
+   "link": null,
+   "locked": false,
+   "boundElements": null,
+   "seed": 649276907,
+   "versionNonce": 1896917087,
+   "id": "dbt",
+   "type": "text",
+   "x": 302.98,
+   "y": 75,
+   "width": 174.04000000000002,
+   "height": 50,
+   "strokeColor": "#1e1e1e",
+   "backgroundColor": "transparent",
+   "fillStyle": "solid",
+   "text": "UPDATE videos\nSET views+1 ✗",
+   "originalText": "UPDATE videos\nSET views+1 ✗",
+   "fontSize": 20,
+   "fontFamily": 5,
+   "textAlign": "center",
+   "verticalAlign": "middle",
+   "containerId": "db",
+   "lineHeight": 1.25,
+   "autoResize": true,
+   "roundness": null
+  }
+ ],
+ "appState": {
+  "viewBackgroundColor": "#ffffff",
+  "gridSize": null
+ },
+ "files": {}
+}
