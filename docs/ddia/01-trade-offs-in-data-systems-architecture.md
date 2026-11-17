@@ -10,6 +10,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 1 · TRADE-OFFS IN DATA SYSTEMS ARCHITECTURE on a single page](../sketchnotes/ddia-01.svg), for revision or printing.
+
 ## TL;DR
 
 There are no perfect data systems, only trade-offs. Before choosing a database, decide four things: is this an **operational** system (serving users) or an **analytical** one (answering questions about the business)? Which data is the **source of truth**, and which is **derived** from it? Will you run it yourself or rent it as a **cloud service**? And do you need **more than one machine** at all? Finally, remember that the data is often about people, and the law has a say in how you keep it.
@@ -179,6 +182,7 @@ Data lives in a shared, replicated storage service, so compute nodes are nearly 
 
 - [SQL vs NoSQL](../101/sql-vs-nosql.md) · [Storage types](../101/storage-types.md) · [Observability](../101/observability.md)
 - [Ad click aggregator](../problems/ad-click-aggregator.md) and [Metrics monitoring](../problems/metrics-monitoring.md) for analytical pipelines in practice
+- [Monolith vs microservices](../core-concepts/monolith-vs-microservices.md) · [Disaster recovery and multi-region](../core-concepts/disaster-recovery.md)
 
 ---
 

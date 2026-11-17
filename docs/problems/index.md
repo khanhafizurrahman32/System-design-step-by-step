@@ -1,13 +1,13 @@
 ---
 title: "Problems"
-description: "Twenty-nine system design problems, each built from a simple first version to a final design with an interview script."
+description: "Thirty-four system design problems, each built from a simple first version to a final design with an interview script."
 ---
 
-# 29 problems
+# 34 problems
 
 Every page follows the same template: requirements, numbers, a **v1** design and where it breaks, the final design and why each part exists, deep dives, a minute-by-minute interview script, and common mistakes.
 
-Interviewing for staff? Each page has a **Staff-level lens** section, and all 29 are collected in [Staff-level answers](../playbook/staff-level.md).
+Interviewing for staff? Each page has a **Staff-level lens** section, and all 34 are collected in [Staff-level answers](../playbook/staff-level.md).
 
 New to this? Start with [URL shortener](url-shortener.md), [Rate limiter](rate-limiter.md) and [Ticketmaster](ticketmaster.md).
 
@@ -25,6 +25,7 @@ New to this? Start with [URL shortener](url-shortener.md), [Rate limiter](rate-l
 | [Local delivery (Gopuff)](local-delivery.md) | Easy | It looks like an ordering system, but most of the load is people checking what is available near them. |
 | [Dating app (Tinder)](dating-app.md) | Medium | Swipes are a firehose of writes, and two people swiping right at the same moment must never miss their match. |
 | [Distributed cache](distributed-cache.md) | Medium | Design Redis itself: data structures inside one node, then distribution across many. |
+| [Search autocomplete](search-autocomplete.md) | Medium | A request on every keystroke within 100 ms: the ranking has to be done before anyone types. |
 
 ## Scaling writes
 
@@ -39,6 +40,8 @@ New to this? Start with [URL shortener](url-shortener.md), [Rate limiter](rate-l
 | [Fitness tracking (Strava)](fitness-tracking.md) | Medium | The key insight is where the work happens: on the phone, not the server. |
 | [Post search (Facebook)](post-search.md) | Medium | Search over billions of posts, where like counts change constantly. |
 | [Price tracker (CamelCamelCamel)](price-tracker.md) | Medium | Five hundred million products can't all be crawled often, so decide what is worth checking. |
+| [Distributed key-value store (Dynamo)](key-value-store.md) | Hard | Every component exists because a specific failure would otherwise lose writes or availability. |
+| [Distributed message queue (Kafka)](message-queue.md) | Hard | Don't delete messages when they're read: an append-only log makes it fast and replayable. |
 
 ## Real-time updates
 
@@ -53,6 +56,7 @@ New to this? Start with [URL shortener](url-shortener.md), [Rate limiter](rate-l
 | [Online auction](online-auction.md) | Medium | Many people bid on one row at the same time, and exactly one of them must win each race. |
 | [LLM chat (ChatGPT)](llm-chat.md) | Hard | GPUs are the scarce resource, so every queueing decision is really a cost decision. |
 | [Chat app (WhatsApp)](chat-app.md) | Medium | Chat looks like CRUD until you notice the two users are on different servers and one of them is offline. |
+| [Gaming leaderboard](leaderboard.md) | Medium | The top ten is easy; player 31,402,118's rank needs a data structure that keeps ranks for you. |
 
 ## Dealing with contention
 
@@ -88,4 +92,5 @@ New to this? Start with [URL shortener](url-shortener.md), [Rate limiter](rate-l
 
 | Problem | Difficulty | What makes it interesting |
 |---|---|---|
+| [Notification system](notification-system.md) | Medium | Every service wants to tell users something; the hard parts are slow providers and never sending the same message twice. |
 

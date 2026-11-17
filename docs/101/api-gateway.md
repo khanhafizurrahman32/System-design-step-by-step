@@ -60,3 +60,4 @@ With a single service, where a load balancer already does the job.
 - [Rate limiter](../problems/rate-limiter.md)
 - [Choosing technologies](../technologies.md)
 - [Sessions vs tokens](sessions-vs-tokens.md)
+- [Load balancing](../core-concepts/load-balancing.md) · [Monolith vs microservices](../core-concepts/monolith-vs-microservices.md)

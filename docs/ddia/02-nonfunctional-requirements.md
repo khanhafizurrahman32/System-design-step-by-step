@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [reliability, scalability, maintainability on one page](../sketchnotes/ddia-01.svg) (drawn for the 1st edition, where this was Chapter 1).
+> **One-page sketchnote:** [DDIA 2 · DEFINING NONFUNCTIONAL REQUIREMENTS on a single page](../sketchnotes/ddia-02.svg), for revision or printing.
 
 ## TL;DR
 

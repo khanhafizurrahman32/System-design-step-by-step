@@ -373,7 +373,7 @@ P.pb1={fr:['Create a short URL for a long URL (optional custom alias, expiry)','
   ['301 or 302?','<b>302</b>: every click reaches you (analytics, expiry, editing). 301 lets browsers cache it, which cuts load but loses analytics.'],
   ['What if the counter node dies?','Redis with AOF + replica, or servers lease ranges from a Postgres sequence. A crash wastes a range; gaps are harmless.'],
   ['Custom aliases?','Same table with a unique constraint; the insert fails if taken. Keep namespaces apart (e.g., counter codes are 7 chars, aliases ≥ 8).']],
- trap:'Sharding 500GB at 12 writes/sec. It fits one machine; scale reads with cache and replicas.',ddia:'Ch 5 replicas · Ch 6 hash sharding'};
+ trap:'Sharding 500GB at 12 writes/sec. It fits one machine; scale reads with cache and replicas.',ddia:'Ch 6 replicas · Ch 7 hash sharding'};
 
 P.pb2={fr:['Limit requests per client (user, IP, API key) by configurable rules','Return 429 with Retry-After and rate-limit headers'],
  nfr:['Adds &lt; 10ms latency','Accurate across many API servers','Highly available (choose fail-open vs fail-closed)','1M requests/sec total'],
@@ -385,10 +385,10 @@ P.pb2={fr:['Limit requests per client (user, IP, API key) by configurable rules'
   e:[['cl','gw','',''],['gw','svc','allowed','g'],['gw','cl','429','rc',0],['gw','loc','','rd',[0,0]],['gw','rd','1 round trip','a',1],['rd','lua','','pd',2],['cfg','gw','cached rules','d',3]]},
  cap:['Naive: each API server counts in local memory. With 50 servers, a client gets 50× the limit.','Centralize counters in Redis. But GET then SET from two servers races: both see 99/100 and both allow.','A Lua script runs refill + check + decrement atomically inside single-threaded Redis, in one round trip, with no race.','Rules come from a config store cached in each gateway. Decide failure mode: fail-open for normal APIs, fail-closed for login and payments.'],
  deep:[['Which algorithm?','<b>Token bucket</b> (capacity = burst, refill = sustained rate) is the industry default. Fixed window allows 2× bursts at boundaries; a sliding-window log is exact but stores every timestamp; a sliding-window counter is a good approximation.'],
-  ['Race between servers?','Read-modify-write is a lost update (DDIA Ch 7). Atomic Lua or INCR + EXPIRE inside Redis fixes it.'],
+  ['Race between servers?','Read-modify-write is a lost update (DDIA Ch 8). Atomic Lua or INCR + EXPIRE inside Redis fixes it.'],
   ['Redis is down?','Fall back to local limits (limit ÷ N servers). Fail-open vs fail-closed is a product decision per endpoint.'],
   ['Very hot client?','One key lands on one shard. Give each server a local allowance and sync periodically, trading accuracy for load.']],
- trap:'Counters in Postgres: 1M writes/sec of throwaway data.',ddia:'Ch 7 lost update · Ch 6 shard by key'};
+ trap:'Counters in Postgres: 1M writes/sec of throwaway data.',ddia:'Ch 8 lost update · Ch 7 shard by key'};
 
 P.pb9={fr:['Search businesses by location + radius, category, text','View business details and reviews','Leave one review per user per business; see average rating'],
  nfr:['Search p99 &lt; 500ms','100M DAU, read-heavy','Ratings can lag slightly (eventual)','Reviews durable'],
@@ -403,7 +403,7 @@ P.pb9={fr:['Search businesses by location + radius, category, text','View busine
   ['Average rating with concurrent reviews?','Store sum and count; UPDATE … SET sum=sum+:r, count=count+1 in the review\'s transaction. That is an atomic operation, so no lost update.'],
   ['One review per user?','A DB unique constraint, not an application check (check-then-insert races).'],
   ['When would you add Elasticsearch?','Only if search needs relevance ranking, fuzzy matching, and facets beyond pg_trgm, or QPS outgrows replicas. Then feed it from Postgres via CDC; never dual-write.']],
- trap:'A geo-sharded cluster for 10GB of data. One Postgres with PostGIS plus replicas is enough.',ddia:'Ch 3 geo indexes · Ch 7 atomic updates · Ch 5 read replicas'};
+ trap:'A geo-sharded cluster for 10GB of data. One Postgres with PostGIS plus replicas is enough.',ddia:'Ch 4 geo indexes · Ch 8 atomic updates · Ch 6 read replicas'};
 
 P.pb11={fr:['Create posts','Follow users','View feed of followed users\' posts, newest first, paginated'],
  nfr:['Feed p99 &lt; 500ms','2B users; eventual consistency (post appears within ~1 min)','Handle accounts with millions of followers','Highly available'],
@@ -418,7 +418,7 @@ P.pb11={fr:['Create posts','Follow users','View feed of followed users\' posts, 
   ['How much memory for feeds?','Only active users, only IDs, capped at 500: 300M × 500 × ~8B ≈ 1.2TB across a Redis cluster. Inactive users get rebuilt on demand.'],
   ['Pagination?','Cursor = (ts, post_id) of the last item. Offsets shift as new posts arrive.'],
   ['User follows someone new?','An async job backfills the followee\'s recent posts into the follower\'s feed.']],
- trap:'Fan-out on write for everyone: one celebrity post means 100M writes and workers hours behind.',ddia:'Ch 1 Twitter load · Ch 11 materialized views · Ch 6 hot keys'};
+ trap:'Fan-out on write for everyone: one celebrity post means 100M writes and workers hours behind.',ddia:'Ch 2 Twitter load · Ch 12 materialized views · Ch 7 hot keys'};
 
 P.pb19={fr:['Feed of recent articles from thousands of publishers, by region and category','Click through to the publisher; infinite scroll'],
  nfr:['Feed p99 &lt; 200ms','100M DAU with breaking-news spikes','New articles visible within ~30 min','Availability over consistency'],
@@ -433,7 +433,7 @@ P.pb19={fr:['Feed of recent articles from thousands of publishers, by region and
   ['Polling cost vs freshness?','Adaptive polling: busy publishers every few minutes, quiet ones hourly. Use webhooks where offered.'],
   ['Duplicate stories?','Unique canonical URL; near-duplicates clustered with SimHash/MinHash on title and body.'],
   ['Pagination?','Cursor on (published_at, id). Offsets break when new articles arrive.']],
- trap:'Per-user fan-out like a social feed when the feed is per region and category: build it once per region and let the CDN cache it.',ddia:'Ch 1 load parameters · Ch 10 ingest pipelines'};
+ trap:'Per-user fan-out like a social feed when the feed is per region and category: build it once per region and let the CDN cache it.',ddia:'Ch 2 load parameters · Ch 11 ingest pipelines'};
 
 P.pb28={fr:['Check availability of items deliverable to a location (DCs within 1 hour)','Order multiple items; never sell stock you don\'t have'],
  nfr:['Availability p99 &lt; 100ms','Orders strongly consistent (no overselling)','10k distribution centres (DCs), ~100k SKUs','Browse load ≫ order load'],
@@ -448,7 +448,7 @@ P.pb28={fr:['Check availability of items deliverable to a location (DCs within 1
   ['Stale availability vs orders?','Different consistency per path: browse is cached and eventually consistent; checkout reads and writes the primary.'],
   ['Scale orders?','Partition inventory by region; an order only touches nearby DCs, so there are no cross-shard transactions.'],
   ['Hot item (flash sale)?','Row contention on one inventory row: queue orders per item, or split stock into sub-buckets.']],
- trap:'Redis as the inventory source of truth, with no multi-item transaction or durability.',ddia:'Ch 7 conditional updates · Ch 5 replica lag'};
+ trap:'Redis as the inventory source of truth, with no multi-item transaction or durability.',ddia:'Ch 8 conditional updates · Ch 6 replica lag'};
 
 P.pb8={fr:['Profile with preferences (age, distance)','Get a stack of nearby candidates','Swipe left/right; get notified on a mutual match'],
  nfr:['Stack load p99 &lt; 300ms','No missed matches (strong consistency on swipes)','Don\'t re-show swiped profiles','20M DAU × 100 swipes'],
@@ -459,10 +459,10 @@ P.pb8={fr:['Profile with preferences (age, distance)','Get a stack of nearby can
    ['es',560,40,'Elasticsearch|geo + filters','p','db',null,150],['sc',720,90,'Redis|precomputed stack\n+ Bloom of swiped','a','db',1,170],['cs',560,300,'Cassandra|swipes (LSM)','g','db',2],['lua',720,230,'Redis Lua|pair key (min,max)\natomic match check','k','db',3,170],['nt',720,320,'Push (APNs/FCM)','x',null,3]],
   e:[['cl','gw',''],['gw','st',''],['st','es','geo query','p'],['st','sc','','a',1],['gw','sw','','',2],['sw','cs','write','g',2],['sw','lua','SET my bit,\nGET theirs','k',3],['lua','nt','match!','k',3]]},
  cap:['Build each stack with a geo + preferences query in Elasticsearch. That works, but is slow on every open.','Precompute the next ~200 candidates per user in Redis and refresh in the background. A per-user <b>Bloom filter</b> hides profiles already swiped.','Swipes are write-heavy (100k/s) and append-only, so an LSM store like Cassandra fits.','Match race: A and B swipe right at the same moment, and each check misses the other. Fix: one key per pair (min, max) and a Lua script that sets my decision and reads theirs atomically.'],
- deep:[['Both swipe at once: why can a match be missed?','Two writes followed by two reads: each read runs before the other\'s write lands. That is write skew (Ch 7). An atomic op on a single pair key makes exactly one side see "both".'],
+ deep:[['Both swipe at once: why can a match be missed?','Two writes followed by two reads: each read runs before the other\'s write lands. That is write skew (Ch 8). An atomic op on a single pair key makes exactly one side see "both".'],
   ['Hide already-swiped profiles?','A Bloom filter per user. A false positive skips an unseen profile, which is acceptable; no false negatives.'],
   ['Location changes?','Invalidate and recompute the stack when the user moves more than X km.']],
- trap:'Separate "write swipe" and "check other swipe" calls without atomicity, so matches are lost.',ddia:'Ch 7 write skew · Ch 3 Bloom filters, LSM'};
+ trap:'Separate "write swipe" and "check other swipe" calls without atomicity, so matches are lost.',ddia:'Ch 8 write skew · Ch 4 Bloom filters, LSM'};
 
 P.pb15={fr:['Top K most-viewed videos for the last hour, day, month, and all time'],
  nfr:['Query latency &lt; 100ms','Freshness ~1 minute','Accurate counts (billing-grade not required, but no big drift)','Massive view volume'],
@@ -477,7 +477,7 @@ P.pb15={fr:['Top K most-viewed videos for the last hour, day, month, and all tim
   ['Sliding windows?','A ring buffer of minute counts per video; for months use hourly buckets. Rolling sums avoid rescanning.'],
   ['Very hot video?','Pre-aggregate on producers (send counts per second, not individual views).'],
   ['Approximate is OK?','Count-Min Sketch + heap uses fixed memory and is good for trending; exact needs partitioned counting.']],
- trap:'A counter row per video in the DB: 800k writes/sec on hot rows.',ddia:'Ch 11 windows, partitioned streams · Ch 6 partition by key'};
+ trap:'A counter row per video in the DB: 800k writes/sec on hot rows.',ddia:'Ch 12 windows, partitioned streams · Ch 7 partition by key'};
 
 P.pb20={fr:['Click on an ad redirects the user to the advertiser','Advertisers query click metrics over time (minute granularity), with filters'],
  nfr:['10k clicks/s peak, 100M/day','Never lose or double-count clicks (it is billing)','Metrics queries &lt; 1s','Freshness ~1 minute'],
@@ -493,7 +493,7 @@ P.pb20={fr:['Click on an ad redirects the user to the advertiser','Advertisers q
   ['Hot ad (Super Bowl)?','Key on ad_id:random(0..N) to spread across partitions, then aggregate twice.'],
   ['Why also batch?','Streams give fast numbers; batch from immutable raw data gives exact billing numbers.'],
   ['Why OLAP?','Column store and pre-aggregates make time-range queries over billions of rows sub-second.']],
- trap:'Aggregating raw rows at query time in the OLTP database.',ddia:'Ch 11 windows, exactly-once · Ch 12 Lambda · Ch 3 column stores'};
+ trap:'Aggregating raw rows at query time in the OLTP database.',ddia:'Ch 12 windows, exactly-once · Ch 13 Lambda · Ch 4 column stores'};
 
 P.pb18={fr:['Crawl from seed URLs, fetch pages, extract text, follow links','Store text for LLM training: 10B pages in 5 days'],
  nfr:['Politeness: robots.txt, per-domain rate limits','Fault tolerant: resume without losing progress','No duplicate URLs or content','Efficient (network-bound)'],
@@ -508,7 +508,7 @@ P.pb18={fr:['Crawl from seed URLs, fetch pages, extract text, follow links','Sto
   ['Crash mid-crawl?','A message is acked only after the raw page is in S3: at-least-once, idempotent by URL hash.'],
   ['Crawler traps?','Max depth per domain, URL normalization, content-hash dedupe.'],
   ['DNS bottleneck?','Cache DNS per worker; multiple resolvers.']],
- trap:'One monolithic fetch→parse loop: a slow parser stalls fetching and a crash loses in-flight work.',ddia:'Ch 10 batch pipelines · Ch 3 Bloom filters · Ch 11 queues'};
+ trap:'One monolithic fetch→parse loop: a slow parser stalls fetching and a crash loses in-flight work.',ddia:'Ch 11 batch pipelines · Ch 4 Bloom filters · Ch 12 queues'};
 
 P.pb25={fr:['Ingest metrics from 500k servers','Query dashboards over time ranges','Alert rules with notifications'],
  nfr:['5M datapoints/s ingest','Recent-data queries &lt; 1s','Alerts within ~1 minute','Late/out-of-order tolerant, durable'],
@@ -524,7 +524,7 @@ P.pb25={fr:['Ingest metrics from 500k servers','Query dashboards over time range
   ['High cardinality?','A user_id tag explodes series count. Cap or reject high-cardinality labels.'],
   ['Late data?','Event-time windows with watermarks; allowed lateness for corrections.'],
   ['Alert flapping?','Require N consecutive windows; dedupe and group in the alert manager.']],
- trap:'Row-per-point in Postgres, and alerting by polling queries.',ddia:'Ch 3 LSM, compression · Ch 11 stream alerting'};
+ trap:'Row-per-point in Postgres, and alerting by polling queries.',ddia:'Ch 4 LSM, compression · Ch 12 stream alerting'};
 
 P.pb21={fr:['Start/pause/stop recording an activity (GPS track)','View activity stats and maps','Share with friends; see friends\' activities; leaderboards'],
  nfr:['Works offline; never lose an activity','10M DAU','Feed eventually consistent','Uploads resumable'],
@@ -539,7 +539,7 @@ P.pb21={fr:['Start/pause/stop recording an activity (GPS track)','View activity 
   ['Upload reliability?','Idempotency key = activity_id; resumable chunks; retry until acked.'],
   ['Leaderboards?','ZADD segment:{id} with the time as score; ZRANGE for top N; snapshot to DB.'],
   ['Time correctness?','Use device timestamps (event time), not upload time.']],
- trap:'Server-side real-time ingestion of every GPS point.',ddia:'Ch 11 event time · Ch 12 idempotent upload'};
+ trap:'Server-side real-time ingestion of every GPS point.',ddia:'Ch 12 event time · Ch 13 idempotent upload'};
 
 P.pb10={fr:['Rider requests a ride (pickup, destination) and sees a fare estimate','Match to a nearby available driver; driver accepts or declines','Live location of driver during the trip'],
  nfr:['Match within ~1 minute','A driver is never assigned two rides (consistency)','High availability for location updates','Handle surge peaks per city'],
@@ -555,7 +555,7 @@ P.pb10={fr:['Rider requests a ride (pickup, destination) and sees a fare estimat
   ['Reduce location load?','Adaptive update frequency (less when stationary), client batching.'],
   ['Why not query Postgres + PostGIS?','Fine for reads, but 250k updates/sec of ephemeral data belongs in memory.'],
   ['Matcher crash mid-match?','Durable workflow/queue; the request is re-processed and idempotent by ride_id.']],
- trap:'Offering a ride to many drivers at once without locks, so two drivers accept the same ride.',ddia:'Ch 8 leases · Ch 3 geo index · Ch 6 partition by region'};
+ trap:'Offering a ride to many drivers at once without locks, so two drivers accept the same ride.',ddia:'Ch 9 leases · Ch 4 geo index · Ch 7 partition by region'};
 
 P.pb12={fr:['Post a comment on a live video','Viewers see new comments in near real time','Late joiners can scroll back through earlier comments'],
  nfr:['Delivery p99 &lt; 200ms','Millions of concurrent viewers; mega-streams with 1M+ viewers','Eventual consistency and ordering are acceptable'],
@@ -569,7 +569,7 @@ P.pb12={fr:['Post a comment on a live video','Viewers see new comments in near r
   ['How does one comment reach 1,000 servers?','Pub/sub fan-out: publish once; each server is subscribed to the channels of videos its viewers watch.'],
   ['Mega-streams?','Sample or rate-limit the comment stream per viewer (nobody can read 1k/s); prioritize friends\' comments.'],
   ['Late join?','Page the last N from Cassandra by cursor, then attach to the stream.']],
- trap:'Polling, which gives high latency and huge wasted load.',ddia:'Ch 11 pub/sub · Ch 6 partition by video'};
+ trap:'Polling, which gives high latency and huge wasted load.',ddia:'Ch 12 pub/sub · Ch 7 partition by video'};
 
 P.pb16={fr:['Create and open documents','Many users edit concurrently and see each other\'s changes live','See collaborators\' cursors and presence'],
  nfr:['Remote edits visible &lt; 100ms','All replicas converge to the same document','No lost edits (durable)','~100 concurrent editors per doc; millions of docs'],
@@ -581,10 +581,10 @@ P.pb16={fr:['Create and open documents','Many users edit concurrently and see ea
   e:[['a','lww','','rd',[0,0]],['b','lww','','rd',[0,0]],['a','ds','op','b',[1,2]],['b','ds','op','b',[1,2]],['a','lb','WS','b',3],['b','lb','WS','b',3],['lb','ds','','b',3],['ds','ol','','g',2],['ds','sn','','gd',2],['zk','lb','','pd',3]]},
  cap:['Naive: send the whole document on save. Last write wins, and someone\'s work disappears.','Send <b>operations</b> (insert "x" at 5). Concurrent ops shift positions, so a single server per doc orders them and <b>transforms</b> each against concurrent ones (Operational Transformation), then broadcasts.','Every op is appended to the op log before it is acknowledged; periodic snapshots make loading fast (snapshot + tail).','All editors of a doc must reach the same owner server: consistent hashing on doc_id, with ownership coordinated through ZooKeeper.'],
  deep:[['OT or CRDT?','<b>OT</b>: a central server orders and transforms; compact; needs one coordinator per doc (Google Docs). <b>CRDT</b>: ops commute, no server needed, good for offline and P2P; bigger metadata (Figma, Yjs).'],
-  ['Why one server per doc?','OT needs a single total order of ops (DDIA Ch 9).'],
+  ['Why one server per doc?','OT needs a single total order of ops (DDIA Ch 10).'],
   ['Offline edits?','Client buffers ops tagged with a base version; on reconnect the server transforms them against everything since that version.'],
   ['Cursors?','Ephemeral presence over the same socket; not persisted.']],
- trap:'Locking the document or paragraph, which defeats real-time collaboration.',ddia:'Ch 5 conflict resolution · Ch 9 total order · Ch 11 event log'};
+ trap:'Locking the document or paragraph, which defeats real-time collaboration.',ddia:'Ch 6 conflict resolution · Ch 10 total order · Ch 12 event log'};
 
 P.pb22={fr:['See live stock prices for watched symbols','Place market and limit orders; cancel orders','See order status and fills'],
  nfr:['Price updates &lt; 200ms','Orders never lost or duplicated','Strong consistency on order state','20M users; market-open spikes'],
@@ -595,11 +595,11 @@ P.pb22={fr:['See live stock prices for watched symbols','Place market and limit 
    ['os',300,270,'Order service','a',2],['pg',500,270,'Postgres|orders (PENDING first)','g','db',2,170],['eg',690,200,'Exchange gateway','b',2],['tp',690,300,'Fill processor','b',3]],
   e:[['ex','pp','feed','',1],['pp','ps','','p',1],['ps','sse','','p',1],['sse','cl','push','b',1],['cl','os','POST /orders','',2],['os','pg','1. insert','g',2],['os','eg','2. send','a',2],['eg','ex','','',2],['ex','tp','fills / acks','d',3],['tp','pg','update status','g',3]]},
  cap:['Order and price paths are separate problems: one is real-time fan-out, the other is correctness.','Prices: one consumer reads the exchange feed and publishes per symbol; SSE servers subscribe to the symbols their clients watch. Throttle to ~1 update/s per symbol for the app.','Orders: <b>persist PENDING first</b> with our own order ID, then send to the exchange using that ID as clientOrderId. If we crash in between, we can look it up and reconcile.','Fills and acks come back asynchronously and update order status; a reconciliation job compares against exchange reports daily.'],
- deep:[['Write DB before or after the exchange call?','Before. Otherwise a crash after sending leaves a live order you don\'t know about. The exchange call has an unknown outcome on timeout (DDIA Ch 8).'],
+ deep:[['Write DB before or after the exchange call?','Before. Otherwise a crash after sending leaves a live order you don\'t know about. The exchange call has an unknown outcome on timeout (DDIA Ch 9).'],
   ['Duplicate submits?','Client Idempotency-Key with a unique index; the exchange also dedupes on clientOrderId.'],
   ['Cancel races with a fill?','Cancel is a request; status changes only on the exchange ack. Handle partial fills.'],
   ['Market-open spike?','Autoscale SSE servers; per-user rate limits on orders.']],
- trap:'Treating the exchange call as a local function call, so timeouts create ghost or duplicate orders.',ddia:'Ch 8 unknown outcomes · Ch 12 idempotency · Ch 11 pub/sub'};
+ trap:'Treating the exchange call as a local function call, so timeouts create ghost or duplicate orders.',ddia:'Ch 9 unknown outcomes · Ch 13 idempotency · Ch 12 pub/sub'};
 
 P.pb6={fr:['Create an auction (item, starting price, end time)','Place bids that must beat the current highest','Watch the highest bid update live; winner decided at the end'],
  nfr:['Bids strongly consistent (never accept a stale "highest")','Live updates &lt; 1s','No lost bids','Hot auctions spike in the final seconds'],
@@ -610,11 +610,11 @@ P.pb6={fr:['Create an auction (item, starting price, end time)','Place bids that
    ['k',370,50,'Kafka|partition by auction_id','p','q',3,180],['ps',600,300,'Pub/sub → SSE','a','q',2],['w',370,300,'Watchers','t','pill',2],['end',740,60,'Delayed job|close auction','x',3]],
   e:[['cl','gw',''],['gw','bs',''],['bs','pg','read max, compare\nin app ✗','r',[0,0]],['bs','pg','UPDATE … WHERE\nmax_bid < :amt','g',[1,2]],['bs','ps','accepted bid','a',2],['ps','w','','a',2],['gw','k','','p',3],['k','bs','ordered per auction','p',3],['bs','pg','','g',3],['end','pg','','d',3]]},
  cap:['Naive: read max_bid, compare in application code, insert. Two concurrent bids both "win", a lost update.','Make it atomic in the DB: UPDATE auctions SET max_bid=:amt, max_bidder=:u WHERE id=:a AND max_bid &lt; :amt AND end_time &gt; now(). 1 row = accepted, 0 = outbid. Bids are also appended for history.','Accepted bids are published to pub/sub and pushed over SSE to everyone watching.','For very hot auctions, a Kafka partition per auction_id serializes bids before the DB (durable and ordered). A delayed job closes the auction at end time.'],
- deep:[['Two bids at the same instant?','Conditional update (or SELECT FOR UPDATE) on the auction row. That is the lost-update fix from DDIA Ch 7.'],
+ deep:[['Two bids at the same instant?','Conditional update (or SELECT FOR UPDATE) on the auction row. That is the lost-update fix from DDIA Ch 8.'],
   ['Clock fairness at the deadline?','Use the DB server time inside the same conditional update, never client time.'],
   ['Durability?','Acknowledge only after commit (or Kafka acks=all).'],
   ['Anti-sniping?','Extend end_time by N seconds on late bids, inside the same update.']],
- trap:'Comparing bids in a Redis cache without atomicity.',ddia:'Ch 7 lost update · Ch 11 partitioned log · Ch 8 clocks'};
+ trap:'Comparing bids in a Redis cache without atomicity.',ddia:'Ch 8 lost update · Ch 12 partitioned log · Ch 9 clocks'};
 
 P.pb29={fr:['Send a message in a conversation','Stream the model\'s answer token by token','View conversation history'],
  nfr:['Time to first token &lt; 1s','GPU capacity is the scarce resource','Conversations durable','100M DAU; bursty'],
@@ -629,7 +629,7 @@ P.pb29={fr:['Send a message in a conversation','Stream the model\'s answer token
   ['Client disconnects?','Generation continues; tokens are buffered in the stream; resume with Last-Event-ID.'],
   ['Long context?','Load recent messages; summarize or truncate to fit the window; cache hot conversations.'],
   ['Cost control?','Per-user rate limits and token quotas at the gateway.']],
- trap:'Holding a synchronous connection through the load balancer straight to a GPU.',ddia:'Ch 11 logs and streams · Ch 1 tail latency'};
+ trap:'Holding a synchronous connection through the load balancer straight to a GPU.',ddia:'Ch 12 logs and streams · Ch 2 tail latency'};
 
 P.pb23={fr:['1:1 and group chats (up to ~100 members)','Send and receive messages in real time','Offline users get messages when they reconnect','Delivery and read receipts; media'],
  nfr:['Delivery &lt; 500ms when online','Messages never lost','Ordered within a chat','1B DAU'],
@@ -641,10 +641,10 @@ P.pb23={fr:['1:1 and group chats (up to ~100 members)','Send and receive message
   e:[['a','s1','WS','b'],['b','s2','WS','b',1],['s1','reg','','a',2],['s1','ps','publish to bob','p',2],['ps','s2','','p',2],['s1','db','persist','g',3],['s1','ib','','g',3],['ib','push','offline','d',3]]},
  cap:['Persistent <b>WebSocket</b> connections for both directions, so there is no polling.','Alice and Bob are usually connected to <b>different</b> servers, so you need routing between them.','A registry (user → server) and a pub/sub channel per user: server 1 publishes to Bob\'s channel; server 2, which holds Bob\'s connection, delivers.','Durability first: persist to the messages table and the recipient\'s inbox <b>before</b> acknowledging Alice. Bob\'s device acks on receipt and the inbox entry is deleted; offline devices get a push and sync on reconnect.'],
  deep:[['Never lose a message?','Persist before ack; at-least-once delivery from the inbox; client dedupes by msg_id.'],
-  ['Ordering?','Per-chat sequence numbers, with chat_id as the partition key so one writer orders them (DDIA Ch 5 consistent prefix).'],
+  ['Ordering?','Per-chat sequence numbers, with chat_id as the partition key so one writer orders them (DDIA Ch 6 consistent prefix).'],
   ['Groups?','Fan-out per member at send time (≤ ~100 members) into inboxes and channels.'],
   ['Media?','Upload to S3 via presigned URL; the message carries only the object key.']],
- trap:'Assuming both users share a server or are always online.',ddia:'Ch 5 consistent prefix · Ch 11 at-least-once + idempotency'};
+ trap:'Assuming both users share a server or are always online.',ddia:'Ch 6 consistent prefix · Ch 12 at-least-once + idempotency'};
 
 P.pb5={fr:['View events and seat maps','Search events','Book tickets: pick seats, hold, pay, confirm'],
  nfr:['Never double-book a seat (strong consistency)','Browse and search highly available, low latency','Extreme spikes: ~10M users for one on-sale','Seat hold ~10 minutes during checkout'],
@@ -655,11 +655,11 @@ P.pb5={fr:['View events and seat maps','Search events','Book tickets: pick seats
    ['pg',600,250,'Postgres|tickets','g','db'],['el',600,60,'Elasticsearch','p','db',3],['lk',740,170,'Hold = conditional\nUPDATE or Redis\nSET NX EX 600','a','n',1,140],['pay',740,310,'Stripe|webhook','x',null,2]],
   e:[['cl','gw',''],['gw','es',''],['gw','bs',''],['bs','pg','SELECT then INSERT ✗','r',[0,0]],['bs','pg','hold','g',1],['pg','lk','','ad',1],['bs','pay','','',2],['pay','bs','confirm','gd',2],['cl','cdn','','a',3],['cl','wq','hot event','k',3],['es','el','','p',3]]},
  cap:['Naive: check the seat is free, then insert a booking. Two users read "free" at the same time and both book: write skew.','Hold atomically: UPDATE tickets SET status=HELD, user=?, hold_expires=now()+10m WHERE id=? AND (status=AVAILABLE OR hold_expires &lt; now()). One row = yours. Or a Redis SET NX with a 10-minute TTL.','The user pays with Stripe; the idempotent webhook flips HELD → BOOKED. An expired hold frees itself, with no cron job.','For hot on-sales, a <b>virtual waiting room</b> admits users in batches; the CDN serves pages and Elasticsearch handles search, keeping the booking DB small and safe.'],
- deep:[['Two users click the same seat?','A conditional update on the ticket row (the seat row materializes the conflict, DDIA Ch 7). Exactly one gets 1 row updated.'],
+ deep:[['Two users click the same seat?','A conditional update on the ticket row (the seat row materializes the conflict, DDIA Ch 8). Exactly one gets 1 row updated.'],
   ['Release abandoned holds?','The expiry is part of the condition, or a Redis TTL. No background job is needed for correctness.'],
   ['Taylor Swift spike?','Waiting room queue (Redis sorted set by arrival), push "your turn" via SSE, admit at the rate booking can handle.'],
   ['Stale seat map?','Cache for a few seconds; the booking path is the source of truth.']],
- trap:'Holding a DB transaction or row lock open while the user pays for 10 minutes.',ddia:'Ch 7 write skew · Ch 8 leases / TTL'};
+ trap:'Holding a DB transaction or row lock open while the user pays for 10 minutes.',ddia:'Ch 8 write skew · Ch 9 leases / TTL'};
 
 P.pb26={fr:['Merchants create payment intents; customers pay by card','Merchants receive status via webhooks','Refunds'],
  nfr:['Never double-charge (exactly-once effect)','Durable and auditable; strongly consistent ledger','~10k TPS','PCI: raw card data isolated'],
@@ -670,11 +670,11 @@ P.pb26={fr:['Merchants create payment intents; customers pay by card','Merchants
    ['pr',650,70,'Card processor|/ network','x'],['vault',430,40,'Card vault|tokenized, PCI','k','db',2],['k',650,250,'Kafka (outbox relay)','p','q',3,150],['wh',430,310,'Webhook service|retry + sign','a',3],['rec',650,320,'Daily reconcile','x',null,3]],
   e:[['m','api',''],['api','pr','charge, then\nwrite DB ✗','r',[0,0]],['api','pg','1. PENDING','g',1],['api','pr','2. charge (our id)','',1],['pr','api','3. result','dC',1],['api','vault','token','k',2],['pg','k','outbox','p',3],['k','wh','','p',3],['wh','m','','a',3],['rec','pr','','d',3]]},
  cap:['Naive: call the processor, then write the DB. A crash in between charges the card with no record of it.','Write the intent as <b>PENDING</b> first, call the processor with our intent ID as the idempotency key, then record the result. On timeout, query by our ID; never create a new charge.','Merchants send an Idempotency-Key on every mutating call (stored with a unique index). Card numbers are tokenized into an isolated vault; the rest of the system sees tokens.','Status changes write an <b>outbox</b> row in the same transaction; a relay publishes and webhooks are delivered with retries and signatures. Money moves as append-only double-entry ledger rows, reconciled daily against processor settlement files.'],
- deep:[['Processor times out?','Unknown outcome (DDIA Ch 8): keep PENDING, retry with the same idempotency key or query status by reference.'],
+ deep:[['Processor times out?','Unknown outcome (DDIA Ch 9): keep PENDING, retry with the same idempotency key or query status by reference.'],
   ['Webhook delivery?','Outbox in the same transaction; exponential backoff; merchants dedupe by event_id.'],
   ['Why double-entry?','Every movement is a debit + credit summing to zero, so balances are derivable and auditable; never UPDATE amounts.'],
   ['Distributed transaction with the bank?','Impossible. Design a state machine with compensation (refund) and reconciliation.']],
- trap:'Using 2PC or assuming the processor call succeeds or fails cleanly.',ddia:'Ch 8 unknown outcomes · Ch 12 end-to-end idempotency, integrity · Ch 11 outbox'};
+ trap:'Using 2PC or assuming the processor call succeeds or fails cleanly.',ddia:'Ch 9 unknown outcomes · Ch 13 end-to-end idempotency, integrity · Ch 12 outbox'};
 
 P.pb4={fr:['Browse problems','Submit code in several languages; get pass/fail per test','Contest leaderboard'],
  nfr:['Untrusted code fully isolated','Result within ~5s','Contest spikes (100k users submitting)','Scalable'],
@@ -689,7 +689,7 @@ P.pb4={fr:['Browse problems','Submit code in several languages; get pass/fail pe
   ['Contest spike?','The queue absorbs it; scale workers on queue depth; pre-warm containers per language.'],
   ['Polling vs push?','Polling every 1s is simple and fine at this scale; SSE is optional.'],
   ['Leaderboard ties?','score = points × 1e6 − penalty_seconds.']],
- trap:'Executing user code with network access or on shared API hosts.',ddia:'Ch 11 queues · Ch 1 bursty load'};
+ trap:'Executing user code with network access or on shared API hosts.',ddia:'Ch 12 queues · Ch 2 bursty load'};
 
 P.pb24={fr:['Schedule jobs: one-off at time T, or cron','Execute jobs with a retry policy','View job status and history'],
  nfr:['10k job executions/s','Start within 2s of scheduled time','At-least-once; jobs idempotent','Never lose a job; billions of jobs stored'],
@@ -704,7 +704,7 @@ P.pb24={fr:['Schedule jobs: one-off at time T, or cron','Execute jobs with a ret
   ['Worker dies mid-job?','Lease expires and the job is retried. Heartbeats extend leases for long jobs; fencing token on completion writes.'],
   ['Duplicate enqueues?','Dedupe by execution_id at the queue or worker.'],
   ['User history queries?','Secondary index on (user_id, scheduled_at).']],
- trap:'Polling the entire jobs table every second.',ddia:'Ch 9 leader election · Ch 8 leases / fencing · Ch 6 time partitioning'};
+ trap:'Polling the entire jobs table every second.',ddia:'Ch 10 leader election · Ch 9 leases / fencing · Ch 7 time partitioning'};
 
 P.pb14={fr:['Upload videos (up to many GB)','Watch videos with smooth playback on any network'],
  nfr:['Resumable uploads','Fast start, adaptive quality','~1M uploads/day; billions of views','Metadata availability over consistency'],
@@ -719,7 +719,7 @@ P.pb14={fr:['Upload videos (up to many GB)','Watch videos with smooth playback o
   ['Fast transcoding?','Segment-level parallelism across many workers; the DAG orchestrator tracks completion.'],
   ['Adaptive bitrate?','The manifest lists renditions; the player switches per segment.'],
   ['Cost?','Transcode popular formats eagerly; long-tail renditions lazily.']],
- trap:'Serving or uploading whole files through app servers.',ddia:'Ch 10 batch DAGs · Ch 1 bandwidth math'};
+ trap:'Serving or uploading whole files through app servers.',ddia:'Ch 11 batch DAGs · Ch 2 bandwidth math'};
 
 P.pb17={fr:['Upload and download files (up to 50GB)','Automatic sync across a user\'s devices','Share files and folders'],
  nfr:['Resumable uploads','Changes visible on other devices within seconds','Durable (S3 11 nines)','Bandwidth-efficient sync'],
@@ -733,9 +733,9 @@ P.pb17={fr:['Upload and download files (up to 50GB)','Automatic sync across a us
  cap:['Naive: upload the whole file through the API. A 50GB upload dies at 99% and starts over.','Split into ~5MB chunks; upload directly to S3 via presigned URLs, which is resumable and parallel.','Fingerprint each chunk, using <b>content-defined chunking</b> so an insert near the start doesn\'t shift every boundary. The server returns only missing chunks. Edits re-upload changed chunks, and identical chunks are stored once (dedupe).','Other devices follow a per-user change log with a cursor (long-poll or WebSocket), fetch the metadata diff, and download only the changed chunks.'],
  deep:[['Resume after failure?','The server knows which chunk hashes exist; the client re-sends only missing ones.'],
   ['How do devices learn about changes?','Change log + cursor per device; long-poll or WebSocket notifications.'],
-  ['Edits on two offline devices?','Upload carries a base version; if stale, save a "conflicted copy" (DDIA Ch 5 multi-leader conflict).'],
+  ['Edits on two offline devices?','Upload carries a base version; if stale, save a "conflicted copy" (DDIA Ch 6 multi-leader conflict).'],
   ['Trust the client said "done"?','Verify via S3 event or ETags before marking the file version committed.']],
- trap:'Proxying file bytes through API servers, and re-uploading whole files on small edits.',ddia:'Ch 5 conflicts · Ch 11 change log / cursor'};
+ trap:'Proxying file bytes through API servers, and re-uploading whole files on small edits.',ddia:'Ch 6 conflicts · Ch 12 change log / cursor'};
 
 P.pb7={fr:['Post photos and videos with captions','Follow users','View a feed of followed users\' posts'],
  nfr:['Feed p99 &lt; 500ms','Media upload and delivery fast globally','500M DAU','Eventual consistency for the feed'],
@@ -750,7 +750,7 @@ P.pb7={fr:['Post photos and videos with captions','Follow users','View a feed of
   ['Celebrities?','Hybrid fan-out as in News Feed.'],
   ['Like counts?','Redis INCR or sharded counters, flushed asynchronously to the DB.'],
   ['Global latency?','CDN for media; regional read replicas or caches for the feed.']],
- trap:'Serving images from app servers or storing blobs in the database.',ddia:'Ch 1 fan-out · Ch 11 async pipelines'};
+ trap:'Serving images from app servers or storing blobs in the database.',ddia:'Ch 2 fan-out · Ch 12 async pipelines'};
 
 P.pb3={fr:['get(key), set(key, value, ttl), delete(key)','LRU eviction when full'],
  nfr:['p99 ~1ms','~1TB data, 100k+ ops/s','Survive node failure','Eventual consistency acceptable'],
@@ -766,7 +766,7 @@ P.pb3={fr:['get(key), set(key, value, ttl), delete(key)','LRU eviction when full
   ['Add a node?','Consistent hashing moves ~1/N of keys; vnodes keep load even; warm gradually.'],
   ['Hot key?','Copies key#0..k on several nodes with random reads, or a client-side L1 cache.'],
   ['Why not hash % N?','Every scale event remaps ~all keys, and the cold cache stampedes the database.']],
- trap:'hash(key) % N sharding.',ddia:'Ch 6 consistent hashing · Ch 5 async replication'};
+ trap:'hash(key) % N sharding.',ddia:'Ch 7 consistent hashing · Ch 6 async replication'};
 
 P.pb13={fr:['Search posts by keyword','Sort results by recency or by likes','(Inputs: create posts, like posts)'],
  nfr:['Search &lt; 500ms','New posts searchable within ~1 minute','Huge write volume (posts and likes)','Read volume ~10k searches/s'],
@@ -781,7 +781,7 @@ P.pb13={fr:['Search posts by keyword','Sort results by recency or by likes','(In
   ['Likes change constantly?','Threshold or batched updates to the ranking score; exact counts live elsewhere.'],
   ['Multi-keyword?','Intersect posting lists, smallest first; consider bigram indexes.'],
   ['Hot term?','Term-partitioned index means one shard per term, so replicate hot terms.']],
- trap:'A Postgres LIKE scan, or re-indexing on every like.',ddia:'Ch 3 inverted index · Ch 6 term-partitioned index · Ch 11 stream indexing'};
+ trap:'A Postgres LIKE scan, or re-indexing on every like.',ddia:'Ch 4 inverted index · Ch 7 term-partitioned index · Ch 12 stream indexing'};
 
 P.pb27={fr:['Track price history for products','Users subscribe to alerts at a target price','View price charts'],
  nfr:['500M products','Alert within ~1 hour of a drop','Respect site rate limits (crawl budget)','Charts load fast'],
@@ -796,7 +796,7 @@ P.pb27={fr:['Track price history for products','Users subscribe to alerts at a t
   ['Bad extension data?','Require agreement or confirm with a crawl before alerting.'],
   ['Matching efficiently?','Index on (product_id, target_price); react to events, never scan all subscriptions.'],
   ['Charts?','Daily aggregates, cached.']],
- trap:'Re-scanning all subscriptions on a schedule instead of reacting to price changes.',ddia:'Ch 11 event-driven · Ch 3 time-series storage'};
+ trap:'Re-scanning all subscriptions on a schedule instead of reacting to price changes.',ddia:'Ch 12 event-driven · Ch 4 time-series storage'};
 
 /* WhatsApp is new (not in problems-tutorial) */
 const PT_EXTRA={id:'pb23',num:'23',title:'WhatsApp — Messaging',diff:'Medium',patterns:['realtime'],tags:['Real-time','WebSockets','Pub/Sub'],

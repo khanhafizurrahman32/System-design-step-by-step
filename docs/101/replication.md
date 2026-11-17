@@ -57,3 +57,4 @@ Synchronous means no data loss on failover but slower writes and dependence on t
 - [Scaling reads](../patterns/scaling-reads.md)
 - [DDIA Ch 6: replication](../ddia/06-replication.md)
 - [CAP theorem](../core-concepts/cap-theorem.md)
+- [Disaster recovery and multi-region](../core-concepts/disaster-recovery.md)

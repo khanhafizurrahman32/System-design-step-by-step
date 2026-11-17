@@ -56,3 +56,4 @@ Asymmetric cryptography is slow; it is used only to agree on keys. Bulk data use
 
 - [What happens when you type a URL](type-a-url.md)
 - [Sessions vs tokens](sessions-vs-tokens.md)
+- [Encryption and secrets](../core-concepts/encryption-and-secrets.md) (mTLS, encryption at rest, KMS)

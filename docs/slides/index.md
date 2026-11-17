@@ -9,9 +9,9 @@ Three interactive decks with the same content as the handbook, for quick review 
 
 | Deck | Slides | Use it to |
 |---|---|---|
-| [DDIA in diagrams](ddia.html) | 96 | Review *Designing Data-Intensive Applications*, each chapter ending with its interview angle (follows the 1st edition's 12-chapter numbering) |
-| [Learn deck](learn.html) | 81 | See the 7 patterns, 9 concepts and 29 problems built step by step |
-| [Staff atlas](staff-atlas.html) | 29 | See every problem at staff level at once: deciding number, staff call, failures to raise, how to run it |
+| [DDIA in diagrams](ddia.html) | 130 | Review all 14 chapters of *Designing Data-Intensive Applications* (2nd edition), each ending with its interview angle |
+| [Learn deck](learn.html) | 81 | See the 7 patterns, 9 concepts and the first 29 problems built step by step |
+| [Staff atlas](staff-atlas.html) | 34 | See every problem at staff level at once: deciding number, staff call, failures to raise, how to run it |
 | [Interview deck](interview.html) | 96 | Rehearse: requirements and numbers, architecture, then deep-dive questions with hidden answers |
 
 Each deck is a single HTML file, so you can download it and use it offline.

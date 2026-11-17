@@ -60,3 +60,4 @@ OAuth is about authorization (what the app may do). OIDC adds authentication: an
 - [JWT](jwt.md)
 - [Single sign-on](sso.md)
 - [Sessions vs tokens](sessions-vs-tokens.md)
+- [Authorization: RBAC, ABAC, ReBAC](../core-concepts/authorization.md)

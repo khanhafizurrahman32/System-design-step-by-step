@@ -111,13 +111,22 @@ nav:
 - Core concepts:
   - Overview: core-concepts/index.md
   - Networking essentials: core-concepts/networking.md
+  - Load balancing: core-concepts/load-balancing.md
   - API design: core-concepts/api-design.md
   - Data modeling: core-concepts/data-modeling.md
   - Database indexing: core-concepts/indexing.md
+  - B-trees and B+ trees: core-concepts/b-trees.md
   - Caching: core-concepts/caching.md
   - Sharding: core-concepts/sharding.md
   - Consistent hashing: core-concepts/consistent-hashing.md
+  - Merkle trees: core-concepts/merkle-trees.md
+  - Probabilistic data structures: core-concepts/probabilistic-data-structures.md
+  - Gossip and failure detection: core-concepts/gossip-and-failure-detection.md
   - CAP theorem and PACELC: core-concepts/cap-theorem.md
+  - Disaster recovery and multi-region: core-concepts/disaster-recovery.md
+  - Monolith vs microservices: core-concepts/monolith-vs-microservices.md
+  - Encryption and secrets: core-concepts/encryption-and-secrets.md
+  - Authorization (RBAC, ABAC, ReBAC): core-concepts/authorization.md
 - Patterns:
   - Overview: patterns/index.md
   - Scaling reads: patterns/scaling-reads.md
@@ -139,6 +148,7 @@ nav:
     - Local delivery (Gopuff): problems/local-delivery.md
     - Dating app (Tinder): problems/dating-app.md
     - Distributed cache: problems/distributed-cache.md
+    - Search autocomplete: problems/search-autocomplete.md
   - Scaling writes:
     - Top-K videos (YouTube): problems/top-k-videos.md
     - Ad click aggregator: problems/ad-click-aggregator.md
@@ -147,6 +157,8 @@ nav:
     - Fitness tracking (Strava): problems/fitness-tracking.md
     - Post search (Facebook): problems/post-search.md
     - Price tracker (CamelCamelCamel): problems/price-tracker.md
+    - Distributed key-value store (Dynamo): problems/key-value-store.md
+    - Distributed message queue (Kafka): problems/message-queue.md
   - Real-time updates:
     - Ride sharing (Uber): problems/ride-sharing.md
     - Live comments (Facebook Live): problems/live-comments.md
@@ -155,6 +167,7 @@ nav:
     - Online auction: problems/online-auction.md
     - LLM chat (ChatGPT): problems/llm-chat.md
     - Chat app (WhatsApp): problems/chat-app.md
+    - Gaming leaderboard: problems/leaderboard.md
   - Contention:
     - Ticketmaster: problems/ticketmaster.md
   - Multi-step processes:
@@ -165,7 +178,8 @@ nav:
     - Video platform (YouTube): problems/video-platform.md
     - File storage and sync (Dropbox): problems/file-sync.md
     - Photo sharing (Instagram): problems/photo-sharing.md
-  - Long-running tasks: []
+  - Long-running tasks:
+    - Notification system: problems/notification-system.md
 - DDIA:
   - Overview: ddia/index.md
   - 'Ch 1: Trade-Offs in Data Systems Architecture': ddia/01-trade-offs-in-data-systems-architecture.md

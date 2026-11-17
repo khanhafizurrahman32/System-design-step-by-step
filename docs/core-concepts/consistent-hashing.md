@@ -50,3 +50,4 @@ You have a cache spread over 4 servers. To decide which server holds a key, the 
 ## Related
 
 - Pattern: [Scaling reads](../patterns/scaling-reads.md)
+- Related concept: [Merkle trees](merkle-trees.md) (how replicas placed on the ring repair each other)

@@ -54,3 +54,4 @@ Separate resource pools (threads, connections) per dependency, so one slow depen
 
 - [Timeouts, retries and backoff](timeouts-and-retries.md)
 - [Rate limiting and load shedding](load-shedding.md)
+- [Monolith vs microservices](../core-concepts/monolith-vs-microservices.md)

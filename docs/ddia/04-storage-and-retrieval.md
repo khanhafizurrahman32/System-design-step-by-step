@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [Storage & retrieval on one page](../sketchnotes/ddia-03.svg) (drawn for the 1st edition, where this was Chapter 3).
+> **One-page sketchnote:** [DDIA 4 · STORAGE & RETRIEVAL on a single page](../sketchnotes/ddia-04.svg), for revision or printing.
 
 ## TL;DR
 
@@ -77,6 +77,8 @@ The B-tree is the other big family, and it is the default in almost every relati
 2. Each level narrows the range further. A page holds hundreds of references (the **branching factor**, often about 500), so the tree is very shallow: **4 levels can address about 256 TB**.
 3. At the bottom, the **leaf** page contains the row itself, or a pointer to it. Finding any key takes one page read per level, usually 3–4 reads, and the top levels are almost always in memory.
 4. **Updating** a value means overwriting the leaf page where the key lives. Overwriting is dangerous: if the machine crashes halfway through writing a page, the page is corrupted. So every change is first written to a **write-ahead log (WAL)**, and after a crash the database replays the log to repair the pages. When a page fills up, it **splits** into two half-full pages, and the parent gets a new pointer.
+
+**B-tree or B+ tree?** Strictly, what databases use is a **B+ tree**: internal pages hold only keys (as signposts), every value lives in the leaves, and neighbouring leaves are linked so a range scan can walk sideways. The book doesn't distinguish the variants, and most engineers just say "B-tree". The [B-trees and B+ trees](../core-concepts/b-trees.md) deep dive covers the differences, page splits and range scans step by step.
 
 > [!NOTE]
 > **Why it matters:** reads are fast and predictable, and each key lives in **exactly one place**. That makes locking a row or a range of rows simple, which is why transactional (OLTP) databases are built on B-trees.
@@ -278,6 +280,7 @@ The two share no terms, and an inverted index matches terms. Vector search can: 
 
 - [Indexing](../core-concepts/indexing.md) · [Storage types](../101/storage-types.md)
 - [Post search](../problems/post-search.md) (inverted index) · [Business discovery](../problems/business-discovery.md) (geo index) · [Metrics monitoring](../problems/metrics-monitoring.md) (LSM / column store)
+- [B-trees and B+ trees](../core-concepts/b-trees.md) · [Probabilistic data structures](../core-concepts/probabilistic-data-structures.md)
 
 ---
 

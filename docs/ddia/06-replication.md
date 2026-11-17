@@ -11,7 +11,7 @@ tags: [ddia, replication]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [Replication on one page](../sketchnotes/ddia-05.svg) (drawn for the 1st edition, where this was Chapter 5).
+> **One-page sketchnote:** [DDIA 6 · REPLICATION on a single page](../sketchnotes/ddia-06.svg), for revision or printing.
 
 ## TL;DR
 
@@ -125,7 +125,7 @@ CRDTs exist for counters, sets, maps, lists and text. They guarantee **strong ev
 There's no leader. The client (or a coordinator) sends each write to all *n* replicas and waits for *w* acknowledgements, and reads from *r* replicas.
 
 - If **w + r > n**, the set of replicas you read from overlaps the set that took the latest write, so at least one reply is up to date. Pick the newest version.
-- **Read repair** writes the newest value back to stale replicas you happened to read. A background anti-entropy process fixes the rest.
+- **Read repair** writes the newest value back to stale replicas you happened to read. A background **anti-entropy** process fixes the rest: replicas compare **Merkle trees** (trees of hashes over key ranges) and walk down only the branches whose hashes differ, so they find the few out-of-date keys without comparing billions. See [Merkle trees](../core-concepts/merkle-trees.md).
 - Common setting: n = 3, w = 2, r = 2, which tolerates one replica down for both reads and writes.
 
 Cassandra and DynamoDB-style systems use this. The catch: concurrent writes to the same key still need conflict handling, and "last write wins" by timestamp can drop data when clocks disagree.
@@ -190,6 +190,8 @@ Conflicting versions of the cart were merged by taking the union of their items.
 - **Pattern:** [Scaling reads](../patterns/scaling-reads.md)
 - **Problems:** [Collaborative editor](../problems/collaborative-editor.md) (OT and CRDTs) · [File sync](../problems/file-sync.md) (offline edits and conflicts)
 - **101:** [Replication](../101/replication.md)
+- **Concepts:** [Disaster recovery and multi-region](../core-concepts/disaster-recovery.md) · [Merkle trees](../core-concepts/merkle-trees.md)
+- **Problem:** [Distributed key-value store (Dynamo)](../problems/key-value-store.md) puts this chapter together
 
 ---
 

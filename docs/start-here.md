@@ -35,7 +35,7 @@ Then skim [System Design 101](101/index.md): 25 one-screen explainers of the pro
 
 1. [API design](core-concepts/api-design.md)
 2. [Data modeling](core-concepts/data-modeling.md)
-3. [Database indexing](core-concepts/indexing.md)
+3. [Database indexing](core-concepts/indexing.md), then [B-trees and B+ trees](core-concepts/b-trees.md) for how indexes work inside
 4. [Caching](core-concepts/caching.md)
 5. [Networking essentials](core-concepts/networking.md)
 
@@ -71,6 +71,7 @@ Do these in order. For each one, **cover the page and try the design yourself fi
 
 - The remaining patterns: [Scaling writes](patterns/scaling-writes.md), [Real-time updates](patterns/real-time-updates.md), [Dealing with contention](patterns/contention.md).
 - The remaining concepts: [Sharding](core-concepts/sharding.md), [Consistent hashing](core-concepts/consistent-hashing.md), [CAP theorem](core-concepts/cap-theorem.md).
+- Then the deeper concepts, in any order: [Load balancing](core-concepts/load-balancing.md), [Probabilistic data structures](core-concepts/probabilistic-data-structures.md), [Merkle trees](core-concepts/merkle-trees.md), [Gossip and failure detection](core-concepts/gossip-and-failure-detection.md), [Disaster recovery](core-concepts/disaster-recovery.md), [Monolith vs microservices](core-concepts/monolith-vs-microservices.md), [Encryption and secrets](core-concepts/encryption-and-secrets.md), [Authorization](core-concepts/authorization.md).
 - [What's expected at each level](playbook/levels.md), so you know how deep a mid-level interview goes.
 - [The 45-minute delivery framework](playbook/delivery-framework.md), then practise out loud with the [interview deck](slides/interview.html).
 
@@ -79,7 +80,7 @@ You can skip the DDIA pages, the Computer Networking chapters and the staff-leve
 ## Path 2: Senior engineer preparing for interviews (about 2 weeks)
 
 1. Skim [Foundations](foundations/index.md) and [System Design 101](101/index.md), and read [Numbers and estimation](foundations/numbers-and-estimation.md) carefully.
-2. Read all [7 patterns](patterns/index.md) and [Choosing technologies](technologies.md).
+2. Read all [7 patterns](patterns/index.md), [Choosing technologies](technologies.md), and the [core concepts](core-concepts/index.md) you can't yet explain in two minutes (load balancing, disaster recovery and authorization come up often).
 3. Do two [problems](problems/index.md) a day, medium and hard. Try each yourself first.
 4. Read the DDIA pages behind your weakest patterns, especially [Ch 6](ddia/06-replication.md), [Ch 8](ddia/08-transactions.md) and [Ch 12](ddia/12-stream-processing.md).
 5. Rehearse with the [interview deck](slides/interview.html) and the [quick-fire questions](playbook/quick-fire.md).
@@ -88,7 +89,7 @@ You can skip the DDIA pages, the Computer Networking chapters and the staff-leve
 
 1. [What's expected at each level](playbook/levels.md) and [Staff-level answers](playbook/staff-level.md).
 2. All 14 [DDIA chapters](ddia/index.md), plus [Operating Systems](os/index.md) for the single-machine behaviour behind them (threads, fsync, GC pauses, container limits).
-3. Every problem's **Staff-level lens** section, or all 29 at once in the [staff atlas](slides/staff-atlas.html).
+3. Every problem's **Staff-level lens** section, or all 34 at once in the [staff atlas](slides/staff-atlas.html).
 4. The night before: the [staff cheat sheet](sketchnotes/staff-cheat-sheet.svg) and the [interview cheat sheet](sketchnotes/interview-cheat-sheet.svg).
 
 ## How to study any page

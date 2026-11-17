@@ -62,3 +62,4 @@ See [REST vs GraphQL vs gRPC](../101/rest-graphql-grpc.md) and [HTTP versions](.
 ## Related
 
 - Pattern: [Real-time updates](../patterns/real-time-updates.md)
+- Deep dive: [Load balancing](load-balancing.md)

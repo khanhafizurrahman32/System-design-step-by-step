@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [Consistency & consensus on one page](../sketchnotes/ddia-09.svg) (drawn for the 1st edition, where this was Chapter 9).
+> **One-page sketchnote:** [DDIA 10 · CONSISTENCY & CONSENSUS on a single page](../sketchnotes/ddia-10.svg), for revision or printing.
 
 ## TL;DR
 

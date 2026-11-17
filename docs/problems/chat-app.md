@@ -178,3 +178,4 @@ Partition by conversation and number messages sequentially within each conversat
 - **Patterns:** [Real-time updates](../patterns/real-time-updates.md)
 - **DDIA:** [Ch 6](../ddia/06-replication.md) consistent prefix · [Ch 12](../ddia/12-stream-processing.md) at-least-once + idempotency
 - **Similar problems:** [Ride sharing (Uber)](ride-sharing.md) · [Live comments (Facebook Live)](live-comments.md) · [Collaborative editor (Google Docs)](collaborative-editor.md) · [Stock trading (Robinhood)](stock-trading.md)
+- **Also see:** [Notification system](notification-system.md) (push to offline devices)

@@ -185,3 +185,4 @@ Every movement is two balancing entries, so money is never created or lost and e
 - **Patterns:** [Multi-step processes](../patterns/multi-step-processes.md)
 - **DDIA:** [Ch 9](../ddia/09-trouble-with-distributed-systems.md) unknown outcomes · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) end-to-end idempotency, integrity · [Ch 12](../ddia/12-stream-processing.md) outbox
 - **Similar problems:** [Online judge (LeetCode)](online-judge.md) · [Job scheduler](job-scheduler.md)
+- **Concepts:** [Encryption and secrets](../core-concepts/encryption-and-secrets.md) · [Disaster recovery](../core-concepts/disaster-recovery.md)

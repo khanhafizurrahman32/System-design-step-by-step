@@ -55,3 +55,4 @@ Expand and contract: add the new column, write both, backfill, switch reads, the
 
 - [Metrics, logs and traces](observability.md)
 - [DDIA Ch 5: encoding and evolution](../ddia/05-encoding-and-evolution.md)
+- [Disaster recovery and multi-region](../core-concepts/disaster-recovery.md)

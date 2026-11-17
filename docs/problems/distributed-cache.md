@@ -179,3 +179,4 @@ Replicate it to several nodes (or add suffixes to spread it) and read from any c
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md) · [Long-running tasks](../patterns/long-running-tasks.md)
 - **DDIA:** [Ch 7](../ddia/07-sharding.md) consistent hashing · [Ch 6](../ddia/06-replication.md) async replication
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md)
+- **Also see:** [Distributed key-value store (Dynamo)](key-value-store.md) · [Gossip and failure detection](../core-concepts/gossip-and-failure-detection.md)

@@ -1,6 +1,6 @@
 ---
 title: "Staff-level answers"
-description: "What changes between a senior and a staff system design answer, with the staff lens applied to all 29 problems."
+description: "What changes between a senior and a staff system design answer, with the staff lens applied to all 34 problems."
 ---
 
 # Staff-level answers
@@ -10,7 +10,7 @@ description: "What changes between a senior and a staff system design answer, wi
 A senior answer produces a working design. A staff answer also says **which number decided it**, **what trade-off it accepts**, **what will break before anyone asks**, and **how it will be run and changed**. Interviewers for staff roles grade those four things more than the boxes on the whiteboard.
 
 > [!TIP]
-> **See all 29 at once:** the [interactive staff atlas](../slides/staff-atlas.html) has cards, a compact view and a full table, with filters. For printing, use the [staff cheat sheet](../sketchnotes/staff-cheat-sheet.svg) and the [29-problem staff table](../sketchnotes/staff-29-problems.svg).
+> **See all 34 at once:** the [interactive staff atlas](../slides/staff-atlas.html) has cards, a compact view and a full table, with filters. For printing, use the [staff cheat sheet](../sketchnotes/staff-cheat-sheet.svg) and the [29-problem staff table](../sketchnotes/staff-29-problems.svg).
 
 ## The staff lens
 
@@ -37,7 +37,7 @@ A senior answer produces a working design. A staff answer also says **which numb
 | **Evolution** | Designs for the stated scale. | Says what breaks at 10×, and keeps today's design simple on purpose. |
 | **Conversation** | Follows the interviewer. | Drives the agenda, checks in, and lets the interviewer steer the deep dives. |
 
-## All 29 problems at a glance
+## All 34 problems at a glance
 
 | Problem | Deciding number | Staff call and trade-off |
 |---|---|---|
@@ -49,6 +49,7 @@ A senior answer produces a working design. A staff answer also says **which numb
 | [Local delivery (Gopuff)](../problems/local-delivery.md) | ~10k browse/s at peak vs ~12 orders/s; the 10k-row warehouse list fits in memory. | Browse is AP (cache + replicas); checkout is CP (conditional decrements in one transaction). Accept occasional "sold out at checkout". |
 | [Dating app (Tinder)](../problems/dating-app.md) | ~100k swipes/s at peak; precomputed stacks ≈ 32 GB. | Precomputed stacks + Bloom filter of swiped profiles; one atomic operation per pair of users for matches. Accept rare skipped profiles from Bloom false positives. |
 | [Distributed cache](../problems/distributed-cache.md) | 1 TB ÷ ~32 GB per node ≈ 32+ nodes; each node ≫ 100k ops/s, so memory sets the count. | Consistent hashing with virtual nodes, async replica per primary. Accept losing a few writes on failover. |
+| [Search autocomplete](../problems/search-autocomplete.md) | ~100k keystroke requests/s at < 10 ms server time; a trie with top 10 per node is ~10–15 GB. | Offline-built trie with top-k per prefix, in memory on replicated servers; accept an hour of staleness plus a streaming overlay for trends. |
 | [Top-K videos (YouTube)](../problems/top-k-videos.md) | 70B views/day ≈ 800k/s; 4B videos × 8 B ≈ 32 GB of counters. | Kafka partitioned by video; in-memory counts and local heaps; merge. Accept ~1 min freshness, with a batch recount for exact totals. |
 | [Ad click aggregator](../problems/ad-click-aggregator.md) | 10k clicks/s at peak, 100M/day, ~10 GB/day raw. | Kafka → Flink (dedupe by signed impression ID) → OLAP store, plus a nightly batch recount. Accept running two paths to get money right. |
 | [Web crawler](../problems/web-crawler.md) | ~23k pages/s; ~46 GB/s of bandwidth; ~20 PB raw. | Separate fetch and parse stages with queues and raw pages in S3. Accept storage cost to make each stage independently retryable. |
@@ -56,6 +57,8 @@ A senior answer produces a working design. A staff answer also says **which numb
 | [Fitness tracking (Strava)](../problems/fitness-tracking.md) | 10M activities/day; ~1 TB/day of tracks. | Record on device; idempotent, resumable upload; process asynchronously. Accept no live server view by default. |
 | [Post search (Facebook)](../problems/post-search.md) | ~12k posts/s and ~10× that in likes. | Inverted index built from the stream, sharded by term; like-based ranking updated in batches or at thresholds. Accept slightly stale like ranking. |
 | [Price tracker (CamelCamelCamel)](../problems/price-tracker.md) | 500M products; ~6k pages/s to crawl each one daily. | Crawl by priority (trackers, volatility) + validated crowd-sourced prices + event-driven alerts. Accept staler prices on the long tail. |
+| [Distributed key-value store (Dynamo)](../problems/key-value-store.md) | 300 TB with 3 replicas ≈ 150 nodes; ~7k ops/s each; W + R > N with N = 3. | Leaderless, tunable quorums with hinted handoff; accept eventual consistency and siblings, or offer Raft per shard for keys needing linearizability. |
+| [Distributed message queue (Kafka)](../problems/message-queue.md) | 200 MB/s in ×3 replicas; ~363 TB for 7 days ≈ 40 brokers; partitions sized at ~10 MB/s. | Partitioned append-only logs, ISR replication with acks=all; accept order only per partition and choose partition counts up front. |
 | [Ride sharing (Uber)](../problems/ride-sharing.md) | 250k location writes/s; ~100 ride requests/s on average. | Redis GEO for locations; offer to one driver at a time with a driver lock and conditional assignment; durable per-region queue. Accept slightly slower matching. |
 | [Live comments (Facebook Live)](../problems/live-comments.md) | 1M viewers × 1k comments/s ≈ 1B deliveries/s for one stream. | SSE + pub/sub per video, viewers of a video routed to the same servers; sample comments on mega-streams. Accept that not every viewer sees every comment. |
 | [Collaborative editor (Google Docs)](../problems/collaborative-editor.md) | ~500 ops/s on a hot document; correctness, not scale. | One owner server per document running OT, with an op log and snapshots. Accept a short pause when the owner fails over. |
@@ -63,10 +66,12 @@ A senior answer produces a working design. A staff answer also says **which numb
 | [Online auction](../problems/online-auction.md) | ~1k bids/s on one auction in its final seconds. | Conditional update on the auction row; a Kafka partition per auction for the hottest ones. Accept serialized throughput per auction. |
 | [LLM chat (ChatGPT)](../problems/llm-chat.md) | ~12k generations/s, each holding a GPU for seconds. | Priority queue with admission control in front of the GPU pool, streamed tokens. Accept 429s or waiting for the free tier. |
 | [Chat app (WhatsApp)](../problems/chat-app.md) | ~600k messages/s; hundreds of millions of open connections. | WebSockets + user→server registry + per-user pub/sub; persist before ack; an inbox per device. Accept at-least-once delivery with client dedupe. |
+| [Gaming leaderboard](../problems/leaderboard.md) | 50M entries ≈ 5 GB per board; O(log n) updates and rank lookups; 100k reads/s mostly for one hot top 100. | Redis sorted sets as a rebuildable view over a durable score store; cache top lists for seconds; percentiles for the long tail at huge scale. |
 | [Ticketmaster](../problems/ticketmaster.md) | ~100k seats vs 10M users: bookings are capped, reads are not. | Conditional-update holds; virtual waiting room; browse is AP, booking is CP. Accept fans waiting in a queue. |
 | [Payment system (Stripe)](../problems/payment-system.md) | ~10k TPS: moderate. Correctness is the problem. | Pending record first, idempotency keys, outbox, double-entry ledger, daily reconciliation. Accept extra writes for auditability. |
 | [Online judge (LeetCode)](../problems/online-judge.md) | ~100 submissions/s at peak; ~500 sandboxes running at once. | Queue + microVM sandboxes + autoscaling workers. Accept a few seconds of latency. |
 | [Job scheduler](../problems/job-scheduler.md) | 864M executions/day. | Time-bucketed store + poller + delay queue + leases. Accept at-least-once execution, so jobs must be idempotent. |
+| [Notification system](../problems/notification-system.md) | 12k/s steady but ~170k/s during broadcasts; OTPs must not wait behind them. | Central service with intake dedupe and per-channel, per-priority queues; accept seconds of delay for marketing to protect transactional latency. |
 | [Video platform (YouTube)](../problems/video-platform.md) | ~1 PB/day raw uploads. | Presigned multipart uploads, a segment-parallel transcoding DAG, CDN delivery. Accept encoding long-tail formats lazily. |
 | [File storage and sync (Dropbox)](../problems/file-sync.md) | A 50 GB file is ~10k chunks; a 1-byte edit changes one chunk. | Content-defined chunking with dedupe, a change log with cursors. Accept "conflicted copy" files for offline edits. |
 | [Photo sharing (Instagram)](../problems/photo-sharing.md) | ~115k feed reads/s; ~200 TB/day of media. | Presigned uploads, async processing, CDN; hybrid fan-out. Accept a post appearing only after processing. |
@@ -153,6 +158,16 @@ A senior answer produces a working design. A staff answer also says **which numb
 - **Senior stops at:** LRU + consistent hashing. **Staff goes on to:** Membership via a config service, gradual warm-up on scale-out, client routing vs proxy trade-off.
 - **Run it:** Watch hit ratio, evictions, per-node p99 and memory, rebalance traffic.
 
+### [Search autocomplete](../problems/search-autocomplete.md)
+
+*Move all ranking off the request path: per-keystroke traffic can only afford a memory lookup.*
+
+- **Deciding number:** ~100k keystroke requests/s at < 10 ms server time; a trie with top 10 per node is ~10–15 GB.
+- **Staff call:** Offline-built trie with top-k per prefix, in memory on replicated servers; accept an hour of staleness plus a streaming overlay for trends.
+- **Raise before you're asked:** Block list at serve time, privacy threshold so rare personal queries never appear, per-language tries.
+- **Senior stops at:** Trie + cache. **Staff goes on to:** Trust and safety workflow, ranking experiments measured by suggestion acceptance, rebuild vs incremental cost.
+- **Run it:** Watch acceptance rate, p99, trie build age; alert on late builds.
+
 ## Scaling writes
 
 ### [Top-K videos (YouTube)](../problems/top-k-videos.md)
@@ -224,6 +239,26 @@ A senior answer produces a working design. A staff answer also says **which numb
 - **Raise before you're asked:** Being blocked by the site; poisoned extension data; alert spam.
 - **Senior stops at:** A cron crawl and a scan of subscriptions. **Staff goes on to:** Prioritises by value, validates crowd data, reacts to price events instead of scanning.
 - **Run it:** Watch freshness of tracked products, alert latency, crawl budget used.
+
+### [Distributed key-value store (Dynamo)](../problems/key-value-store.md)
+
+*Stay writable through failures and growth, and bound how far replicas drift.*
+
+- **Deciding number:** 300 TB with 3 replicas ≈ 150 nodes; ~7k ops/s each; W + R > N with N = 3.
+- **Staff call:** Leaderless, tunable quorums with hinted handoff; accept eventual consistency and siblings, or offer Raft per shard for keys needing linearizability.
+- **Raise before you're asked:** Tombstones vs resurrection, repair cost, LWW and clock skew, hot keys, rebalancing throttles.
+- **Senior stops at:** Consistent hashing + replication + quorum. **Staff goes on to:** Repair SLAs, rolling upgrades, per-tenant quotas, and the right default consistency per client.
+- **Run it:** Watch per-node p99, hint backlog, Merkle repair duration, tombstones, compaction backlog.
+
+### [Distributed message queue (Kafka)](../problems/message-queue.md)
+
+*Durable, ordered, replayable streams at hundreds of MB/s without per-message bookkeeping.*
+
+- **Deciding number:** 200 MB/s in ×3 replicas; ~363 TB for 7 days ≈ 40 brokers; partitions sized at ~10 MB/s.
+- **Staff call:** Partitioned append-only logs, ISR replication with acks=all; accept order only per partition and choose partition counts up front.
+- **Raise before you're asked:** Consumer lag, poison messages, rebalance pauses, unclean leader election, hot partitions.
+- **Senior stops at:** Partitions + replication + consumer groups. **Staff goes on to:** Quotas, schema registry rules, tiered storage cost, cross-region mirroring, capacity by partition.
+- **Run it:** Watch consumer lag, under-replicated partitions, produce p99, disk headroom.
 
 ## Real-time updates
 
@@ -297,6 +332,16 @@ A senior answer produces a working design. A staff answer also says **which numb
 - **Senior stops at:** WebSockets + a database. **Staff goes on to:** Delivery semantics, draining connections during deploys, the limits end-to-end encryption puts on server features.
 - **Run it:** Watch delivery latency, undelivered inbox size, reconnect rate.
 
+### [Gaming leaderboard](../problems/leaderboard.md)
+
+*Rank anyone among tens of millions under constant updates, and keep it trustworthy.*
+
+- **Deciding number:** 50M entries ≈ 5 GB per board; O(log n) updates and rank lookups; 100k reads/s mostly for one hot top 100.
+- **Staff call:** Redis sorted sets as a rebuildable view over a durable score store; cache top lists for seconds; percentiles for the long tail at huge scale.
+- **Raise before you're asked:** Cheating and score validation, ties, season resets, rebuild time after losing Redis.
+- **Senior stops at:** Redis sorted set. **Staff goes on to:** Anti-cheat pipeline, sharding huge boards by score range, cost of thousands of boards, percentiles and friends boards.
+- **Run it:** Watch score-to-board lag, Redis memory, flagged scores, rebuild drills.
+
 ## Contention
 
 ### [Ticketmaster](../problems/ticketmaster.md)
@@ -340,6 +385,16 @@ A senior answer produces a working design. A staff answer also says **which numb
 - **Raise before you're asked:** Poller leader failing; clock drift; duplicate execution; every cron job firing at :00.
 - **Senior stops at:** A jobs table and a queue. **Staff goes on to:** Reasons through the two-tier design, leader election with fencing, isolation between tenants.
 - **Run it:** Watch schedule-to-start lag p99, missed jobs, retries.
+
+### [Notification system](../problems/notification-system.md)
+
+*Turn slow, unreliable, rate-limited providers into a reliable internal API without spamming or duplicating.*
+
+- **Deciding number:** 12k/s steady but ~170k/s during broadcasts; OTPs must not wait behind them.
+- **Staff call:** Central service with intake dedupe and per-channel, per-priority queues; accept seconds of delay for marketing to protect transactional latency.
+- **Raise before you're asked:** SMS cost of duplicates, frequency caps and quiet hours, provider failover, invalid-token cleanup, opt-out law.
+- **Senior stops at:** Queues and workers. **Staff goes on to:** A self-serve platform for other teams (templates, categories, quotas), notification-fatigue metrics, cost controls.
+- **Run it:** Watch queue age by priority, provider error and throttle rates, opt-outs, DLQ volume.
 
 ## Large blobs
 

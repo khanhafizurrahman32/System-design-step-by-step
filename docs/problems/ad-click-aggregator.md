@@ -175,3 +175,4 @@ Billing needs exact numbers; the batch recount from raw logs corrects any stream
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
 - **DDIA:** [Ch 12](../ddia/12-stream-processing.md) windows, exactly-once · [Ch 13](../ddia/13-philosophy-of-streaming-systems.md) Lambda · [Ch 4](../ddia/04-storage-and-retrieval.md) column stores
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Web crawler](web-crawler.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md) · [Fitness tracking (Strava)](fitness-tracking.md)
+- **Also see:** [Distributed message queue (Kafka)](message-queue.md)

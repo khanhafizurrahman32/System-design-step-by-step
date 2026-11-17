@@ -83,6 +83,9 @@ Each step fixes one specific problem with the step before it.
 
 **How:** the client computes a **hash** (SHA-256) of each chunk and sends the **list of hashes** first. The server replies with the hashes it **doesn't already have**, and only those chunks are uploaded. A small edit uploads just the one or two changed chunks. Identical chunks across files and users are stored **once** (deduplication).
 
+> [!NOTE]
+> **At larger scale:** a flat list of 10,000 chunk hashes is fine. For whole folders with millions of chunks, hash the chunk hashes into a **Merkle tree** (as Git does for directories and commits): client and server compare root hashes, then descend only into subtrees that differ, so an unchanged folder costs one hash comparison. See [Merkle trees](../core-concepts/merkle-trees.md).
+
 One subtlety: with fixed 5 MB boundaries, inserting one byte near the start shifts **every** boundary after it, so every chunk looks new. **Content-defined chunking** places boundaries where the data matches a pattern (using a rolling hash), so an insert changes only the chunk around it and boundaries further on stay put.
 
 ### Step 3: sync other devices from a change log

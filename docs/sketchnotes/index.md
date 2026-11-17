@@ -7,7 +7,7 @@ description: "One dense, hand-drawn page per topic: everything you need to remem
 
 One hand-drawn page per topic, with as much as fits on a single sheet: the TL;DR, requirements, numbers, the final architecture, the naive version and why it breaks, deep dives, and what to say or avoid. Use them for revision, print them, or pin one above your desk.
 
-Each page links to the full write-up. All 59 pages are also in one printable file: [sketchnotes PDF](../downloads/sketchnotes.pdf).
+Each page links to the full write-up. All 75 pages are also in one printable file: [sketchnotes PDF](../downloads/sketchnotes.pdf).
 
 ## Start here
 
@@ -69,6 +69,18 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 
 [Read the full page](../problems/distributed-cache.md) · [Open full size](problem-distributed-cache.svg)
 
+### DISTRIBUTED KEY-VALUE STORE
+
+[![DISTRIBUTED KEY-VALUE STORE sketchnote](problem-key-value-store.svg)](problem-key-value-store.svg)
+
+[Read the full page](../problems/key-value-store.md) · [Open full size](problem-key-value-store.svg)
+
+### DISTRIBUTED MESSAGE QUEUE
+
+[![DISTRIBUTED MESSAGE QUEUE sketchnote](problem-message-queue.svg)](problem-message-queue.svg)
+
+[Read the full page](../problems/message-queue.md) · [Open full size](problem-message-queue.svg)
+
 ### FILE STORAGE AND SYNC (DROPBOX)
 
 [![FILE STORAGE AND SYNC (DROPBOX) sketchnote](problem-file-sync.svg)](problem-file-sync.svg)
@@ -80,6 +92,12 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 [![FITNESS TRACKING (STRAVA) sketchnote](problem-fitness-tracking.svg)](problem-fitness-tracking.svg)
 
 [Read the full page](../problems/fitness-tracking.md) · [Open full size](problem-fitness-tracking.svg)
+
+### GAMING LEADERBOARD
+
+[![GAMING LEADERBOARD sketchnote](problem-leaderboard.svg)](problem-leaderboard.svg)
+
+[Read the full page](../problems/leaderboard.md) · [Open full size](problem-leaderboard.svg)
 
 ### JOB SCHEDULER
 
@@ -122,6 +140,12 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 [![NEWS FEED (FACEBOOK) sketchnote](problem-news-feed.svg)](problem-news-feed.svg)
 
 [Read the full page](../problems/news-feed.md) · [Open full size](problem-news-feed.svg)
+
+### NOTIFICATION SYSTEM
+
+[![NOTIFICATION SYSTEM sketchnote](problem-notification-system.svg)](problem-notification-system.svg)
+
+[Read the full page](../problems/notification-system.md) · [Open full size](problem-notification-system.svg)
 
 ### ONLINE AUCTION
 
@@ -170,6 +194,12 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 [![RIDE SHARING (UBER) sketchnote](problem-ride-sharing.svg)](problem-ride-sharing.svg)
 
 [Read the full page](../problems/ride-sharing.md) · [Open full size](problem-ride-sharing.svg)
+
+### SEARCH AUTOCOMPLETE
+
+[![SEARCH AUTOCOMPLETE sketchnote](problem-search-autocomplete.svg)](problem-search-autocomplete.svg)
+
+[Read the full page](../problems/search-autocomplete.md) · [Open full size](problem-search-autocomplete.svg)
 
 ### STOCK TRADING (ROBINHOOD)
 
@@ -259,6 +289,18 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 
 [Read the full page](../core-concepts/api-design.md) · [Open full size](concept-api-design.svg)
 
+### AUTHORIZATION: RBAC, ABAC, REBAC
+
+[![AUTHORIZATION: RBAC, ABAC, REBAC sketchnote](concept-authorization.svg)](concept-authorization.svg)
+
+[Read the full page](../core-concepts/authorization.md) · [Open full size](concept-authorization.svg)
+
+### B-TREES AND B+ TREES
+
+[![B-TREES AND B+ TREES sketchnote](concept-b-trees.svg)](concept-b-trees.svg)
+
+[Read the full page](../core-concepts/b-trees.md) · [Open full size](concept-b-trees.svg)
+
 ### CACHING
 
 [![CACHING sketchnote](concept-caching.svg)](concept-caching.svg)
@@ -289,11 +331,53 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 
 [Read the full page](../core-concepts/indexing.md) · [Open full size](concept-indexing.svg)
 
+### DISASTER RECOVERY AND MULTI-REGION
+
+[![DISASTER RECOVERY AND MULTI-REGION sketchnote](concept-disaster-recovery.svg)](concept-disaster-recovery.svg)
+
+[Read the full page](../core-concepts/disaster-recovery.md) · [Open full size](concept-disaster-recovery.svg)
+
+### ENCRYPTION AND SECRETS
+
+[![ENCRYPTION AND SECRETS sketchnote](concept-encryption-and-secrets.svg)](concept-encryption-and-secrets.svg)
+
+[Read the full page](../core-concepts/encryption-and-secrets.md) · [Open full size](concept-encryption-and-secrets.svg)
+
+### GOSSIP AND FAILURE DETECTION
+
+[![GOSSIP AND FAILURE DETECTION sketchnote](concept-gossip-and-failure-detection.svg)](concept-gossip-and-failure-detection.svg)
+
+[Read the full page](../core-concepts/gossip-and-failure-detection.md) · [Open full size](concept-gossip-and-failure-detection.svg)
+
+### LOAD BALANCING
+
+[![LOAD BALANCING sketchnote](concept-load-balancing.svg)](concept-load-balancing.svg)
+
+[Read the full page](../core-concepts/load-balancing.md) · [Open full size](concept-load-balancing.svg)
+
+### MERKLE TREES
+
+[![MERKLE TREES sketchnote](concept-merkle-trees.svg)](concept-merkle-trees.svg)
+
+[Read the full page](../core-concepts/merkle-trees.md) · [Open full size](concept-merkle-trees.svg)
+
+### MONOLITH VS MICROSERVICES
+
+[![MONOLITH VS MICROSERVICES sketchnote](concept-monolith-vs-microservices.svg)](concept-monolith-vs-microservices.svg)
+
+[Read the full page](../core-concepts/monolith-vs-microservices.md) · [Open full size](concept-monolith-vs-microservices.svg)
+
 ### NETWORKING ESSENTIALS
 
 [![NETWORKING ESSENTIALS sketchnote](concept-networking.svg)](concept-networking.svg)
 
 [Read the full page](../core-concepts/networking.md) · [Open full size](concept-networking.svg)
+
+### PROBABILISTIC DATA STRUCTURES
+
+[![PROBABILISTIC DATA STRUCTURES sketchnote](concept-probabilistic-data-structures.svg)](concept-probabilistic-data-structures.svg)
+
+[Read the full page](../core-concepts/probabilistic-data-structures.md) · [Open full size](concept-probabilistic-data-structures.svg)
 
 ### SHARDING
 
@@ -303,78 +387,88 @@ Each page links to the full write-up. All 59 pages are also in one printable fil
 
 ## DDIA chapters
 
-> [!NOTE]
-> These sketchnotes were drawn for the 1st edition, so their chapter numbers are one lower than the 2nd-edition pages they link to (for example, sketchnote 6 is now Chapter 7, Sharding). The 2nd edition's new material (Chapters 1 and 14, and the new sections in the others) is covered on the full pages.
+One page per chapter of the 2nd edition.
 
-### DDIA 1 · RELIABLE, SCALABLE, MAINTAINABLE
+### DDIA 1 · TRADE-OFFS IN DATA SYSTEMS ARCHITECTURE
 
-[![DDIA 1 · RELIABLE, SCALABLE, MAINTAINABLE sketchnote](ddia-01.svg)](ddia-01.svg)
+[![DDIA 1 · TRADE-OFFS IN DATA SYSTEMS ARCHITECTURE sketchnote](ddia-01.svg)](ddia-01.svg)
 
-[Read the full page](../ddia/02-nonfunctional-requirements.md) · [Open full size](ddia-01.svg)
+[Read the full page](../ddia/01-trade-offs-in-data-systems-architecture.md) · [Open full size](ddia-01.svg)
 
-### DDIA 2 · DATA MODELS & QUERY LANGUAGES
+### DDIA 2 · DEFINING NONFUNCTIONAL REQUIREMENTS
 
-[![DDIA 2 · DATA MODELS & QUERY LANGUAGES sketchnote](ddia-02.svg)](ddia-02.svg)
+[![DDIA 2 · DEFINING NONFUNCTIONAL REQUIREMENTS sketchnote](ddia-02.svg)](ddia-02.svg)
 
-[Read the full page](../ddia/03-data-models.md) · [Open full size](ddia-02.svg)
+[Read the full page](../ddia/02-nonfunctional-requirements.md) · [Open full size](ddia-02.svg)
 
-### DDIA 3 · STORAGE & RETRIEVAL
+### DDIA 3 · DATA MODELS & QUERY LANGUAGES
 
-[![DDIA 3 · STORAGE & RETRIEVAL sketchnote](ddia-03.svg)](ddia-03.svg)
+[![DDIA 3 · DATA MODELS & QUERY LANGUAGES sketchnote](ddia-03.svg)](ddia-03.svg)
 
-[Read the full page](../ddia/04-storage-and-retrieval.md) · [Open full size](ddia-03.svg)
+[Read the full page](../ddia/03-data-models.md) · [Open full size](ddia-03.svg)
 
-### DDIA 4 · ENCODING & EVOLUTION
+### DDIA 4 · STORAGE & RETRIEVAL
 
-[![DDIA 4 · ENCODING & EVOLUTION sketchnote](ddia-04.svg)](ddia-04.svg)
+[![DDIA 4 · STORAGE & RETRIEVAL sketchnote](ddia-04.svg)](ddia-04.svg)
 
-[Read the full page](../ddia/05-encoding-and-evolution.md) · [Open full size](ddia-04.svg)
+[Read the full page](../ddia/04-storage-and-retrieval.md) · [Open full size](ddia-04.svg)
 
-### DDIA 5 · REPLICATION
+### DDIA 5 · ENCODING & EVOLUTION
 
-[![DDIA 5 · REPLICATION sketchnote](ddia-05.svg)](ddia-05.svg)
+[![DDIA 5 · ENCODING & EVOLUTION sketchnote](ddia-05.svg)](ddia-05.svg)
 
-[Read the full page](../ddia/06-replication.md) · [Open full size](ddia-05.svg)
+[Read the full page](../ddia/05-encoding-and-evolution.md) · [Open full size](ddia-05.svg)
 
-### DDIA 6 · PARTITIONING (SHARDING)
+### DDIA 6 · REPLICATION
 
-[![DDIA 6 · PARTITIONING (SHARDING) sketchnote](ddia-06.svg)](ddia-06.svg)
+[![DDIA 6 · REPLICATION sketchnote](ddia-06.svg)](ddia-06.svg)
 
-[Read the full page](../ddia/07-sharding.md) · [Open full size](ddia-06.svg)
+[Read the full page](../ddia/06-replication.md) · [Open full size](ddia-06.svg)
 
-### DDIA 7 · TRANSACTIONS
+### DDIA 7 · SHARDING
 
-[![DDIA 7 · TRANSACTIONS sketchnote](ddia-07.svg)](ddia-07.svg)
+[![DDIA 7 · SHARDING sketchnote](ddia-07.svg)](ddia-07.svg)
 
-[Read the full page](../ddia/08-transactions.md) · [Open full size](ddia-07.svg)
+[Read the full page](../ddia/07-sharding.md) · [Open full size](ddia-07.svg)
 
-### DDIA 8 · THE TROUBLE WITH DISTRIBUTED SYSTEMS
+### DDIA 8 · TRANSACTIONS
 
-[![DDIA 8 · THE TROUBLE WITH DISTRIBUTED SYSTEMS sketchnote](ddia-08.svg)](ddia-08.svg)
+[![DDIA 8 · TRANSACTIONS sketchnote](ddia-08.svg)](ddia-08.svg)
 
-[Read the full page](../ddia/09-trouble-with-distributed-systems.md) · [Open full size](ddia-08.svg)
+[Read the full page](../ddia/08-transactions.md) · [Open full size](ddia-08.svg)
 
-### DDIA 9 · CONSISTENCY & CONSENSUS
+### DDIA 9 · THE TROUBLE WITH DISTRIBUTED SYSTEMS
 
-[![DDIA 9 · CONSISTENCY & CONSENSUS sketchnote](ddia-09.svg)](ddia-09.svg)
+[![DDIA 9 · THE TROUBLE WITH DISTRIBUTED SYSTEMS sketchnote](ddia-09.svg)](ddia-09.svg)
 
-[Read the full page](../ddia/10-consistency-and-consensus.md) · [Open full size](ddia-09.svg)
+[Read the full page](../ddia/09-trouble-with-distributed-systems.md) · [Open full size](ddia-09.svg)
 
-### DDIA 10 · BATCH PROCESSING
+### DDIA 10 · CONSISTENCY & CONSENSUS
 
-[![DDIA 10 · BATCH PROCESSING sketchnote](ddia-10.svg)](ddia-10.svg)
+[![DDIA 10 · CONSISTENCY & CONSENSUS sketchnote](ddia-10.svg)](ddia-10.svg)
 
-[Read the full page](../ddia/11-batch-processing.md) · [Open full size](ddia-10.svg)
+[Read the full page](../ddia/10-consistency-and-consensus.md) · [Open full size](ddia-10.svg)
 
-### DDIA 11 · STREAM PROCESSING
+### DDIA 11 · BATCH PROCESSING
 
-[![DDIA 11 · STREAM PROCESSING sketchnote](ddia-11.svg)](ddia-11.svg)
+[![DDIA 11 · BATCH PROCESSING sketchnote](ddia-11.svg)](ddia-11.svg)
 
-[Read the full page](../ddia/12-stream-processing.md) · [Open full size](ddia-11.svg)
+[Read the full page](../ddia/11-batch-processing.md) · [Open full size](ddia-11.svg)
 
-### DDIA 12 · THE FUTURE OF DATA SYSTEMS
+### DDIA 12 · STREAM PROCESSING
 
-[![DDIA 12 · THE FUTURE OF DATA SYSTEMS sketchnote](ddia-12.svg)](ddia-12.svg)
+[![DDIA 12 · STREAM PROCESSING sketchnote](ddia-12.svg)](ddia-12.svg)
 
-[Read the full page](../ddia/13-philosophy-of-streaming-systems.md) · [Open full size](ddia-12.svg)
+[Read the full page](../ddia/12-stream-processing.md) · [Open full size](ddia-12.svg)
 
+### DDIA 13 · A PHILOSOPHY OF STREAMING SYSTEMS
+
+[![DDIA 13 · A PHILOSOPHY OF STREAMING SYSTEMS sketchnote](ddia-13.svg)](ddia-13.svg)
+
+[Read the full page](../ddia/13-philosophy-of-streaming-systems.md) · [Open full size](ddia-13.svg)
+
+### DDIA 14 · DOING THE RIGHT THING
+
+[![DDIA 14 · DOING THE RIGHT THING sketchnote](ddia-14.svg)](ddia-14.svg)
+
+[Read the full page](../ddia/14-doing-the-right-thing.md) · [Open full size](ddia-14.svg)

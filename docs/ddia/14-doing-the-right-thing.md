@@ -10,6 +10,9 @@ tags: [ddia]
 
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
+> [!TIP]
+> **One-page sketchnote:** [DDIA 14 · DOING THE RIGHT THING on a single page](../sketchnotes/ddia-14.svg), for revision or printing.
+
 ## TL;DR
 
 Every system is built for a purpose, and every design decision has consequences, intended or not. Many datasets are **about people**, so the engineers who build data systems share responsibility for what those systems do to people. The chapter looks at two areas: **using data to make decisions about people** (predictive analytics, bias, accountability, feedback loops) and **collecting data about people** (tracking, surveillance, consent, privacy). It ends with what we can do: collect less, keep it shorter, and treat users as people rather than metrics.
@@ -182,6 +185,7 @@ Collect only what has a purpose (minimisation); enforce retention periods and pu
 
 - [Chapter 1: Data systems, law and society](01-trade-offs-in-data-systems-architecture.md#data-systems-law-and-society)
 - [Storing passwords](../101/storing-passwords.md) · [Observability](../101/observability.md) (what not to log)
+- [Encryption and secrets](../core-concepts/encryption-and-secrets.md) (crypto-shredding, KMS) · [Authorization](../core-concepts/authorization.md)
 
 ---
 

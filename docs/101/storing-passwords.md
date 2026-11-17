@@ -56,3 +56,4 @@ Read the user's salt and parameters, hash the typed password the same way, and c
 - [Sessions vs tokens](sessions-vs-tokens.md)
 - [Single sign-on](sso.md)
 - [Rate limiter](../problems/rate-limiter.md)
+- [Encryption and secrets](../core-concepts/encryption-and-secrets.md)

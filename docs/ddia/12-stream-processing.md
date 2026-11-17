@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [Stream processing on one page](../sketchnotes/ddia-11.svg) (drawn for the 1st edition, where this was Chapter 11).
+> **One-page sketchnote:** [DDIA 12 · STREAM PROCESSING on a single page](../sketchnotes/ddia-12.svg), for revision or printing.
 
 ## TL;DR
 
@@ -234,6 +234,7 @@ The sink is idempotent (upsert by key, or offsets stored with the output) or tra
 
 - [Queue vs stream](../101/queue-vs-stream.md) · [Outbox](../101/outbox.md) · [Delivery guarantees](../101/delivery-guarantees.md) · [Dead-letter queues](../101/dead-letter-queues.md)
 - [Ad click aggregator](../problems/ad-click-aggregator.md) · [Top-K videos](../problems/top-k-videos.md) · [Real-time updates](../patterns/real-time-updates.md)
+- [Distributed message queue (Kafka)](../problems/message-queue.md) (designing the broker itself)
 
 ---
 

@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [The future of data systems on one page](../sketchnotes/ddia-12.svg) (drawn for the 1st edition, where this was Chapter 12).
+> **One-page sketchnote:** [DDIA 13 · A PHILOSOPHY OF STREAMING SYSTEMS on a single page](../sketchnotes/ddia-13.svg), for revision or printing.
 
 ## TL;DR
 
@@ -111,6 +111,8 @@ Most systems can relax timeliness, which is what makes eventual consistency, cac
 
 > [!NOTE]
 > **Trust, but verify:** run regular **reconciliation and audit** jobs that recompute derived data from the source and compare: do ledger entries sum to zero, do inventory counts match? Bugs, bad deploys and disk corruption happen in real systems, so plan to **detect** them.
+>
+> **Cryptographic auditing** goes further. The book points to tools borrowed from blockchains without their overhead: **Merkle trees** (trees of hashes that prove a record belongs to a dataset with a few hashes) and append-only, hash-verified logs. **Certificate Transparency** uses exactly this to make the issuing of every TLS certificate publicly auditable, with a single leader per log instead of a consensus protocol. See [Merkle trees](../core-concepts/merkle-trees.md).
 
 ## In the system design interview
 

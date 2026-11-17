@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [Transactions on one page](../sketchnotes/ddia-07.svg) (drawn for the 1st edition, where this was Chapter 7).
+> **One-page sketchnote:** [DDIA 8 · TRANSACTIONS on a single page](../sketchnotes/ddia-08.svg), for revision or printing.
 
 ## TL;DR
 

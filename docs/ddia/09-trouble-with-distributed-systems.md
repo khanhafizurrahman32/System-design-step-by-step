@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [The trouble with distributed systems on one page](../sketchnotes/ddia-08.svg) (drawn for the 1st edition, where this was Chapter 8).
+> **One-page sketchnote:** [DDIA 9 · THE TROUBLE WITH DISTRIBUTED SYSTEMS on a single page](../sketchnotes/ddia-09.svg), for revision or printing.
 
 ## TL;DR
 
@@ -242,6 +242,7 @@ Every source of non-determinism (network, clock, disk, scheduling) is driven by 
 
 - [Timeouts and retries](../101/timeouts-and-retries.md) · [Delivery guarantees](../101/delivery-guarantees.md)
 - [Job scheduler](../problems/job-scheduler.md) (leases and fencing) · [Payment system](../problems/payment-system.md) (idempotency keys)
+- [Gossip and failure detection](../core-concepts/gossip-and-failure-detection.md)
 
 ---
 

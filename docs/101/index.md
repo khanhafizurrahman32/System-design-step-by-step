@@ -22,6 +22,8 @@ Read them before [Core concepts](../core-concepts/index.md), or dip in whenever 
 | [Webhooks vs polling](webhooks-vs-polling.md) | Asking again and again versus being called when something happens, and how to receive webhooks safely. |
 | [API gateway](api-gateway.md) | One front door for your services: what belongs in it and what doesn't. |
 
+Going deeper: [Monolith vs microservices](../core-concepts/monolith-vs-microservices.md)
+
 ## Security & auth
 
 | Topic | In one line |
@@ -33,6 +35,8 @@ Read them before [Core concepts](../core-concepts/index.md), or dip in whenever 
 | [OAuth 2.0](oauth.md) | How an app gets permission to act for a user at another service, without seeing their password. |
 | [Single sign-on (SSO)](sso.md) | Log in once at an identity provider and get into every app that trusts it. |
 
+Going deeper: [Authorization (RBAC, ABAC, ReBAC)](../core-concepts/authorization.md) · [Encryption and secrets](../core-concepts/encryption-and-secrets.md)
+
 ## Reliability
 
 | Topic | In one line |
@@ -43,6 +47,8 @@ Read them before [Core concepts](../core-concepts/index.md), or dip in whenever 
 | [Metrics, logs and traces](observability.md) | The three signals that tell you something is wrong, where, and why, and how to alert on them. |
 | [Deploying safely](safe-deploys.md) | Canary, blue-green and feature flags: how to ship often without breaking production. |
 
+Going deeper: [Load balancing](../core-concepts/load-balancing.md) · [Disaster recovery and multi-region](../core-concepts/disaster-recovery.md) · [Gossip and failure detection](../core-concepts/gossip-and-failure-detection.md)
+
 ## Databases & storage
 
 | Topic | In one line |
@@ -51,6 +57,8 @@ Read them before [Core concepts](../core-concepts/index.md), or dip in whenever 
 | [ACID and isolation levels](acid-and-isolation.md) | What a transaction promises, and which concurrency bugs each isolation level still allows. |
 | [Database replication](replication.md) | Leaders, followers and replication lag: how copies of data give you read scale and failover. |
 | [Block, file and object storage](storage-types.md) | Three ways to store bytes, and why images and videos almost always go to object storage. |
+
+Going deeper: [B-trees and B+ trees](../core-concepts/b-trees.md) · [Merkle trees](../core-concepts/merkle-trees.md) · [Probabilistic data structures](../core-concepts/probabilistic-data-structures.md)
 
 ## Messaging
 

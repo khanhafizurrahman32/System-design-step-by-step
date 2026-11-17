@@ -171,3 +171,4 @@ Each checks for the other's swipe before either is saved. Store both directions 
 - **Patterns:** [Scaling reads](../patterns/scaling-reads.md)
 - **DDIA:** [Ch 8](../ddia/08-transactions.md) write skew · [Ch 4](../ddia/04-storage-and-retrieval.md) Bloom filters, LSM
 - **Similar problems:** [URL shortener (Bitly)](url-shortener.md) · [Rate limiter](rate-limiter.md) · [Business discovery (Yelp)](business-discovery.md) · [News feed (Facebook)](news-feed.md)
+- **Concept:** [Probabilistic data structures](../core-concepts/probabilistic-data-structures.md) (Bloom filters)

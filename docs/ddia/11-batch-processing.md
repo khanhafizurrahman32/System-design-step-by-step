@@ -11,7 +11,7 @@ tags: [ddia]
 > These DDIA pages are study notes in our own words and diagrams, following the **2nd edition** of *Designing Data-Intensive Applications* by Martin Kleppmann and Chris Riccomini. They connect the book to interview problems and don't replace it; the book is worth reading in full.
 
 > [!TIP]
-> **Revision sketchnote:** [Batch processing on one page](../sketchnotes/ddia-10.svg) (drawn for the 1st edition, where this was Chapter 10).
+> **One-page sketchnote:** [DDIA 11 · BATCH PROCESSING on a single page](../sketchnotes/ddia-11.svg), for revision or printing.
 
 ## TL;DR
 

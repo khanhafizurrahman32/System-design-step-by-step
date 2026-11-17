@@ -175,3 +175,4 @@ Respect robots.txt and per-domain rate limits, usually with a per-domain queue a
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
 - **DDIA:** [Ch 11](../ddia/11-batch-processing.md) batch pipelines · [Ch 4](../ddia/04-storage-and-retrieval.md) Bloom filters · [Ch 12](../ddia/12-stream-processing.md) queues
 - **Similar problems:** [Top-K videos (YouTube)](top-k-videos.md) · [Ad click aggregator](ad-click-aggregator.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md) · [Fitness tracking (Strava)](fitness-tracking.md)
+- **Concept:** [Probabilistic data structures](../core-concepts/probabilistic-data-structures.md) (Bloom filters for seen URLs)

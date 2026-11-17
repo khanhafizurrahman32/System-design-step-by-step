@@ -157,3 +157,25 @@
 *[shared-nothing]: An architecture where each node has its own CPU, memory and disk and nodes coordinate only over the network.
 *[system of record]: The authoritative source of a piece of data; other copies are derived from it.
 *[gray failure]: A component that is slow or partly broken rather than clearly dead, so failure detection doesn't trigger.
+*[B+ tree]: The B-tree variant databases actually use: internal pages hold only keys, all values sit in leaves linked in order, which makes range scans cheap.
+*[Merkle tree]: A tree of hashes: each parent hashes its children, so comparing roots and descending only into differing branches finds changed data, and a few sibling hashes prove a record belongs.
+*[Merkle trees]: A tree of hashes: each parent hashes its children, so comparing roots and descending only into differing branches finds changed data, and a few sibling hashes prove a record belongs.
+*[anti-entropy]: A background process that compares replicas (often with Merkle trees) and repairs data that drifted apart.
+*[L4 load balancer]: Spreads TCP/UDP connections by IP address and port without reading the request; very fast.
+*[L7 load balancer]: Terminates TLS and routes individual HTTP requests by path, host or header; can retry and rate-limit.
+*[Service mesh]: A sidecar proxy beside every service instance that handles discovery, load balancing, retries, mTLS and metrics.
+*[Count-min sketch]: A small grid of counters that estimates how often items appear; never undercounts.
+*[HyperLogLog]: Estimates the number of distinct items in about 12 KB with ~1% error; sketches can be merged.
+*[Gossip protocol]: Nodes periodically exchange state with random peers, so information reaches all N nodes in about log N rounds.
+*[Phi accrual detector]: A failure detector that outputs a suspicion level based on the history of heartbeat timings instead of a fixed timeout.
+*[SWIM]: A membership protocol: probe one random node per interval, use indirect probes before suspecting it, and spread news by gossip.
+*[Hinted handoff]: A neighbour accepts writes for an unreachable replica and hands them over when it returns.
+*[Sloppy quorum]: Counting writes to stand-in nodes towards the quorum when the key's own replicas are down.
+*[ISR]: In-sync replicas: the followers of a Kafka partition that are caught up with the leader.
+*[RPO]: Recovery point objective: how much data (time of writes) you can afford to lose in a disaster.
+*[RTO]: Recovery time objective: how long you can afford to be down after a disaster.
+*[KMS]: Key management service: holds master keys in hardware and performs encryption operations with access control and audit.
+*[Envelope encryption]: Encrypting data with a data key and storing that key encrypted under a KMS master key.
+*[RBAC]: Role-based access control: permissions are grouped into roles assigned to users.
+*[ABAC]: Attribute-based access control: a policy decides using attributes of the user, resource and context.
+*[ReBAC]: Relationship-based access control: permissions follow a graph of relationships (Google Zanzibar).

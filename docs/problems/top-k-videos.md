@@ -173,3 +173,4 @@ Pre-aggregate before Kafka (count locally for a second, then send one update) so
 - **Patterns:** [Scaling writes](../patterns/scaling-writes.md)
 - **DDIA:** [Ch 12](../ddia/12-stream-processing.md) windows, partitioned streams · [Ch 7](../ddia/07-sharding.md) partition by key
 - **Similar problems:** [Ad click aggregator](ad-click-aggregator.md) · [Web crawler](web-crawler.md) · [Metrics monitoring (Datadog)](metrics-monitoring.md) · [Fitness tracking (Strava)](fitness-tracking.md)
+- **Concept:** [Probabilistic data structures](../core-concepts/probabilistic-data-structures.md) (Count-min sketch, HyperLogLog)
